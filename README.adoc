@@ -1,0 +1,7 @@
+# Newton
+
+Newton is a Polyglot Distributed DDD Framework designed for building complex event based Microservice applications using CQRS principles, Event Sourcing and Stream Processing. 
+
+It provides Event Sourced Aggregates, Stream Processed Views and Distributed Sagas. It enables you to build highly complex transactional systems that are naturally distributed, event oriented and give event based transactional semantics.
+
+
