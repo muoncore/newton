@@ -48,6 +48,10 @@ public class MuonEventSourceConfiguration {
 	}
 
 	@Bean
+  @ConditionalOnMissingBean(EventStreamProcessor.class)
+	public EventStreamProcessor eventStreamProcessor() { return new NoOpEventStreamProcessor(); }
+
+	@Bean
 	public EventClient eventClient(Muon muon) {
 		return new DefaultEventClient(muon);
 	}
