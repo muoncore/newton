@@ -29,13 +29,16 @@ public class MuonEventSourceConfiguration {
 	@Value("${spring.application.name}")
 	private String applicationName;
 
+  @Value("${muon.amqp.url}")
+  private String amqpUrl;
+
 	@Bean
 	@Profile("!test")
 	public Muon muon(Codecs codecs) {
 		AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier(applicationName)
 			.addWriter(autoConfiguration -> {
-				autoConfiguration.getProperties().put("amqp.transport.url", "amqp://localhost");
-				autoConfiguration.getProperties().put("amqp.discovery.url", "amqp://localhost");
+				autoConfiguration.getProperties().put("amqp.transport.url", amqpUrl);
+				autoConfiguration.getProperties().put("amqp.discovery.url", amqpUrl);
 			}).build();
 
 		return MuonBuilder.withConfig(config).withCodecs(codecs).build();

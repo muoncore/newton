@@ -6,13 +6,24 @@ buildscript {
   }
   dependencies {
     classpath "io.franzbecker:gradle-lombok:1.8"
+    classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '3.2.0')
   }
 }
+
+
+project.version = currentVersion.toString()
+
 
 subprojects {
 
   apply plugin:'io.franzbecker.gradle-lombok'
   apply plugin:'groovy'
+  apply plugin: 'maven'
+  apply plugin: 'maven-publish'
+  apply plugin: "com.jfrog.artifactory"
+
+  group = "io.muoncore.newton"
+  version = currentVersion.toString()
 
   repositories {
     jcenter()
@@ -42,4 +53,53 @@ subprojects {
     testCompile 'org.mockito:mockito-all:1.10.19'
     testCompile "io.muoncore:test-event-store:0.0.2"
   }
+
+  //release pieces
+  publishing {
+    publications {
+      mavenJava(MavenPublication) {
+        from components.java
+      }
+    }
+  }
+  artifactory {
+    contextUrl = 'https://simplicityitself.artifactoryonline.com/simplicityitself/'   //The base Artifactory URL if not overridden by the publisher/resolver
+    publish {
+      repository {
+        repoKey = 'muon'   //The Artifactory repository key to publish to
+        username = 'sergio'          //The publisher user name
+        password = 'cistechfutures'       //The publisher password
+      }
+      defaults {
+        publications ('mavenJava')
+        publishArtifacts = true
+        publishPom = true
+      }
+    }
+    resolve {
+      repository {
+        repoKey = 'repo'  //The Artifactory (preferably virtual) repository key to resolve from
+      }
+    }
+    configurations {
+      published
+    }
+
+    task sourceJar(type: Jar) {
+      from sourceSets.main.allSource
+      classifier = 'sources'
+    }
+    task javadocJar(type: Jar, dependsOn: javadoc) {
+      classifier = 'javadoc'
+      from javadoc.destinationDir
+    }
+
+    // Add the sourceJars to non-extractor modules
+    artifacts {
+      published sourceJar
+      published javadocJar
+    }
+  }
 }
+
+
