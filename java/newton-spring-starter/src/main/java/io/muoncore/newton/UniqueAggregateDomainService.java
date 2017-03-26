@@ -1,6 +1,8 @@
 package io.muoncore.newton;
 
 
+import lombok.extern.slf4j.Slf4j;
+
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Collections;
@@ -9,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+@Slf4j
 public abstract class UniqueAggregateDomainService<V> {
 
 	private Map<NewtonIdentifier, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
@@ -23,6 +26,7 @@ public abstract class UniqueAggregateDomainService<V> {
 	}
 
 	private void handleEvent(NewtonEvent event) {
+	  log.debug("Accepting event for view " + getClass() + ": " + event);
 		eventAdaptor.accept(event);
 	}
 

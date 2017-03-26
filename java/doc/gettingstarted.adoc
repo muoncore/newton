@@ -1,0 +1,11 @@
+
+## Getting Started
+
+Initial setup. get a Muon system running, including Photon, the event store.
+
+set up a saga and stream index store. default is MongoDB
+
+see extending to implement a new store.
+
+Also, check out the Muon Java and Muon Spring docs to see how to create APIs between your Microservices for interactions
+that don't fit the event based model that Newton implements.

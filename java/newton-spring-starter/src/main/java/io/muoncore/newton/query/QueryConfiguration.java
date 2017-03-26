@@ -6,6 +6,7 @@ import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.query.mongo.MongoEventStreamIndexStore;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,16 +16,9 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @ConditionalOnClass(Muon.class)
 public class QueryConfiguration {
 
-	@Value("${spring.application.name}")
-	private String applicationName;
-
-	@Bean
-	public LegacyViewEventStreamSubscription eventStreamSubscription(StreamSubscriptionManager streamSubscriptionManager, ApplicationEventPublisher applicationEventPublisher, EventStreamIndexStore eventStreamIndexStore) {
-		return new LegacyViewEventStreamSubscription(streamSubscriptionManager, applicationEventPublisher, applicationName);
-	}
-
 	@Bean
 	@ConditionalOnClass(MongoTemplate.class)
+  @ConditionalOnMissingBean(EventStreamIndexStore.class)
 	public EventStreamIndexStore mongoEventStreamIndexStore(MongoTemplate mongoTemplate) {
 		return new MongoEventStreamIndexStore(mongoTemplate);
 	}

@@ -3,6 +3,7 @@ package io.muoncore.newton.saga.mongo;
 import com.mongodb.BulkWriteResult;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.UUIDIdentifier;
 import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.saga.SagaInterest;

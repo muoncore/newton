@@ -18,7 +18,7 @@ public class MuonLookupUtils {
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
 
 	static {
-		Reflections reflections = new Reflections("mu.cibecs", new SubTypesScanner());
+		Reflections reflections = new Reflections("mytown", new SubTypesScanner());
 		final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
 		eventTypeMappings = new HashMap<>();
 		for (Class<? extends NewtonEvent> cibecsEvent : eventTypes) {

@@ -48,7 +48,7 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, UUI
     }
 
     protected <E extends NewtonEvent> void notifyOn(Class<E> type, String key, String value) {
-        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), getId(), key, value));
+        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new UUIDIdentifier(), getId(), key, value));
     }
 
     protected void end() {

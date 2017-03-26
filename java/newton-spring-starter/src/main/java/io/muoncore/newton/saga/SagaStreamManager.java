@@ -96,7 +96,7 @@ public class SagaStreamManager {
                 if (!sagaInterestMatcher.matches(event, interest)) {
                     return;
                 }
-                Optional<? extends Saga> saga = sagaRepository.load(interest.getId(), sagaLoader.loadSagaClass(interest));
+                Optional<? extends Saga> saga = sagaRepository.load(interest.getSagaId(), sagaLoader.loadSagaClass(interest));
                 saga.ifPresent(saga1 -> {
                     saga1.handle(event);
                     sagaRepository.save(saga1);

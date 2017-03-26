@@ -77,7 +77,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 		eventClient.replay(
 			streamName,
 			EventReplayMode.REPLAY_THEN_LIVE,
-			Collections.singletonMap("from", lastSeen),
+			Collections.singletonMap("from", lastSeen + 1),
                 new EventSubscriber(event -> {
                     log.debug("NewtonEvent received " + event);
                     Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
