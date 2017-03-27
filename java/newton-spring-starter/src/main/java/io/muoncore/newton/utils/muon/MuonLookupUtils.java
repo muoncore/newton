@@ -5,20 +5,34 @@ import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.PostConstruct;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
 
 public class MuonLookupUtils {
 
 	private static Map<String, Class<? extends Saga>> sagaTypeMappings;
 	private static Map<String, Class<? extends NewtonEvent>> eventTypeMappings;
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
+	static CountDownLatch ready = new CountDownLatch(1);
 
 	static {
-		Reflections reflections = new Reflections("mytown", new SubTypesScanner());
+	  init();
+  }
+
+	private static void init() {
+
+    List<URL> urls = new ArrayList<>();
+    urls.addAll(ClasspathHelper.forPackage("io.muoncore.newton", ClassLoader.getSystemClassLoader()));
+    urls.addAll(ClasspathHelper.forPackage("mytown", ClassLoader.getSystemClassLoader()));
+
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+      .addScanners(new SubTypesScanner())
+      .setUrls(urls));
 		final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
 		eventTypeMappings = new HashMap<>();
 		for (Class<? extends NewtonEvent> cibecsEvent : eventTypes) {
@@ -36,6 +50,7 @@ public class MuonLookupUtils {
 		for (Class<? extends Saga> root : sagaTypes) {
 			sagaTypeMappings.put(root.getSimpleName(), root);
 		}
+		ready.countDown();
 	}
 
 	public static Class<? extends NewtonEvent> getDomainClass(io.muoncore.protocol.event.Event event) {
@@ -58,16 +73,11 @@ public class MuonLookupUtils {
 		return aggregateRootMappings.keySet();
 	}
 
-
 	private static void waitForMappingsToBeInitialized() {
-		try {
-			while (eventTypeMappings == null || aggregateRootMappings == null) {
-				Thread.sleep(500);
-			}
-		} catch (InterruptedException e) {
-			//DO NOTHING
-		}
+    try {
+      ready.await();
+    } catch (InterruptedException e) {
+      //NOTHING
+    }
 	}
-
-
 }

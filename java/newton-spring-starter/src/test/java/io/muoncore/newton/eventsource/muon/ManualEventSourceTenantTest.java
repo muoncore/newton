@@ -1,6 +1,6 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.query.QueryConfiguration;
 import io.muoncore.protocol.event.client.AggregateEventClient;
@@ -40,7 +40,7 @@ public class ManualEventSourceTenantTest {
 	@Test
 	public void testTenantAggregateRoot() throws InterruptedException {
 		IntStream.rangeClosed(0, 100).forEach(i -> {
-			eventSourceRepository.save(new TestAggregate(new UUIDIdentifier()));
+			eventSourceRepository.save(new TestAggregate(new DocumentId()));
 		});
 
 		Thread.sleep(5000);

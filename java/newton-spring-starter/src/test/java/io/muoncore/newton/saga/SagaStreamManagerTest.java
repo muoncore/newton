@@ -1,9 +1,9 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
 import org.junit.Before;
@@ -66,11 +66,11 @@ public class SagaStreamManagerTest {
 
         SagaWithEventHandler saga = mock(SagaWithEventHandler.class);
 
-        UUIDIdentifier sagaId = new UUIDIdentifier();
+        DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
                 SagaIntegrationTests.TestSaga.class.getName(),
-                SagaWithEventHandler.class.getName(), sagaId, "hello", "world")));
+                SagaWithEventHandler.class.getName(), sagaId, new DocumentId(), "hello", "world")));
 
         Class<? extends Saga> type = SagaWithEventHandler.class;
 
@@ -101,10 +101,10 @@ public class SagaStreamManagerTest {
         ArgumentCaptor<Consumer<NewtonEvent>> eventStreamCaptor =  (ArgumentCaptor)ArgumentCaptor.forClass(Consumer.class);
         manager.processSaga(SagaWithCommands.class);
 
-        NewtonIdentifier sagaId = new UUIDIdentifier();
+        DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, "hello", "world")));
+                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new DocumentId(), "hello", "world")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -131,10 +131,10 @@ public class SagaStreamManagerTest {
         ArgumentCaptor<Consumer<NewtonEvent>> eventStreamCaptor =  (ArgumentCaptor)ArgumentCaptor.forClass(Consumer.class);
         manager.processSaga(SagaWithCommands.class);
 
-        NewtonIdentifier sagaId = new UUIDIdentifier();
+        DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, "hello", "orld")));
+                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new DocumentId(), "hello", "orld")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -182,7 +182,7 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public NewtonIdentifier getId() {
+        public DocumentId getId() {
             return null;
         }
 
@@ -216,7 +216,7 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public NewtonIdentifier getId() {
+        public DocumentId getId() {
             return null;
         }
 

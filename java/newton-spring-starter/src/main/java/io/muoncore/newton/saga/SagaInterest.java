@@ -1,7 +1,6 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.NewtonIdentifier;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -9,11 +8,11 @@ import lombok.ToString;
 @Data
 @AllArgsConstructor
 @ToString
-public class SagaInterest<ID extends UUIDIdentifier> {
+public class SagaInterest {
     private String sagaClassName;
     private String className;
-    private ID id;
-    private ID sagaId;
+    private DocumentId id;
+    private DocumentId sagaId;
     private String key;
     private String value;
 }

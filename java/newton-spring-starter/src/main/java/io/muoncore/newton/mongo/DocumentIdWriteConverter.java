@@ -1,6 +1,6 @@
 package io.muoncore.newton.mongo;
 
-import mu.cibecs.common.identity.DocumentId;
+import io.muoncore.newton.DocumentId;
 import org.bson.types.ObjectId;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.data.convert.WritingConverter;

@@ -1,8 +1,8 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
-import io.muoncore.newton.NewtonIdentifier;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.protocol.event.Event;
@@ -45,7 +45,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test
 	public void load() throws Exception {
-		NewtonIdentifier id = new UUIDIdentifier();
+		DocumentId id = new DocumentId();
 		client.publishDomainEvents(id.toString(), Collections.singletonList(
 			new TestAggregateCreated()
 		));
@@ -57,7 +57,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test
 	public void save() throws Exception {
-    UUIDIdentifier id = new UUIDIdentifier();
+    DocumentId id = new DocumentId();
 		TestAggregate customer = new TestAggregate(id);
 		repository.save(customer);
 
@@ -69,17 +69,17 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void throwsExceptionOnNonExistingAggregate() {
-		repository.load(new UUIDIdentifier());
+		repository.load(new DocumentId());
 	}
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void withVersionThrowsExceptionOnNonExistingAggregate() {
-		repository.load(new UUIDIdentifier(), 5L);
+		repository.load(new DocumentId(), 5L);
 	}
 
 	@Test
 	public void canLoadWithVersion() {
-    UUIDIdentifier id = new UUIDIdentifier();
+    DocumentId id = new DocumentId();
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated(),
 			new TestAggregateCreated()
@@ -91,7 +91,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = OptimisticLockException.class)
 	public void throwsOptimisticLocExceptionOnBadVersion() {
-    UUIDIdentifier id = new UUIDIdentifier();
+    DocumentId id = new DocumentId();
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated()
 		));

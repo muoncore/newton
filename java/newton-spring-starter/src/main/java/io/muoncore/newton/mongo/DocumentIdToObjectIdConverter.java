@@ -1,6 +1,6 @@
 package io.muoncore.newton.mongo;
 
-import mu.cibecs.common.identity.DocumentId;
+import io.muoncore.newton.DocumentId;
 import org.bson.types.ObjectId;
 
 import java.util.Arrays;

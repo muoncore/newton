@@ -1,7 +1,7 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.AggregateEventClient;
@@ -30,7 +30,7 @@ public abstract class MuonEventSourceRepository<A extends AggregateRoot> impleme
 	}
 
 	@Override
-	public A load(NewtonIdentifier aggregateIdentifier) {
+	public A load(DocumentId aggregateIdentifier) {
 		try {
 			A aggregate = aggregateType.newInstance();
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
@@ -43,7 +43,7 @@ public abstract class MuonEventSourceRepository<A extends AggregateRoot> impleme
 	}
 
 	@Override
-	public A load(NewtonIdentifier aggregateIdentifier, Long version) {
+	public A load(DocumentId aggregateIdentifier, Long version) {
 		try {
 			A aggregate = (A) aggregateType.newInstance();
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
@@ -73,7 +73,7 @@ public abstract class MuonEventSourceRepository<A extends AggregateRoot> impleme
 		emitForStreamProcessing(aggregate);
 	}
 
-	private List<NewtonEvent> replayEvents(NewtonIdentifier id) {
+	private List<NewtonEvent> replayEvents(DocumentId id) {
 		try {
 			//load from event store and obtain the payloads in their concrete types.
 			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString())

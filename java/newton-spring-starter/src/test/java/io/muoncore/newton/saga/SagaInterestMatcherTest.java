@@ -1,7 +1,7 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.Test;
@@ -14,7 +14,7 @@ public class SagaInterestMatcherTest {
         SagaInterestMatcher matcher = new SagaInterestMatcher();
 
         assertTrue(matcher.matches(new TestEvent("hello world"), new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), TestEvent.class.getCanonicalName(), new UUIDIdentifier(), "myId", "hello world")));
+                SagaIntegrationTests.TestSaga.class.getName(), TestEvent.class.getCanonicalName(), new DocumentId(), new DocumentId(), "myId", "hello world")));
 
     }
 

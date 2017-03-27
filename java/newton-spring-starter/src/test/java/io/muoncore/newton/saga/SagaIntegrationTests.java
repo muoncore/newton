@@ -56,7 +56,7 @@ public class SagaIntegrationTests {
 
     @Test
     public void sagaCanBeLoadedLater() {
-        SagaMonitor<UUIDIdentifier, TestSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
+        SagaMonitor<DocumentId, TestSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
                 new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
         Optional<TestSaga> load = sagaRepository.load(sagaMonitor.getId(), TestSaga.class);
@@ -67,10 +67,10 @@ public class SagaIntegrationTests {
 
     @Test
     public void sagaCanBeMonitoredLater() {
-        SagaMonitor<UUIDIdentifier, TestSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
+        SagaMonitor<DocumentId, TestSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
                 new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
-        SagaMonitor<UUIDIdentifier, TestSaga, OrderRequestedEvent> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
+        SagaMonitor<DocumentId, TestSaga, OrderRequestedEvent> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
 
         assertNotNull(monitor);
 
@@ -79,7 +79,7 @@ public class SagaIntegrationTests {
     @Test
     public void multiStepSagaWorkflow() {
 
-        SagaMonitor<UUIDIdentifier, ComplexSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
+        SagaMonitor<DocumentId, ComplexSaga, OrderRequestedEvent> sagaMonitor = sagaBus.dispatch(
                 new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
         ComplexSaga saga = sagaMonitor.waitForCompletion(TimeUnit.MINUTES, 1);
@@ -102,7 +102,7 @@ public class SagaIntegrationTests {
     @SagaStreamConfig(streams = {"TestAggregate"})
     public class ComplexSaga extends StatefulSaga<OrderRequestedEvent> {
 
-        private UUIDIdentifier orderId;
+        private DocumentId orderId;
 
         @Override
         public void start(OrderRequestedEvent event) {
@@ -139,33 +139,33 @@ public class SagaIntegrationTests {
 
     @Getter
     public static class OrderRequestedEvent implements NewtonEvent {
-        private UUIDIdentifier id = new UUIDIdentifier();
+        private DocumentId id = new DocumentId();
     }
 
     @Getter
     @AllArgsConstructor
     @ToString
     public static class PaymentRecievedEvent implements NewtonEvent {
-        private UUIDIdentifier orderId;
+        private DocumentId orderId;
     }
 
     @Getter
     @AllArgsConstructor
     @ToString
     public static class OrderShippedEvent implements NewtonEvent {
-        private UUIDIdentifier orderId;
+        private DocumentId orderId;
     }
 
     @Scope("prototype")
     @Component
-    static class TakePayment implements IdentifiableCommand<UUIDIdentifier> {
+    static class TakePayment implements IdentifiableCommand<DocumentId> {
 
         @Autowired
         private EventClient eventClient;
-        private UUIDIdentifier orderId;
+        private DocumentId orderId;
 
         @Override
-        public void setId(UUIDIdentifier id) {
+        public void setId(DocumentId id) {
             this.orderId = id;
         }
 
@@ -188,14 +188,14 @@ public class SagaIntegrationTests {
     @Scope("prototype")
     @Component
     @Slf4j
-    static class ShipOrder implements IdentifiableCommand<UUIDIdentifier> {
+    static class ShipOrder implements IdentifiableCommand<DocumentId> {
 
         @Autowired
         private EventClient eventClient;
-        private UUIDIdentifier orderId;
+        private DocumentId orderId;
 
         @Override
-        public void setId(UUIDIdentifier id) {
+        public void setId(DocumentId id) {
             this.orderId = id;
         }
 

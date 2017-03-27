@@ -1,14 +1,12 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.NewtonIdentifier;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.junit.Assert;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -47,7 +45,7 @@ public class CommandFactoryTest {
 	@Test
 	public void createFromCommandDefinition() throws Exception {
 		final TestRequest payload = new TestRequest("AAA");
-		final UUIDIdentifier id = new UUIDIdentifier();
+		final DocumentId id = new DocumentId();
 		final Class<TestPayloadCommand> type = TestPayloadCommand.class;
 		Command cmd = commandFactory.create(type, payload, id, "tenantId");
 		Assert.assertNotNull(cmd);
@@ -95,20 +93,20 @@ public class CommandFactoryTest {
 
 	public static class TestCommand implements Command {
 
-		protected UUIDIdentifier id;
+		protected DocumentId id;
 
 		@Override
 		public void execute() {
 		}
 
-		public void setId(UUIDIdentifier id) {
+		public void setId(DocumentId id) {
 			this.id = id;
 		}
 	}
 
 	public static class TestIdCommand implements Command {
 
-		protected UUIDIdentifier id;
+		protected DocumentId id;
 
 		@Override
 		public void execute() {
@@ -117,7 +115,7 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(UUIDIdentifier id) {
+		public void setId(DocumentId id) {
 			this.id = id;
 		}
 	}
@@ -126,7 +124,7 @@ public class CommandFactoryTest {
 	public static class TestPayloadCommand implements IdentifiableCommand {
 
     @Setter
-		protected NewtonIdentifier id;
+		protected DocumentId id;
 		@Setter
 		private String prop1;
 		@Setter
@@ -143,7 +141,7 @@ public class CommandFactoryTest {
 			System.out.println("RUNNING");
 		}
 
-		public void setId(NewtonIdentifier id) {
+		public void setId(DocumentId id) {
 			this.id = id;
 		}
 	}

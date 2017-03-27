@@ -1,6 +1,6 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.DocumentId;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,11 +22,11 @@ public class CommandFactory implements ApplicationContextAware {
 		return create(commandType, payload, null, null, tenantId);
 	}
 
-	public Command create(Class<? extends Command> commandType, Object payload, NewtonIdentifier id, String tenantId) {
+	public Command create(Class<? extends Command> commandType, Object payload, DocumentId id, String tenantId) {
 		return create(commandType, payload, id, null, tenantId);
 	}
 
-	public Command create(Class<? extends Command> commandType, Object payload, NewtonIdentifier id, Map<String, Object> additionalProperties, String tenantId) {
+	public Command create(Class<? extends Command> commandType, Object payload, DocumentId id, Map<String, Object> additionalProperties, String tenantId) {
 		Command command = loadFromSpringContext(commandType);
 		if (payload != null) {
 			command = decorateWithPayload(command, payload);
@@ -79,7 +79,7 @@ public class CommandFactory implements ApplicationContextAware {
 		return command;
 	}
 
-	private Command decorateWithId(Command command, NewtonIdentifier id) {
+	private Command decorateWithId(Command command, DocumentId id) {
 		if (command instanceof IdentifiableCommand) {
 			((IdentifiableCommand) command).setId(id);
 		}

@@ -47,7 +47,7 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
   @Override
   public CustomConversions customConversions() {
     return new CustomConversions(Arrays.asList(
-      new UUIDIdentifierReadConverter(),
+      new DocumentIdReadConverter(),
       new DocumentIdWriteConverter()
     ));
   }

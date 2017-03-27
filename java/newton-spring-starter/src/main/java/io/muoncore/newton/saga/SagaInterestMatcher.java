@@ -20,11 +20,8 @@ public class SagaInterestMatcher {
             if (method.getName().startsWith("get")) {
                 PropertyDescriptor ed = BeanUtils.findPropertyForMethod(method);
                 if (ed == null) {
-                  log.debug("No propertyDescriptor for {}", method.getName());
                   continue;
                 }
-                log.debug("Pre Matching {} against {}", ed, interests);
-                log.debug("Matching {} against {}", ed.getName(), interests.getKey());
                 if (ed.getName().equals(interests.getKey())) {
                     try {
                         Object ret = method.invoke(event);

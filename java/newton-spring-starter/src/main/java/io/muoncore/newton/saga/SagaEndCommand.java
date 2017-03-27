@@ -1,6 +1,6 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.DocumentId;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventResult;
@@ -17,7 +17,7 @@ import static io.muoncore.newton.saga.SagaStreamManager.SAGA_LIFECYCLE_STREAM;
 public class SagaEndCommand implements IdentifiableCommand {
 
     @Setter
-    private NewtonIdentifier id;
+    private DocumentId id;
     @Setter
     private CorrelationId correlationId;
 

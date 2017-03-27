@@ -2,8 +2,7 @@ package io.muoncore.newton.saga.mongo;
 
 import com.mongodb.BulkWriteResult;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.NewtonIdentifier;
-import io.muoncore.newton.UUIDIdentifier;
+import io.muoncore.newton.DocumentId;
 import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.saga.SagaInterest;
@@ -26,7 +25,7 @@ public class MongoSagaRepository implements SagaRepository {
 	}
 
   @Override
-  public <T extends Saga> Optional<T> load(NewtonIdentifier sagaIdentifier, Class<T> type) {
+  public <T extends Saga> Optional<T> load(DocumentId sagaIdentifier, Class<T> type) {
 		return Optional.ofNullable(
 				mongoTemplate.findById(sagaIdentifier, type, "sagas"));
 	}
@@ -44,7 +43,7 @@ public class MongoSagaRepository implements SagaRepository {
 		Query ops = new Query();
 
 		ops.addCriteria(
-				Criteria.where("id").is(saga.getId())
+				Criteria.where("sagaId").is(saga.getId().getValue())
 		);
 
 		BulkWriteResult execute = mongoTemplate.bulkOps(BulkOperations.BulkMode.ORDERED, SagaInterest.class).remove(ops).execute();

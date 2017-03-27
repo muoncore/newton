@@ -6,8 +6,11 @@ import org.springframework.util.StringUtils;
 
 
 public final class DocumentId<D> {
-  @Getter
   private ObjectId value;
+
+  public DocumentId() {
+    value = new ObjectId();
+  }
 
   private DocumentId(String value) {
     if(!StringUtils.isEmpty(value)) {

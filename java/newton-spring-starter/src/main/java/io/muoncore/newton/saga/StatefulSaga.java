@@ -11,9 +11,9 @@ import java.util.List;
 /**
  * A Saga that maintains its state in a mutable store.
  */
-public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, UUIDIdentifier> {
+public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, DocumentId> {
 
-    protected UUIDIdentifier id = new UUIDIdentifier();
+    protected DocumentId id = new DocumentId();
     @Getter
     private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);
     private long version;
@@ -39,16 +39,16 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, UUI
         return version;
     }
 
-    public UUIDIdentifier getId() {
+    public DocumentId getId() {
         return id;
     }
 
-    public void setId(UUIDIdentifier id) {
+    public void setId(DocumentId id) {
         this.id = id;
     }
 
     protected <E extends NewtonEvent> void notifyOn(Class<E> type, String key, String value) {
-        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new UUIDIdentifier(), getId(), key, value));
+        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new DocumentId(), getId(), key, value));
     }
 
     protected void end() {

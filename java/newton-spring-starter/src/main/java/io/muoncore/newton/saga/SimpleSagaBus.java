@@ -1,7 +1,7 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.NewtonIdentifier;
+import io.muoncore.newton.DocumentId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class SimpleSagaBus implements SagaBus {
@@ -14,7 +14,7 @@ public class SimpleSagaBus implements SagaBus {
 	}
 
   @Override
-  public <T extends Saga<P, ID>, P extends NewtonEvent, ID extends NewtonIdentifier> SagaMonitor<ID, T, P> dispatch(SagaIntent<ID, T, P> commandIntent) {
+  public <T extends Saga<P, ID>, P extends NewtonEvent, ID extends DocumentId> SagaMonitor<ID, T, P> dispatch(SagaIntent<ID, T, P> commandIntent) {
 		return sagaFactory.create(commandIntent.getType(), commandIntent.getPayload());
 	}
 }
