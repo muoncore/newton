@@ -70,7 +70,7 @@ public class SagaStreamManagerTest {
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
                 SagaIntegrationTests.TestSaga.class.getName(),
-                SagaWithEventHandler.class.getName(), sagaId, new DocumentId(), "hello", "world")));
+                SagaWithEventHandler.class.getName(), new DocumentId(), sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithEventHandler.class;
 
@@ -104,7 +104,7 @@ public class SagaStreamManagerTest {
         DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new DocumentId(), "hello", "world")));
+                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), new DocumentId(), sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 

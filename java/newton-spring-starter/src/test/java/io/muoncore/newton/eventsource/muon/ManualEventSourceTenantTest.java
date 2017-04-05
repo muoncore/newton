@@ -2,9 +2,11 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.EventSourceRepository;
+import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.QueryConfiguration;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.EventClient;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -26,8 +29,9 @@ import static org.junit.Assert.assertNotNull;
 @ActiveProfiles({"default"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-	ManualEventSourceTenantTest.TestConfiguration.class, MuonEventSourceConfiguration.class, QueryConfiguration.class
+	ManualEventSourceTenantTest.TestConfiguration.class, MuonEventSourceConfiguration.class, QueryConfiguration.class, MongoConfiguration.class
 })
+@Ignore
 public class ManualEventSourceTenantTest {
 
     @Autowired
