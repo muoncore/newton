@@ -5,6 +5,7 @@ import io.muoncore.newton.command.CommandConfiguration;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.command.IdentifiableCommand;
 import io.muoncore.newton.eventsource.muon.TestAggregate;
+import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.QueryConfiguration;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.EventClient;
@@ -32,7 +33,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 @ActiveProfiles({"test", "log-events"})
-@ContextConfiguration(classes = {QueryConfiguration.class, CommandConfiguration.class, MuonTestConfiguration.class, SagaIntegrationTests.class, SagaConfiguration.class})
+@ContextConfiguration(classes = {QueryConfiguration.class, CommandConfiguration.class, MuonTestConfiguration.class, SagaIntegrationTests.class, SagaConfiguration.class, MongoConfiguration.class})
 @RunWith(SpringRunner.class)
 @Configuration
 @SpringBootTest

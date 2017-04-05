@@ -14,5 +14,5 @@ public class EventStreamIndex {
 
 	@Id
 	private String stream;
-	private Long lastSeen;
+	private long lastSeen;
 }

@@ -15,38 +15,39 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @Configuration
 public class SagaConfiguration {
 
-    @Bean
-    public SagaBus sagaBus(SagaFactory sagaFactory) {
-        return new SimpleSagaBus(sagaFactory);
-    }
+  @Bean
+  public SagaBus sagaBus(SagaFactory sagaFactory) {
+    return new SimpleSagaBus(sagaFactory);
+  }
 
-    @Bean
-	public SagaRepository repository(MongoTemplate template) {
-		return new MongoSagaRepository(template);
-	}
+  @Bean
+  public SagaRepository repository(MongoTemplate template) {
+    return new MongoSagaRepository(template);
+  }
 
-	@Bean
-	public SagaFactory sagaFactory(SagaRepository sagaRepository, CommandBus commandBus) {
-		return new SagaFactory(sagaRepository, commandBus);
-	}
+  @Bean
+  public SagaFactory sagaFactory(SagaRepository sagaRepository, CommandBus commandBus) {
+    return new SagaFactory(sagaRepository, commandBus);
+  }
 
-	@Bean
-	public SagaStreamManager sagaStreamManager(StreamSubscriptionManager streamSubscriptionManager, SagaRepository sagaRepository, CommandBus commandBus, SagaInterestMatcher sagaInterestMatcher, SagaFactory sagaFactory, SagaLoader sagaLoader) {
-		return new SagaStreamManager(streamSubscriptionManager, sagaRepository, commandBus, sagaInterestMatcher, sagaFactory, sagaLoader);
-	}
+  @Bean
+  public SagaStreamManager sagaStreamManager(StreamSubscriptionManager streamSubscriptionManager, SagaRepository sagaRepository, CommandBus commandBus, SagaInterestMatcher sagaInterestMatcher, SagaFactory sagaFactory, SagaLoader sagaLoader) {
+    return new SagaStreamManager(streamSubscriptionManager, sagaRepository, commandBus, sagaInterestMatcher, sagaFactory, sagaLoader);
+  }
 
-	@Bean
-	public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService) {
-		return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService);
-	}
-	@Bean
-	public SagaInterestMatcher sagaInterestMatcher() {
-		return new SagaInterestMatcher();
-	}
+  @Bean
+  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService) {
+    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService);
+  }
 
-	@Scope("prototype")
-	@Bean
-	public SagaEndCommand sagaEndCommand() {
-		return new SagaEndCommand();
-	}
+  @Bean
+  public SagaInterestMatcher sagaInterestMatcher() {
+    return new SagaInterestMatcher();
+  }
+
+  @Scope("prototype")
+  @Bean
+  public SagaEndCommand sagaEndCommand() {
+    return new SagaEndCommand();
+  }
 }

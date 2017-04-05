@@ -4,7 +4,6 @@ import io.muoncore.newton.DynamicInvokeEventAdaptor;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.OnViewEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.eventsource.TenantEvent;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -40,9 +39,9 @@ public abstract class SharedDatastoreViewService {
 
 	private void processStreams() {
 
-		ViewConfiguration[] s = getClass().getAnnotationsByType(ViewConfiguration.class);
+		NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
 
-		if (s.length == 0) throw new IllegalStateException("View does not have @ViewConfiguration: " + this);
+		if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
 
 		String[] streams = s[0].streams();
 

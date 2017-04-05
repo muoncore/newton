@@ -74,7 +74,10 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
     log.debug("Subscribing to event stream '{}'...", streamName);
 
-    Long lastSeen = eventStreamIndexStore.findOneById(subscriptionName).orElse(new EventStreamIndex(streamName, 0l)).getLastSeen();
+    EventStreamIndex eventStreamIndex = eventStreamIndexStore.findOneById(subscriptionName)
+      .orElse(new EventStreamIndex(streamName, 0L));
+
+    Long lastSeen = eventStreamIndex.getLastSeen();
 
     eventClient.replay(
       streamName,
@@ -83,6 +86,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       new EventSubscriber(event -> {
         log.debug("NewtonEvent received " + event);
         Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
+        log.info("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getEventTime());
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getEventTime()));
         onData.accept(event.getPayload(eventType));
       }, onError));

@@ -35,9 +35,9 @@ public abstract class RebuildingDatastoreViewService {
 
 	private void processStreams() {
 
-		ViewConfiguration[] s = getClass().getAnnotationsByType(ViewConfiguration.class);
+		NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
 
-		if (s.length == 0) throw new IllegalStateException("View does not have @ViewConfiguration: " + this);
+		if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
 
 		String[] streams = s[0].streams();
 
