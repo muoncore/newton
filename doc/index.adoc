@@ -12,6 +12,8 @@ ifdef::env-doc[]
 :includedir: submodules/newton/doc
 endif::[]
 
+include::{includedir}/version.adoc[leveloffset=+1]
+
 TIP: This document is maintained at https://github.com/muoncore/newton.
 Please submit issues at that repository.
 
