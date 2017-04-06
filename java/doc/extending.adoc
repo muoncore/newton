@@ -1,5 +1,0 @@
-
-## Extending Newton
-
-uses photon
-

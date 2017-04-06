@@ -1,4 +1,7 @@
 
 ## Event Sourced Aggregate Roots - Transactional Code
 
-Hello World!
+In the DDD world, Aggregate Roots are the transactional consistency limit.
+
+
+

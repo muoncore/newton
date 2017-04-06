@@ -1,4 +1,69 @@
 
-## Getting Started
+## Creating views of data
 
-Hello World!
+Building views of event data is a core part of building a CQRS system. This can be done in a variety of ways,
+but ultimately, it is a form of stream processing. You take each event and maintain some data structure
+ in light of the new item of data. This is known as a *_reducer_* algorithm.
+
+Newton provides a simple method to build reducers in the form of annotation driven spring service classes
+that respond to the events on the streams you are interested in.
+
+The data structure that you build needs to be stored somewhere (even if that is simply in memory!). These
+different locations to store the view require different types of controlling of the consistency to maintain them
+properly.
+
+Newton provides three classes you can use to quickly build views that keep data in different places.
+
+### SharedDataStoreView
+
+The most common view is *SharedDataStoreView*. This view type assumes that a variety of nodes in your system
+are all looking at the same shared data store. This view type controls updates so that the same event, although potentially
+distributed to every member in the group will only be applied to the shared data store once.
+
+[source,java]
+----
+import io.muoncore.newton.OnViewEvent
+import io.muoncore.newton.StreamSubscriptionManager
+import io.muoncore.newton.eventsource.muon.EventStreamProcessor
+import io.muoncore.newton.query.NewtonView
+import io.muoncore.newton.query.SharedDatastoreView
+import org.springframework.stereotype.Service
+
+@Service
+@NewtonView(streams = ["user/Invite"])              // <1>
+class InviteView extends SharedDatastoreView {      // <2>
+
+
+    InviteView(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
+        super(streamSubscriptionManager, eventStreamProcessor)
+    }
+
+    @OnViewEvent                                  //<3>
+    def on(InviteCreated ev) {                    //<4>
+        //.... save to the data store
+    }
+
+    @OnViewEvent
+    def on(InviteConfirmed ev) {
+        //.... save to the data store
+    }
+}
+
+
+----
+<1> `@NewtonView` is used to define the event streams that this view is interested in.
+<1> `SharedDatastoreView` means that this view will only process events on one member in the group
+<1> `@OnViewEvent` is required and declares this to be an event handler.
+<1> For event handlers, the type of the argument is used to select the handler to use.
+
+### RebuildingDatastoreView
+
+Many views are find to keep in memory.
+
+### Writing a custom view
+
+
+### Causing a view to rebuild
+
+TODO
+

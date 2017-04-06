@@ -3,12 +3,18 @@
 
 what is a process manager. cross root, orchestrate systems. events in, commands out.
 
-
 ### Reacting to Events that have happened
 
 notifyON
 
+@OnDomainEvent
+void on(XX)
+
 ### Creating Commands to Mutate the System
 
 raiseCommand
+
+
+
+### Saga store
 

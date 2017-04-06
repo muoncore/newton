@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.function.Consumer;
 
 /**
  * Base class for views that mutate a shared data store.
@@ -23,7 +24,7 @@ import java.util.concurrent.Executors;
  * as the base view.
  */
 @Slf4j
-public abstract class SharedDatastoreViewService {
+public abstract class SharedDatastoreView extends BaseView {
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnViewEvent.class);
@@ -32,39 +33,14 @@ public abstract class SharedDatastoreViewService {
 	//avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
 	private Executor worker = Executors.newSingleThreadExecutor();
 
-	public SharedDatastoreViewService(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
-		this.streamSubscriptionManager = streamSubscriptionManager;
-		this.eventStreamProcessor = eventStreamProcessor;
-	}
+  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
+    super(streamSubscriptionManager, eventStreamProcessor);
+  }
 
-	private void processStreams() {
-
-		NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
-
-		if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
-
-		String[] streams = s[0].streams();
-
-		for(String stream: streams) {
-			if (!subscribedStreams.contains(stream)) {
-				subscribedStreams.add(stream);
-				streamSubscriptionManager.globallyUniqueSubscription(getClass().getSimpleName() + "-" + stream, stream, event -> {
-					worker.execute(() -> eventStreamProcessor.executeWithinEventContext(event, this::handleEvent));
-				});
-			}
-		}
-	}
-
-	private void handleEvent(NewtonEvent event) {
-	  eventStreamProcessor.executeWithinEventContext(event, newtonEvent -> {
-      if (!eventAdaptor.apply(event)) {
-        log.debug("View {} did not accept event {}, which discarded by the view", getClass().getName(), event);
-      }
-    });
-	}
-
-	@PostConstruct
-	public void initSubscription() throws InterruptedException {
-		processStreams();
-	}
+  @Override
+  protected Consumer<Consumer<NewtonEvent>> run(String stream) {
+    return consumer -> {
+      streamSubscriptionManager.globallyUniqueSubscription(getClass().getSimpleName() + "-" + stream, stream, consumer);
+    };
+  }
 }
