@@ -20,15 +20,14 @@ public class MuonLookupUtils {
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
 	static CountDownLatch ready = new CountDownLatch(1);
 
-	static {
-	  init();
-  }
 
-	private static void init() {
+	static void init(String[] packages) {
 
     List<URL> urls = new ArrayList<>();
     urls.addAll(ClasspathHelper.forPackage("io.muoncore.newton", ClassLoader.getSystemClassLoader()));
-    urls.addAll(ClasspathHelper.forPackage("mytown", ClassLoader.getSystemClassLoader()));
+    for (String aPackage : packages) {
+      urls.addAll(ClasspathHelper.forPackage(aPackage, ClassLoader.getSystemClassLoader()));
+    }
 
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
       .addScanners(new SubTypesScanner())
@@ -72,6 +71,11 @@ public class MuonLookupUtils {
 		waitForMappingsToBeInitialized();
 		return aggregateRootMappings.keySet();
 	}
+
+  public static Collection<Class<?extends AggregateRoot>> listAllAggregateRootClass() {
+    waitForMappingsToBeInitialized();
+    return aggregateRootMappings.values();
+  }
 
 	private static void waitForMappingsToBeInitialized() {
     try {

@@ -2,7 +2,6 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.newton.DocumentId;
-import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.protocol.event.Event;
@@ -11,7 +10,6 @@ import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.newton.MuonTestConfiguration;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;

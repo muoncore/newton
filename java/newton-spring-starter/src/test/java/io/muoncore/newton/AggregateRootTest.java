@@ -1,5 +1,6 @@
 package io.muoncore.newton;
 
+import io.muoncore.newton.eventsource.AggregateConfiguration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.hamcrest.Matchers;
@@ -38,6 +39,7 @@ public class AggregateRootTest {
 
 
 	@Data
+  @AggregateConfiguration(context = "user")
 	public class TestAggregateRoot extends AggregateRoot {
 
 		private String aString;

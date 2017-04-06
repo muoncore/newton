@@ -15,18 +15,18 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public abstract class MuonEventSourceRepository<A extends AggregateRoot> implements EventSourceRepository<A> {
+public class MuonEventSourceRepository<A extends AggregateRoot> implements EventSourceRepository<A> {
 
 	private Class<A> aggregateType;
 	private AggregateEventClient aggregateEventClient;
 	private EventClient eventClient;
-	private final String applicationName;
+	private final String boundedContextName;
 
-	public MuonEventSourceRepository(Class<A> type, AggregateEventClient aggregateEventClient, EventClient eventClient, String applicationName) {
+	public MuonEventSourceRepository(Class<A> type, AggregateEventClient aggregateEventClient, EventClient eventClient, String boundedContextName) {
 		aggregateType = type;
 		this.aggregateEventClient = aggregateEventClient;
 		this.eventClient = eventClient;
-		this.applicationName = applicationName;
+		this.boundedContextName = boundedContextName;
 	}
 
 	@Override
@@ -96,7 +96,7 @@ public abstract class MuonEventSourceRepository<A extends AggregateRoot> impleme
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
-		String streamName = applicationName + "/" + aggregate.getClass().getSimpleName();
+		String streamName = boundedContextName + "/" + aggregate.getClass().getSimpleName();
 		System.out.println("Emitting event on " + streamName);
 		aggregate.getNewOperations().forEach(
 			event -> eventClient.event(

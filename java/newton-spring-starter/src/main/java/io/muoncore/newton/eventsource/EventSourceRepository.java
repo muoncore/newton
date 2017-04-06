@@ -1,10 +1,11 @@
 package io.muoncore.newton.eventsource;
 
+import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.DocumentId;
 
 import java.util.concurrent.Callable;
 
-public interface EventSourceRepository<A> {
+public interface EventSourceRepository<A extends AggregateRoot> {
 
 	A load(DocumentId aggregateIdentifier) throws AggregateNotFoundException;
 

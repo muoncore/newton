@@ -18,7 +18,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class BaseView {
 
-  private StreamSubscriptionManager streamSubscriptionManager;
+  protected StreamSubscriptionManager streamSubscriptionManager;
   private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnViewEvent.class);
   private Set<String> subscribedStreams = new HashSet<>();
   private EventStreamProcessor eventStreamProcessor;
