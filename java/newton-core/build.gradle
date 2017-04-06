@@ -1,0 +1,9 @@
+
+
+dependencies {
+  compile "io.muoncore:muon-core:7.2.4"
+  compile "io.muoncore:muon-event:7.2.4"
+  compile 'org.reflections:reflections:0.9.11'
+
+  compile 'org.jgroups:jgroups:4.0.1.Final'
+}

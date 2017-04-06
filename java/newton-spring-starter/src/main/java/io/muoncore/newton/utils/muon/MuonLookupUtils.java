@@ -1,0 +1,83 @@
+package io.muoncore.newton.utils.muon;
+
+import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.saga.Saga;
+import io.muoncore.newton.AggregateRoot;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+import org.reflections.util.ClasspathHelper;
+import org.reflections.util.ConfigurationBuilder;
+
+import javax.annotation.PostConstruct;
+import java.net.URL;
+import java.util.*;
+import java.util.concurrent.CountDownLatch;
+
+public class MuonLookupUtils {
+
+	private static Map<String, Class<? extends Saga>> sagaTypeMappings;
+	private static Map<String, Class<? extends NewtonEvent>> eventTypeMappings;
+	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
+	static CountDownLatch ready = new CountDownLatch(1);
+
+	static {
+	  init();
+  }
+
+	private static void init() {
+
+    List<URL> urls = new ArrayList<>();
+    urls.addAll(ClasspathHelper.forPackage("io.muoncore.newton", ClassLoader.getSystemClassLoader()));
+    urls.addAll(ClasspathHelper.forPackage("mytown", ClassLoader.getSystemClassLoader()));
+
+		Reflections reflections = new Reflections(new ConfigurationBuilder()
+      .addScanners(new SubTypesScanner())
+      .setUrls(urls));
+		final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
+		eventTypeMappings = new HashMap<>();
+		for (Class<? extends NewtonEvent> cibecsEvent : eventTypes) {
+			eventTypeMappings.put(cibecsEvent.getSimpleName(), cibecsEvent);
+		}
+
+		final Set<Class<? extends AggregateRoot>> aggregateRootTypes = reflections.getSubTypesOf(AggregateRoot.class);
+		aggregateRootMappings = new HashMap<>();
+		for (Class<? extends AggregateRoot> root : aggregateRootTypes) {
+			aggregateRootMappings.put(root.getSimpleName(), root);
+		}
+
+		final Set<Class<? extends Saga>> sagaTypes = reflections.getSubTypesOf(Saga.class);
+		sagaTypeMappings = new HashMap<>();
+		for (Class<? extends Saga> root : sagaTypes) {
+			sagaTypeMappings.put(root.getSimpleName(), root);
+		}
+		ready.countDown();
+	}
+
+	public static Class<? extends NewtonEvent> getDomainClass(io.muoncore.protocol.event.Event event) {
+		waitForMappingsToBeInitialized();
+		return eventTypeMappings.get(event.getEventType());
+	}
+
+	public static Collection<Class<? extends Saga>> listAllSagas() {
+		waitForMappingsToBeInitialized();
+		return sagaTypeMappings.values();
+	}
+
+	public static Set<String> listAllEventTypes() {
+		waitForMappingsToBeInitialized();
+		return eventTypeMappings.keySet();
+	}
+
+	public static Set<String> listAllAggregateRoots() {
+		waitForMappingsToBeInitialized();
+		return aggregateRootMappings.keySet();
+	}
+
+	private static void waitForMappingsToBeInitialized() {
+    try {
+      ready.await();
+    } catch (InterruptedException e) {
+      //NOTHING
+    }
+	}
+}

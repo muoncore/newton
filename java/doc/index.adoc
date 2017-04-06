@@ -1,0 +1,40 @@
+---
+layout: documentation
+---
+:title: Newton - DDD for Microservices
+:source-highlighter: pygments
+:toc: right
+:toc-title: Newton DDD
+:toclevels: 6
+
+:includedir: .
+ifdef::env-doc[]
+:includedir: submodules/newton/doc
+endif::[]
+
+TIP: This document is maintained at https://github.com/muoncore/newton.
+Please submit issues at that repository.
+
+## Newton - DDD for Microservices.
+
+Newton is an application framework that allows you to implemented Domain Driven Design patterns in Microservices.
+Built using Muon as its communication foundation, Newton enables rapid development of complex, event driven, distributed applications.
+
+If you are building a new complex distributed system or attempting to rescue the value from a legacy system,
+Newton can help you.
+
+It allows you to build three major concepts, *Event Sourced Aggregates*, *Stream Processed Views* and *Process Managers* (aka, Sagas).
+
+Together, they enable you to build highly distributed, complex systems with well defined orchestration workflows across the Microservices
+
+.Contributing
+****
+Muon and the ecosystem services are open source.
+Contribute to Newton and this documentation at http://github.com/muoncore/newton
+****
+
+include::{includedir}/gettingstarted.adoc[leveloffset=+1]
+include::{includedir}/aggregates.adoc[leveloffset=+1]
+include::{includedir}/streamviews.adoc[leveloffset=+1]
+include::{includedir}/sagas.adoc[leveloffset=+1]
+include::{includedir}/extending.adoc[leveloffset=+1]
