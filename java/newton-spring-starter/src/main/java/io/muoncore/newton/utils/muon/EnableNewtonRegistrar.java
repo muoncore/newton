@@ -33,19 +33,8 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
     try {
-      AnnotationAttributes attributes =
-        AnnotationAttributes.fromMap(
-          importingClassMetadata.getAnnotationAttributes
-            (EnableNewton.class.getName(), false));
 
-      String[] packages = attributes.getStringArray("value");
-
-      List<String> packs = new ArrayList<>();
-      packs.addAll(Arrays.asList(packages));
-
-      packs.add(Class.forName(importingClassMetadata.getClassName()).getPackage().getName());
-
-      MuonLookupUtils.init(packs.toArray(new String[packs.size()]));
+      initScan(importingClassMetadata);
 
       MuonLookupUtils.listAllAggregateRootClass().forEach(s -> {
 
@@ -72,6 +61,19 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+  private void initScan(AnnotationMetadata importingClassMetadata) throws ClassNotFoundException {
+    AnnotationAttributes attributes =
+      AnnotationAttributes.fromMap(
+        importingClassMetadata.getAnnotationAttributes
+          (EnableNewton.class.getName(), false));
+
+    String[] packages = attributes.getStringArray("value");
+    List<String> packs = new ArrayList<>();
+    packs.addAll(Arrays.asList(packages));
+    packs.add(Class.forName(importingClassMetadata.getClassName()).getPackage().getName());
+    MuonLookupUtils.init(packs.toArray(new String[packs.size()]));
   }
 
   private Class makeRepo(Class param) {
