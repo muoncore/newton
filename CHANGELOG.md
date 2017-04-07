@@ -1,5 +1,14 @@
 # Change Log
 
+## [v0.0.2](https://github.com/muoncore/newton/tree/v0.0.2) (2017-04-07)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.1...v0.0.2)
+
+**Closed issues:**
+
+- Auto generate repositories [\#11](https://github.com/muoncore/newton/issues/11)
+- Add view types: RebuildingDatastoreView, SharedDataStore, BaseView [\#10](https://github.com/muoncore/newton/issues/10)
+- Automatically generate the repositories [\#4](https://github.com/muoncore/newton/issues/4)
+
 ## [v0.0.1](https://github.com/muoncore/newton/tree/v0.0.1) (2017-04-06)
 **Merged pull requests:**
 
