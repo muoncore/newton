@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.0.3](https://github.com/muoncore/newton/tree/v0.0.3) (2017-04-15)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.2...v0.0.3)
+
+**Closed issues:**
+
+- Reflections requires explicit jar file classpath loading in spring boot apps [\#14](https://github.com/muoncore/newton/issues/14)
+
 ## [v0.0.2](https://github.com/muoncore/newton/tree/v0.0.2) (2017-04-07)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.1...v0.0.2)
 
