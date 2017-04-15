@@ -3,16 +3,17 @@ package io.muoncore.newton.utils.muon;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
+import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import javax.annotation.PostConstruct;
 import java.net.URL;
 import java.util.*;
 import java.util.concurrent.CountDownLatch;
 
+@Slf4j
 public class MuonLookupUtils {
 
 	private static Map<String, Class<? extends Saga>> sagaTypeMappings;
@@ -20,14 +21,20 @@ public class MuonLookupUtils {
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
 	static CountDownLatch ready = new CountDownLatch(1);
 
-
 	static void init(String[] packages) {
 
     List<URL> urls = new ArrayList<>();
-    urls.addAll(ClasspathHelper.forPackage("io.muoncore.newton", ClassLoader.getSystemClassLoader()));
+    urls.addAll(ClasspathHelper.forPackage("io.muoncore.newton", MuonLookupUtils.class.getClassLoader()));
     for (String aPackage : packages) {
-      urls.addAll(ClasspathHelper.forPackage(aPackage, ClassLoader.getSystemClassLoader()));
+      log.info("Adding package {}", aPackage);
+
+      Collection<URL> urls1 = ClasspathHelper.forPackage(aPackage, MuonLookupUtils.class.getClassLoader());
+
+      log.info("Got {}", urls1);
+      urls.addAll(urls1);
     }
+
+    log.info("Booting Reflections with urls {}", urls);
 
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
       .addScanners(new SubTypesScanner())

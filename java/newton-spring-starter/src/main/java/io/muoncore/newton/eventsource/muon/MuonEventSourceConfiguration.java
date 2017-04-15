@@ -64,16 +64,19 @@ public class MuonEventSourceConfiguration {
 		return new AggregateEventClient(eventClient);
 	}
 
+  @ConditionalOnMissingBean(StreamSubscriptionManager.class)
 	@Bean
 	public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService) {
 		return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService);
 	}
 
+  @ConditionalOnMissingBean(LockService.class)
 	@Bean
 	public LockService lockService() throws Exception {
 		return new JGroupsLockService();
 	}
 
+  @ConditionalOnMissingBean(SagaLoader.class)
 	@Bean
 	public SagaLoader sagaLoader() {
 		return interest -> (Class) Class.forName(interest.getSagaClassName());

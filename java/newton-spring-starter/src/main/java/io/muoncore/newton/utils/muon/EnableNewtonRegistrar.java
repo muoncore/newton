@@ -3,14 +3,10 @@ package io.muoncore.newton.utils.muon;
 import io.muoncore.newton.EnableNewton;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
-import javassist.CannotCompileException;
-import javassist.ClassPool;
-import javassist.CtClass;
-import javassist.NotFoundException;
+import javassist.*;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.SignatureAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -73,11 +69,15 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
     List<String> packs = new ArrayList<>();
     packs.addAll(Arrays.asList(packages));
     packs.add(Class.forName(importingClassMetadata.getClassName()).getPackage().getName());
+    log.info("Initialising Newton by scanning the packages {}", packs);
     MuonLookupUtils.init(packs.toArray(new String[packs.size()]));
   }
 
   private Class makeRepo(Class param) {
     ClassPool defaultClassPool = ClassPool.getDefault();
+    defaultClassPool.appendClassPath(new LoaderClassPath(param.getClassLoader()));
+    defaultClassPool.appendClassPath(new LoaderClassPath(MuonEventSourceRepository.class.getClassLoader()));
+    defaultClassPool.appendSystemPath();
     try {
       CtClass superInterface = defaultClassPool.getCtClass(MuonEventSourceRepository.class
         .getName());

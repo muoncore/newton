@@ -16,20 +16,27 @@ public class JGroupsLockService implements LockService {
 	private Executor pool = Executors.newFixedThreadPool(100);
 
 	public JGroupsLockService() throws Exception {
-
 		JChannel ch = new JChannel(JGroupsLockService.class.getResourceAsStream("/jgroups.xml"));
 		lockService = new org.jgroups.blocks.locking.LockService(ch);
-		ch.connect("cibecs-cluster");
+		ch.connect("newton-cluster");
 	}
+
+  public JGroupsLockService(JChannel channel) throws Exception {
+    lockService = new org.jgroups.blocks.locking.LockService(channel);
+    channel.connect("newton-cluster");
+  }
 
 	@Override
 	public void executeAndRepeatWithLock(String name, LockedTask exec) {
 
+    log.info("Starting to wait on the lock " + name);
+
 		pool.execute(() -> {
+      log.info("In executor " + name);
 			Lock lock = lockService.getLock(name);
 
 			while(true) {
-				log.debug("Waiting on the lock " + name);
+				log.info("Waiting on the lock " + name);
 
 				lock.lock();
 				CountDownLatch latch = new CountDownLatch(1);
