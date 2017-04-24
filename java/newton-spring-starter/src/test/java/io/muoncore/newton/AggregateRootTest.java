@@ -62,13 +62,12 @@ public class AggregateRootTest {
 	@Data
 	@AllArgsConstructor
 	public class AEvent implements NewtonEvent {
-
+    private final DocumentId id = new DocumentId();
 		private String value;
 	}
 
+	@Data
 	public class BEvent implements NewtonEvent {
-
+    private final DocumentId id = new DocumentId();
 	}
-
-
 }

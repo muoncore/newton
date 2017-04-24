@@ -3,9 +3,9 @@ package io.muoncore.newton.saga;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
+import lombok.Getter;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -69,7 +69,7 @@ public class SagaStreamManagerTest {
         DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(),
+                TestSaga.class.getName(),
                 SagaWithEventHandler.class.getName(), new DocumentId(), sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithEventHandler.class;
@@ -104,7 +104,7 @@ public class SagaStreamManagerTest {
         DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), new DocumentId(), sagaId, "hello", "world")));
+                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), new DocumentId(), sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -134,7 +134,7 @@ public class SagaStreamManagerTest {
         DocumentId sagaId = new DocumentId();
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                SagaIntegrationTests.TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new DocumentId(), "hello", "orld")));
+                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new DocumentId(), "hello", "orld")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -161,7 +161,6 @@ public class SagaStreamManagerTest {
 
         }
     }
-
 
     static class NoAnnotationSaga extends StatefulSaga {
         @Override
@@ -240,5 +239,8 @@ public class SagaStreamManagerTest {
         }
     }
 
-    static class SagaEvent implements NewtonEvent {}
+    static class SagaEvent implements NewtonEvent {
+      @Getter
+      private final DocumentId id = new DocumentId();
+    }
 }

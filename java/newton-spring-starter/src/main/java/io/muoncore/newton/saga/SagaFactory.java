@@ -39,13 +39,13 @@ public class SagaFactory implements ApplicationContextAware {
         bus.post(event);
     }
 
-    public <ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T, P> create(Class<T> sagaType, P payload) {
-        log.debug("Creating new saga of type " + sagaType + " with payload " + payload);
+    public <ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T> create(Class<T> sagaType, P payload) {
+        log.info("Creating new saga of type " + sagaType + " with payload " + payload);
         T saga = (T) loadFromSpringContext(sagaType);
         final T thesaga = saga;
         thesaga.start(payload);
 
-        sagaRepository.save(saga);
+        sagaRepository.saveNewSaga(saga, payload);
 
         EventedSagaMonitor monitor = new EventedSagaMonitor<>(saga.getId(), sagaType);
 
@@ -54,13 +54,13 @@ public class SagaFactory implements ApplicationContextAware {
         return monitor;
     }
 
-    public <ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T, P> monitor(ID sagaId, Class<T> type) {
+    public <T extends Saga<? extends NewtonEvent, ID>,ID extends DocumentId> SagaMonitor<ID, T>monitor(DocumentId sagaId, Class<T> type) {
 
         Optional<T> saga = sagaRepository.load(sagaId, type);
         if (!saga.isPresent()) {
             throw new IllegalStateException("Saga with ID " + sagaId + " does not exist");
         }
-        return new EventedSagaMonitor<>(sagaId, type);
+        return new EventedSagaMonitor(sagaId, type);
     }
 
     private void processCommands(Saga saga) {
@@ -80,7 +80,7 @@ public class SagaFactory implements ApplicationContextAware {
         return applicationContext.getBean(sagaType);
     }
 
-    class EventedSagaMonitor<ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> implements SagaMonitor<ID, T,P> {
+    class EventedSagaMonitor<ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> implements SagaMonitor<ID, T> {
         private ID id;
         private Class<T> sagaType;
         private List<SagaListener> listeners = new ArrayList<>();

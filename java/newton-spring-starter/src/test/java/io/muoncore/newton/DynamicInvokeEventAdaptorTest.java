@@ -1,5 +1,6 @@
 package io.muoncore.newton;
 
+import lombok.Data;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -45,9 +46,21 @@ public class DynamicInvokeEventAdaptorTest {
         public void on(NonExplicitMatchEvent ev) {this.event = ev;}
     }
 
-    static class Event1 implements NewtonEvent {}
-    static class ParentEvent implements NewtonEvent {}
+    @Data
+    static class Event1 implements NewtonEvent {
+      private final DocumentId id = new DocumentId();
+    }
+    @Data
+    static class ParentEvent implements NewtonEvent {
+      private final DocumentId id = new DocumentId();
+    }
     interface GenericEvent extends NewtonEvent {}
-    static class NonExplicitMatchEvent implements NewtonEvent {}
-    static class EventWithParent extends NonExplicitMatchEvent {}
+    @Data
+    static class NonExplicitMatchEvent implements NewtonEvent {
+      private final DocumentId id = new DocumentId();
+    }
+    @Data
+    static class EventWithParent extends NonExplicitMatchEvent {
+      private final DocumentId id = new DocumentId();
+    }
 }

@@ -6,7 +6,7 @@ import io.muoncore.newton.DocumentId;
 
 import java.util.concurrent.TimeUnit;
 
-public interface SagaMonitor<ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> {
+public interface SagaMonitor<ID extends DocumentId, T extends Saga<? extends NewtonEvent, ID>> {
     ID getId();
     /*
      * async interface (preferred!) Will use an internal dispatch pool and not block control thread.

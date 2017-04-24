@@ -1,7 +1,9 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.OnDomainEvent;
+import lombok.Data;
 import lombok.Getter;
 import org.junit.Test;
 
@@ -44,6 +46,12 @@ public class StatefulSagaTest {
         }
     }
 
-    static class MyEvent implements NewtonEvent {}
-    static class MyOtherEvent implements NewtonEvent {}
+    @Data
+    static class MyEvent implements NewtonEvent {
+      private final DocumentId id = new DocumentId();
+    }
+    @Data
+    static class MyOtherEvent implements NewtonEvent {
+      private final DocumentId id = new DocumentId();
+    }
 }

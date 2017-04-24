@@ -5,7 +5,7 @@ import io.muoncore.newton.DocumentId;
 
 import java.util.concurrent.Callable;
 
-public interface EventSourceRepository<A extends AggregateRoot> {
+public interface EventSourceRepository<A extends AggregateRoot<DocumentId>> {
 
 	A load(DocumentId aggregateIdentifier) throws AggregateNotFoundException;
 

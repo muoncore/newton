@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
-public class MuonEventSourceRepository<A extends AggregateRoot> implements EventSourceRepository<A> {
+public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> implements EventSourceRepository<A> {
 
 	private Class<A> aggregateType;
 	private AggregateEventClient aggregateEventClient;

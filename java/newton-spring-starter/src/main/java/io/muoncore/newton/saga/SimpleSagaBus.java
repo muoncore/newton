@@ -14,7 +14,7 @@ public class SimpleSagaBus implements SagaBus {
 	}
 
   @Override
-  public <T extends Saga<P, ID>, P extends NewtonEvent, ID extends DocumentId> SagaMonitor<ID, T, P> dispatch(SagaIntent<ID, T, P> commandIntent) {
+  public <T extends Saga<P, ID>, P extends NewtonEvent, ID extends DocumentId> SagaMonitor<ID, T> dispatch(SagaIntent<ID, T, P> commandIntent) {
 		return sagaFactory.create(commandIntent.getType(), commandIntent.getPayload());
 	}
 }
