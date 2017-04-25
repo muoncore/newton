@@ -20,6 +20,7 @@ dependencies {
   compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
 
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
+  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
   testCompile("io.muoncore:test-event-store:0.0.6-SNAPSHOT") {
     //exclude module:"slf4j-simple"
   }

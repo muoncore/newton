@@ -18,7 +18,7 @@ public interface StreamSubscriptionManager {
     void globallyUniqueSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData);
 
     /**
-     * Will subscribe to the given stream and persist the current location so that on restart/ failover
+     * Will replay to the given stream and persist the current location so that on restart/ failover
      * the stream will be played from this location.
      *
      * This will run as many times as requested across the various instances of a service, no locking or cluster resource exclusion.

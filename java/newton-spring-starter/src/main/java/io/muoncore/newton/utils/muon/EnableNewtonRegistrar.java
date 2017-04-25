@@ -51,7 +51,7 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
         beanDefinition.setConstructorArgumentValues(vals);
 
         registry.registerBeanDefinition("newtonRepo" + s.getSimpleName(), beanDefinition);
-        log.info("Newton Repository in context {} is registered  {}", context, beanDefinition.getBeanClassName());
+        log.debug("Newton Repository in context {} is registered  {}", context, beanDefinition.getBeanClassName());
       });
 
     } catch (ClassNotFoundException e) {
@@ -69,7 +69,7 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
     List<String> packs = new ArrayList<>();
     packs.addAll(Arrays.asList(packages));
     packs.add(Class.forName(importingClassMetadata.getClassName()).getPackage().getName());
-    log.info("Initialising Newton by scanning the packages {}", packs);
+    log.debug("Initialising Newton by scanning the packages {}", packs);
     MuonLookupUtils.init(packs.toArray(new String[packs.size()]));
   }
 
@@ -88,7 +88,6 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
       ClassFile classFile = repositoryInterface.getClassFile();
 
       String sig = "Ljava/lang/Object;Lio/muoncore/newton/eventsource/muon/MuonEventSourceRepository<L" + getSigName(param) + ";>;";
-      log.info(sig);
       SignatureAttribute signatureAttribute = new SignatureAttribute(
         classFile.getConstPool(),
         sig);
@@ -97,14 +96,13 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
       return repositoryInterface.toClass();
 
     } catch (NotFoundException | CannotCompileException e) {
-      e.printStackTrace();
+      log.error("Unable to register a newton repository", e);
     }
 
     return null;
   }
 
   private String getSigName(Class param) {
-    log.info("VAL IS " + Arrays.asList(param.getName().split("\\.")));
     return StringUtils.arrayToDelimitedString(param.getName().split("\\."), "/");
   }
 }
