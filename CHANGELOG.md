@@ -1,5 +1,14 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.4...HEAD)
+
+**Closed issues:**
+
+- Expose aggregate stream as a stream [\#15](https://github.com/muoncore/newton/issues/15)
+- Need to sync up the stream names for UniqueAggregateDomainService [\#5](https://github.com/muoncore/newton/issues/5)
+
 ## [v0.0.4](https://github.com/muoncore/newton/tree/v0.0.4) (2017-04-24)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.3...v0.0.4)
 
