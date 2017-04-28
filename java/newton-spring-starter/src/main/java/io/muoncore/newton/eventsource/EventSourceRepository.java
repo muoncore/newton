@@ -31,7 +31,24 @@ public interface EventSourceRepository<A extends AggregateRoot<DocumentId>> {
    */
 	A newInstance(Callable<A> factoryMethod);
 
+  /**
+   * Persist an existing aggregate root.
+   */
 	void save(A aggregate);
 
-	void replay(DocumentId aggregateIdentifier, Subscriber<NewtonEvent> sub);
+  /**
+   * Cold replay of the event contents of an aggregate root.
+   */
+	Publisher<NewtonEvent> replay(DocumentId aggregateIdentifier);
+
+  /**
+   * Cold+hot replay of of the event contents of Aggregate.
+   */
+  Publisher<NewtonEvent> subscribeColdHot(DocumentId aggregateIdentifier);
+
+  /**
+   * hot only subscription to the event contents of an Aggregate.
+   * This publisher will emit when new data is added to this aggregate, but not any previously saved data.
+   */
+  Publisher<NewtonEvent> subscribeHot(DocumentId aggregateIdentifier);
 }

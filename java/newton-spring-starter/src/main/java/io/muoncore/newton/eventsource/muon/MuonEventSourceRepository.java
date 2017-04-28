@@ -80,27 +80,39 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
 		emitForStreamProcessing(aggregate);
 	}
 
+  private Publisher<NewtonEvent> subscribe(DocumentId aggregateIdentifier, EventReplayMode mode) {
+	  return sub -> eventClient.replay("/aggregate/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {
+        public void onSubscribe(Subscription s) {
+          sub.onSubscribe(s);
+        }
+
+        public void onNext(Event o) {
+          sub.onNext(o.getPayload(MuonLookupUtils.getDomainClass(o)));
+        }
+
+        public void onError(Throwable t) {
+          sub.onError(t);
+        }
+
+        public void onComplete() {
+          sub.onComplete();
+        }
+      });
+  }
+
   @Override
-  public void replay(DocumentId aggregateIdentifier, Subscriber<NewtonEvent> sub) {
-    eventClient.replay("/aggregate/" + aggregateIdentifier.toString(), EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
-      public void onSubscribe(Subscription s) {
-        sub.onSubscribe(s);
-      }
+  public Publisher<NewtonEvent> replay(DocumentId aggregateIdentifier) {
+	  return subscribe(aggregateIdentifier, EventReplayMode.REPLAY_ONLY);
+  }
 
-      public void onNext(Event o) {
-        log.warn("PROCESSING EVENT PLAY");
-        sub.onNext(o.getPayload(MuonLookupUtils.getDomainClass(o)));
-        log.warn("WOOT");
-      }
+  @Override
+  public Publisher<NewtonEvent> subscribeColdHot(DocumentId aggregateIdentifier) {
+    return subscribe(aggregateIdentifier, EventReplayMode.REPLAY_THEN_LIVE);
+  }
 
-      public void onError(Throwable t) {
-        sub.onError(t);
-      }
-
-      public void onComplete() {
-        sub.onComplete();
-      }
-    });
+  @Override
+  public Publisher<NewtonEvent> subscribeHot(DocumentId aggregateIdentifier) {
+    return subscribe(aggregateIdentifier, EventReplayMode.LIVE_ONLY);
   }
 
   private List<NewtonEvent> replayEvents(DocumentId id) {

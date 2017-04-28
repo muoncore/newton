@@ -75,8 +75,18 @@ public class SagaIntegrationTests {
   @Test
   public void sagaCanBeStartedViaIntent() throws InterruptedException {
 
-    TestSaga testSaga = sagaBus.dispatch(
+    OrderRequestedEvent ev = new OrderRequestedEvent();
+
+    SagaCreated sagaCreated = sagaRepository.getSagasCreatedByEventId(ev.getId()).get(0);
+
+    SagaMonitor<DocumentId, TestSaga> monitor = sagaFactory.monitor(sagaCreated.getSagaId(), TestSaga.class);
+
+
+
+
+      TestSaga testSaga = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent())).waitForCompletion(TimeUnit.MINUTES, 1);
+
 
     assertTrue(testSaga.isComplete());
   }

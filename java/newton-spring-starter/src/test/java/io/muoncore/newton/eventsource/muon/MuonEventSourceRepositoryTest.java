@@ -112,7 +112,7 @@ public class MuonEventSourceRepositoryTest {
 
     List<NewtonEvent> events = new ArrayList<>();
 
-    repository.replay(id, new Subscriber<NewtonEvent>() {
+    repository.replay(id).subscribe(new Subscriber<NewtonEvent>() {
       @Override
       public void onSubscribe(Subscription s) {
         s.request(Integer.MAX_VALUE);

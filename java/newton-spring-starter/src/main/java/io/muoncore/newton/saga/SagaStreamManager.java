@@ -102,7 +102,7 @@ public class SagaStreamManager {
   }
 
   public void processEvent(NewtonEvent event) {
-    log.info("Checking if there is a Saga to be run for " + event.getClass());
+    log.debug("Checking if there is a Saga to be run for " + event.getClass());
 
     startSagasFor(event);
     extractSagasFor(event);
@@ -132,7 +132,7 @@ public class SagaStreamManager {
   private void startSagasFor(NewtonEvent event) {
     List<Class<? extends Saga>> sagas = sagaStartCache.find(event.getClass());
 
-    log.info("Will starts Sagas {}", sagas);
+    log.debug("Will starts Sagas {}", sagas);
 
     sagas.forEach(sagaClass -> sagaFactory.create(sagaClass, event));
   }
