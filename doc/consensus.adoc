@@ -1,0 +1,16 @@
+## Managing system consensus
+
+Newton, like all applications, has differing consistency needs depending on what is being done.
+
+For elements like Saga processing or the `SharedDatasourceView`, you need to ensure that a piece of data will only
+be processed once.
+
+Newton implements these verying consistency systems by implementing a consensus system and using it to provide
+distributed resource management across the group.
+
+Moving this intelligence to the application tier enables the handling of event semantics much more naturally, and
+ allows the use of a far simpler, more generic data tier.
+
+Currently JGroups is used to implement this system, using UDP Multicast, or TCP based gossip locators (where UDP is
+not available, eg Docker overlay networks)
+

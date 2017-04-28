@@ -17,10 +17,11 @@ include::{includedir}/version.adoc[leveloffset=+1]
 TIP: This document is maintained at https://github.com/muoncore/newton.
 Please submit issues at that repository.
 
-## Newton - DDD for Microservices.
+## Newton - DDD and Microservices
 
-Newton is an application framework that allows you to implemented Domain Driven Design patterns in Microservices.
-Built using Muon as its communication foundation, Newton enables rapid development of complex, event driven, distributed applications.
+Newton is an application framework that allows you to implemented Domain Driven Design patterns in Microservice based distributed systems.
+Built using Muon as its communication foundation, Newton enables rapid development of complex, event driven, distributed applications and can
+run on your infrastructure of choice.
 
 If you are building a new complex distributed system or attempting to rescue the value from a legacy system,
 Newton can help you.
@@ -36,6 +37,9 @@ Contribute to Newton and this documentation at http://github.com/muoncore/newton
 ****
 
 include::{includedir}/gettingstarted.adoc[leveloffset=+1]
+include::{includedir}/events.adoc[leveloffset=+1]
 include::{includedir}/aggregates.adoc[leveloffset=+1]
 include::{includedir}/streamviews.adoc[leveloffset=+1]
 include::{includedir}/sagas.adoc[leveloffset=+1]
+include::{includedir}/sagas.adoc[leveloffset=+1]
+include::{includedir}/consensus.adoc[leveloffset=+1]

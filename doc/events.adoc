@@ -1,24 +1,42 @@
 
 ## Newton Events
 
-Defining an event
+Newton is built upon Muon Core, especially the Muon event protocols. These give a common, polyglot protocol to manage events across
+ a distributed system. The Muon event store, Photon, implements the server side of protocols and gives a rich,
+ event based API for you to use, on top of a variety of persistence stores.
+
+Newton is an application framework, and so it takes the concepts that Muon Core gives and integrates them cleanly
+into your applications. In this case, events become a first class concept
+
+### Defining an event
 
 How this is used.
 
 MuonLookupUtils
 
 
+### Reacting to an event
+
+In a DDD system, you will have _Domain Services_, these provide application logic, and in Newton, give a place that
+ can react to events from within or outside of the system.
+
+TODO, discuss event streams
+
+You can create a new Domain Service like this
+
+----
+----
+
+Create this now, then use the Muon CLI to emit an event that matches this
+
+----
+muon emit TODODODODOD
+----
+
+You should see the event received
+
+
 ### Event replay
 
 
 #### Tracking replay positions within a stream
-
-#### Replacing the Event Stream Index Store
-
-
-
-
-### Multi Tenancy
-
-
-

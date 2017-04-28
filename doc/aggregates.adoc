@@ -5,3 +5,31 @@ In the DDD world, Aggregate Roots are the transactional consistency limit.
 
 
 
+### Creating a new Aggregate Root
+
+define the type.
+define the events it is made up of.
+needs an empty constructor for reply.
+adding api methods.
+event handlers
+
+state should only be created and altered
+from within the event handlers
+
+
+### Using EventSourceRepository
+
+new instance
+load
+Optimistic locing
+save
+replay
+
+### Inspecting the streams
+
+The event source stream, a shallow stream, conceptually bound to the lifetime of the owning aggregate root.
+  It will most likely have a relatively small number of events in it.
+
+The aggregated stream over the domain can be found at
+XXX. It is a deep stream, conceptually unbounded.
+
