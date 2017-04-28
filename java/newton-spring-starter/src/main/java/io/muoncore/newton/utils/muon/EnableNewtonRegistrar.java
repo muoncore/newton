@@ -84,17 +84,21 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
       String repoName = param.getName() + "Repository";
 
-      CtClass repositoryInterface = defaultClassPool.makeClass(repoName, superInterface);
-      ClassFile classFile = repositoryInterface.getClassFile();
 
-      String sig = "Ljava/lang/Object;Lio/muoncore/newton/eventsource/muon/MuonEventSourceRepository<L" + getSigName(param) + ";>;";
-      SignatureAttribute signatureAttribute = new SignatureAttribute(
-        classFile.getConstPool(),
-        sig);
-      classFile.addAttribute(signatureAttribute);
+      try {
+        return Class.forName(repoName);
+      } catch (ClassNotFoundException e) {
+        CtClass repositoryInterface = defaultClassPool.makeClass(repoName, superInterface);
+        ClassFile classFile = repositoryInterface.getClassFile();
 
-      return repositoryInterface.toClass();
+        String sig = "Ljava/lang/Object;Lio/muoncore/newton/eventsource/muon/MuonEventSourceRepository<L" + getSigName(param) + ";>;";
+        SignatureAttribute signatureAttribute = new SignatureAttribute(
+          classFile.getConstPool(),
+          sig);
+        classFile.addAttribute(signatureAttribute);
 
+        return repositoryInterface.toClass();
+      }
     } catch (NotFoundException | CannotCompileException e) {
       log.error("Unable to register a newton repository", e);
     }
