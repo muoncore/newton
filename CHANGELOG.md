@@ -6,6 +6,9 @@
 
 **Closed issues:**
 
+- Should only create the repository class if it does not already exist [\#21](https://github.com/muoncore/newton/issues/21)
+- Photon 'from' is being misused [\#20](https://github.com/muoncore/newton/issues/20)
+- Provide a cold+hot subscription to an event aggregate [\#16](https://github.com/muoncore/newton/issues/16)
 - Expose aggregate stream as a stream [\#15](https://github.com/muoncore/newton/issues/15)
 - Need to sync up the stream names for UniqueAggregateDomainService [\#5](https://github.com/muoncore/newton/issues/5)
 
