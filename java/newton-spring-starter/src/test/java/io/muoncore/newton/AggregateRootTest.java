@@ -35,6 +35,8 @@ public class AggregateRootTest {
 		TestAggregateRoot testAggregate = new TestAggregateRoot();
 		//WHEN
 		testAggregate.doB("ZZZ");
+
+		
 	}
 
 
