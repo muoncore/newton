@@ -1,7 +1,7 @@
 package io.muoncore.newton.command;
 
 import io.muoncore.newton.CorrelationId;
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.AggregateRootId;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Objects;
 
 @Getter
-public class CommandIntent<ID extends DocumentId> {
+public class CommandIntent<ID extends AggregateRootId> {
 
 	private String type;
 	private Object payload;
@@ -25,11 +25,11 @@ public class CommandIntent<ID extends DocumentId> {
 		this.correlationId = correlationId;
 	}
 
-	public static <ID extends DocumentId> CommandIntentBuilder<ID> builder(String type) {
+	public static <ID extends AggregateRootId> CommandIntentBuilder<ID> builder(String type) {
 		return new CommandIntentBuilder<>(type);
 	}
 
-	public static class CommandIntentBuilder<ID extends DocumentId> {
+	public static class CommandIntentBuilder<ID extends AggregateRootId> {
 
 		private String type;
 		private Object request;

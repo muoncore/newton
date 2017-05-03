@@ -1,6 +1,7 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.AggregateRootId;
+import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,7 @@ public class CommandFactoryTest {
 	@Test
 	public void createFromCommandDefinition() throws Exception {
 		final TestRequest payload = new TestRequest("AAA");
-		final DocumentId id = new DocumentId();
+		final AggregateRootId id = new SimpleAggregateRootId();
 		final Class<TestPayloadCommand> type = TestPayloadCommand.class;
 		Command cmd = commandFactory.create(type, payload, id, "tenantId");
 		Assert.assertNotNull(cmd);
@@ -93,20 +94,20 @@ public class CommandFactoryTest {
 
 	public static class TestCommand implements Command {
 
-		protected DocumentId id;
+		protected AggregateRootId id;
 
 		@Override
 		public void execute() {
 		}
 
-		public void setId(DocumentId id) {
+		public void setId(AggregateRootId id) {
 			this.id = id;
 		}
 	}
 
 	public static class TestIdCommand implements Command {
 
-		protected DocumentId id;
+		protected AggregateRootId id;
 
 		@Override
 		public void execute() {
@@ -115,7 +116,7 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(DocumentId id) {
+		public void setId(AggregateRootId id) {
 			this.id = id;
 		}
 	}
@@ -124,7 +125,7 @@ public class CommandFactoryTest {
 	public static class TestPayloadCommand implements IdentifiableCommand {
 
     @Setter
-		protected DocumentId id;
+		protected AggregateRootId id;
 		@Setter
 		private String prop1;
 		@Setter
@@ -141,7 +142,7 @@ public class CommandFactoryTest {
 			System.out.println("RUNNING");
 		}
 
-		public void setId(DocumentId id) {
+		public void setId(AggregateRootId id) {
 			this.id = id;
 		}
 	}

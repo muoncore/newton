@@ -1,13 +1,13 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.OnDomainEvent;
+import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.Data;
-import lombok.Getter;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 public class StatefulSagaTest {
     @Test
@@ -48,10 +48,10 @@ public class StatefulSagaTest {
 
     @Data
     static class MyEvent implements NewtonEvent {
-      private final DocumentId id = new DocumentId();
+      private final AggregateRootId id = new SimpleAggregateRootId();
     }
     @Data
     static class MyOtherEvent implements NewtonEvent {
-      private final DocumentId id = new DocumentId();
+      private final AggregateRootId id = new SimpleAggregateRootId();
     }
 }

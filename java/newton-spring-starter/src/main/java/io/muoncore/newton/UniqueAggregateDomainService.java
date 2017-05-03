@@ -14,7 +14,7 @@ import java.util.function.Predicate;
 @Slf4j
 public abstract class UniqueAggregateDomainService<V> {
 
-	private Map<DocumentId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
+	private Map<AggregateRootId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private Class<? extends AggregateRoot> aggregateType;
@@ -35,26 +35,26 @@ public abstract class UniqueAggregateDomainService<V> {
 		streamSubscriptionManager.localNonTrackingSubscription(aggregateType.getSimpleName(), this::handleEvent);
 	}
 
-	public boolean isUnique(DocumentId thisId, V value) {
+	public boolean isUnique(AggregateRootId thisId, V value) {
 		return !exists(thisId, value);
 	}
 
-	public boolean exists(DocumentId thisId, V value) {
+	public boolean exists(AggregateRootId thisId, V value) {
 		if (thisId != null) {
 			return entriesMap.entrySet().stream().anyMatch(x -> x.getValue().equals(value) && !x.getKey().equals(thisId));
 		}
 		return entriesMap.values().stream().anyMatch(v -> v.equals(value));
 	}
 
-	public void addValue(DocumentId id, V value) {
+	public void addValue(AggregateRootId id, V value) {
 		entriesMap.put(id, value);
 	}
 
-	public void removeValue(DocumentId id) {
+	public void removeValue(AggregateRootId id) {
 		entriesMap.remove(id);
 	}
 
-	public void updateValue(DocumentId id, V value) {
+	public void updateValue(AggregateRootId id, V value) {
 		entriesMap.entrySet().stream()
 			.filter(entry -> entry.getKey().equals(id))
 			.findFirst()

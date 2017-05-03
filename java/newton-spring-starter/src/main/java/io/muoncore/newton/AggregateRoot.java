@@ -3,7 +3,7 @@ package io.muoncore.newton;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AggregateRoot<Identifier extends DocumentId> {
+public abstract class AggregateRoot<Identifier extends AggregateRootId> {
 
 	protected Identifier id;
 	private long version;

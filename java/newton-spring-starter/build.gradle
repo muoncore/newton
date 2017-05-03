@@ -21,7 +21,7 @@ dependencies {
 
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
-  testCompile("io.muoncore:test-event-store:0.0.6-SNAPSHOT") {
+  testCompile("io.muoncore:test-event-store:0.0.2") {
     //exclude module:"slf4j-simple"
   }
 }

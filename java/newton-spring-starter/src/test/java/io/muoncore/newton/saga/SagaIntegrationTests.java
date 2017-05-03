@@ -60,12 +60,12 @@ public class SagaIntegrationTests {
   public void sagaCanBeStartedViaStartEvent() throws InterruptedException {
 
     //save a domain class, triggering a save event
-    NewtonEvent<DocumentId> createEvent = testAggregateRepo.newInstance(SagaTestAggregate::new).getNewOperations().get(0);
+    NewtonEvent<AggregateRootId> createEvent = testAggregateRepo.newInstance(SagaTestAggregate::new).getNewOperations().get(0);
 
     Thread.sleep(1000);
     //lookup the saga via the ID
     List<SagaCreated> sagas = sagaRepository.getSagasCreatedByEventId(createEvent.getId());
-    SagaMonitor<DocumentId, ComplexSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), ComplexSaga.class);
+    SagaMonitor<AggregateRootId, ComplexSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), ComplexSaga.class);
 
     ComplexSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
 
@@ -79,7 +79,7 @@ public class SagaIntegrationTests {
 
     SagaCreated sagaCreated = sagaRepository.getSagasCreatedByEventId(ev.getId()).get(0);
 
-    SagaMonitor<DocumentId, TestSaga> monitor = sagaFactory.monitor(sagaCreated.getSagaId(), TestSaga.class);
+    SagaMonitor<AggregateRootId, TestSaga> monitor = sagaFactory.monitor(sagaCreated.getSagaId(), TestSaga.class);
 
 
 
@@ -93,7 +93,7 @@ public class SagaIntegrationTests {
 
   @Test
   public void sagaCanBeLoadedLater() {
-    SagaMonitor<DocumentId, TestSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<AggregateRootId, TestSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
     Optional<TestSaga> load = sagaRepository.load(sagaMonitor.getId(), TestSaga.class);
@@ -104,10 +104,10 @@ public class SagaIntegrationTests {
 
   @Test
   public void sagaCanBeMonitoredLater() {
-    SagaMonitor<DocumentId, TestSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<AggregateRootId, TestSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
-    SagaMonitor<DocumentId, TestSaga> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
+    SagaMonitor<AggregateRootId, TestSaga> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
 
     assertNotNull(monitor);
 
@@ -116,7 +116,7 @@ public class SagaIntegrationTests {
   @Test
   public void multiStepSagaWorkflow() {
 
-    SagaMonitor<DocumentId, ComplexSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<AggregateRootId, ComplexSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
     ComplexSaga saga = sagaMonitor.waitForCompletion(TimeUnit.MINUTES, 1);
@@ -130,7 +130,7 @@ public class SagaIntegrationTests {
   @SagaStreamConfig(streams = {"TestAggregate", "user/SagaTestAggregate"})
   public static class ComplexSaga extends StatefulSaga<OrderRequestedEvent> {
 
-    private DocumentId orderId;
+    private AggregateRootId orderId;
 
     @Override
     public void start(OrderRequestedEvent event) {
@@ -167,35 +167,35 @@ public class SagaIntegrationTests {
 
   @Getter
   public static class OrderRequestedEvent implements NewtonEvent {
-    private final DocumentId id = new DocumentId();
+    private final AggregateRootId id = new SimpleAggregateRootId();
   }
 
   @Getter
   @AllArgsConstructor
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
-    private DocumentId orderId;
-    private final DocumentId id = new DocumentId();
+    private AggregateRootId orderId;
+    private final AggregateRootId id = new SimpleAggregateRootId();
   }
 
   @Getter
   @AllArgsConstructor
   @ToString
   public static class OrderShippedEvent implements NewtonEvent {
-    private DocumentId orderId;
-    private final DocumentId id = new DocumentId();
+    private AggregateRootId orderId;
+    private final AggregateRootId id = new SimpleAggregateRootId();
   }
 
   @Scope("prototype")
   @Component
-  static class TakePayment implements IdentifiableCommand<DocumentId> {
+  static class TakePayment implements IdentifiableCommand<AggregateRootId> {
 
     @Autowired
     private EventClient eventClient;
-    private DocumentId orderId;
+    private AggregateRootId orderId;
 
     @Override
-    public void setId(DocumentId id) {
+    public void setId(AggregateRootId id) {
       this.orderId = id;
     }
 
@@ -218,14 +218,14 @@ public class SagaIntegrationTests {
   @Scope("prototype")
   @Component
   @Slf4j
-  static class ShipOrder implements IdentifiableCommand<DocumentId> {
+  static class ShipOrder implements IdentifiableCommand<AggregateRootId> {
 
     @Autowired
     private EventClient eventClient;
-    private DocumentId orderId;
+    private AggregateRootId orderId;
 
     @Override
-    public void setId(DocumentId id) {
+    public void setId(AggregateRootId id) {
       this.orderId = id;
     }
 

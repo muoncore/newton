@@ -40,7 +40,7 @@ public class AggregateRootTest {
 
 	@Data
   @AggregateConfiguration(context = "user")
-	public class TestAggregateRoot extends AggregateRoot {
+	public class TestAggregateRoot extends AggregateRoot<SimpleAggregateRootId> {
 
 		private String aString;
 
@@ -62,12 +62,12 @@ public class AggregateRootTest {
 	@Data
 	@AllArgsConstructor
 	public class AEvent implements NewtonEvent {
-    private final DocumentId id = new DocumentId();
+    private final AggregateRootId id = new SimpleAggregateRootId();
 		private String value;
 	}
 
 	@Data
 	public class BEvent implements NewtonEvent {
-    private final DocumentId id = new DocumentId();
+    private final AggregateRootId id = new SimpleAggregateRootId();
 	}
 }

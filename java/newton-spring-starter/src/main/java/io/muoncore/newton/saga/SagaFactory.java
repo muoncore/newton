@@ -4,7 +4,7 @@ package io.muoncore.newton.saga;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import lombok.AllArgsConstructor;
@@ -35,11 +35,11 @@ public class SagaFactory implements ApplicationContextAware {
         this.sagaRepository = sagaRepository;
     }
 
-    public void notifySagaLifeCycle(DocumentId id, SagaLifecycleEvent event) {
+    public void notifySagaLifeCycle(AggregateRootId id, SagaLifecycleEvent event) {
         bus.post(event);
     }
 
-    public <ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T> create(Class<T> sagaType, P payload) {
+    public <ID extends AggregateRootId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T> create(Class<T> sagaType, P payload) {
         log.info("Creating new saga of type " + sagaType + " with payload " + payload);
         T saga = (T) loadFromSpringContext(sagaType);
         final T thesaga = saga;
@@ -54,7 +54,7 @@ public class SagaFactory implements ApplicationContextAware {
         return monitor;
     }
 
-    public <T extends Saga<? extends NewtonEvent, ID>,ID extends DocumentId> SagaMonitor<ID, T>monitor(DocumentId sagaId, Class<T> type) {
+    public <T extends Saga<? extends NewtonEvent, ID>,ID extends AggregateRootId> SagaMonitor<ID, T>monitor(AggregateRootId sagaId, Class<T> type) {
 
         Optional<T> saga = sagaRepository.load(sagaId, type);
         if (!saga.isPresent()) {
@@ -76,11 +76,11 @@ public class SagaFactory implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    private <ID extends DocumentId, P extends NewtonEvent> Saga<P, ID> loadFromSpringContext(Class<? extends Saga> sagaType) {
+    private <ID extends AggregateRootId, P extends NewtonEvent> Saga<P, ID> loadFromSpringContext(Class<? extends Saga> sagaType) {
         return applicationContext.getBean(sagaType);
     }
 
-    class EventedSagaMonitor<ID extends DocumentId, T extends Saga<P, ID>, P extends NewtonEvent> implements SagaMonitor<ID, T> {
+    class EventedSagaMonitor<ID extends AggregateRootId, T extends Saga<P, ID>, P extends NewtonEvent> implements SagaMonitor<ID, T> {
         private ID id;
         private Class<T> sagaType;
         private List<SagaListener> listeners = new ArrayList<>();
@@ -152,7 +152,7 @@ public class SagaFactory implements ApplicationContextAware {
     @Data
     @AllArgsConstructor
     static class LifeCycleEvent {
-        private DocumentId id;
+        private AggregateRootId id;
         private NewtonEvent event;
     }
 }

@@ -1,6 +1,6 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.QueryConfiguration;
@@ -16,7 +16,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.EventListener;
-import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -44,7 +43,7 @@ public class ManualEventSourceTenantTest {
 	@Test
 	public void testTenantAggregateRoot() throws InterruptedException {
 		IntStream.rangeClosed(0, 100).forEach(i -> {
-			eventSourceRepository.save(new TestAggregate(new DocumentId()));
+			eventSourceRepository.save(new TestAggregate(new SimpleAggregateRootId()));
 		});
 
 		Thread.sleep(5000);

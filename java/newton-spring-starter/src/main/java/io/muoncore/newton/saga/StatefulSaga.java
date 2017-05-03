@@ -1,8 +1,8 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.*;
-import lombok.Getter;
 import io.muoncore.newton.command.CommandIntent;
+import lombok.Getter;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
@@ -11,9 +11,10 @@ import java.util.List;
 /**
  * A Saga that maintains its state in a mutable store.
  */
-public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, DocumentId> {
+public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, AggregateRootId> {
 
-    protected DocumentId id = new DocumentId();
+    protected AggregateRootId id = new SimpleAggregateRootId();
+
     @Getter
     private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);
     private long version;
@@ -39,16 +40,16 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Doc
         return version;
     }
 
-    public DocumentId getId() {
+    public AggregateRootId getId() {
         return id;
     }
 
-    public void setId(DocumentId id) {
+    public void setId(AggregateRootId id) {
         this.id = id;
     }
 
     protected <E extends NewtonEvent> void notifyOn(Class<E> type, String key, String value) {
-        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new DocumentId(), getId(), key, value));
+        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new SimpleAggregateRootId(), getId(), key, value));
     }
 
     protected void end() {

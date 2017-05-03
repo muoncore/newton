@@ -1,8 +1,8 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.EnableNewton;
 import io.muoncore.newton.MuonTestConfiguration;
+import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,7 +27,7 @@ public class EnableNewtonRegistrarTest {
   @Test
   public void testAutoCreatedRepo() {
     assertNotNull(repo);
-    DocumentId id = new DocumentId();
+    SimpleAggregateRootId id = new SimpleAggregateRootId();
     repo.newInstance(() -> new TestAggregate(id));
 
     assertNotNull(repo.load(id));
