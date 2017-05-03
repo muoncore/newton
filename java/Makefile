@@ -2,6 +2,10 @@
 install:
 	./gradlew install
 
+snapshot: clean
+	echo repoKey=muon-snapshot>>gradle.properties
+	./gradlew artifactoryPublish
+
 publish: clean
 ifndef VERSION
 	$(error VERSION is undefined for Newton Release)
@@ -11,9 +15,9 @@ endif
 	echo group=io.muoncore.newton>>gradle.properties
 	echo exclude=>>gradle.properties
 	./gradlew artifactoryPublish
-	git add gradle.properties
-	git commit -m "Update version to $(VERSION )while publishing"
-	git push origin
+	#git add gradle.properties
+	#git commit -m "Update version to $(VERSION )while publishing"
+	#git push origin
 
 test:
 	SHORT_TEST=true ./gradlew check

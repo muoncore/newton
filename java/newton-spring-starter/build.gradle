@@ -8,6 +8,8 @@ buildscript {
     }
 }
 
+apply plugin:"groovy"
+
 repositories {
   mavenLocal()
 }
