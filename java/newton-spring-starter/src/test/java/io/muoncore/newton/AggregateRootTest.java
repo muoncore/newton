@@ -36,7 +36,7 @@ public class AggregateRootTest {
 		//WHEN
 		testAggregate.doB("ZZZ");
 
-		
+
 	}
 
 
@@ -54,7 +54,7 @@ public class AggregateRootTest {
 			raiseEvent(new BEvent());
 		}
 
-		@OnDomainEvent
+		@EventHandler
 		public void handle(AEvent aEvent) {
 			this.aString = aEvent.getValue();
 		}

@@ -2,7 +2,7 @@ package io.muoncore.newton.saga;
 
 import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.OnDomainEvent;
+import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.Data;
 import org.junit.Test;
@@ -37,7 +37,7 @@ public class StatefulSagaTest {
 
         }
 
-        @OnDomainEvent
+        @EventHandler
         public void onEvent(MyEvent myEvent) {
             event = myEvent;
         }

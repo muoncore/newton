@@ -7,7 +7,7 @@ public abstract class AggregateRoot<Identifier extends AggregateRootId> {
 
 	protected Identifier id;
 	private long version;
-	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnDomainEvent.class);
+	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
 	private transient List<NewtonEvent> newOperations = new ArrayList<>();
 

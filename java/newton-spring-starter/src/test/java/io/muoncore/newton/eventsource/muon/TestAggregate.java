@@ -2,7 +2,7 @@ package io.muoncore.newton.eventsource.muon;
 
 
 import io.muoncore.newton.AggregateRoot;
-import io.muoncore.newton.OnDomainEvent;
+import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 
@@ -16,7 +16,7 @@ public class TestAggregate extends AggregateRoot<SimpleAggregateRootId> {
 		raiseEvent(new TestAggregateCreated(id));
 	}
 
-	@OnDomainEvent
+	@EventHandler
 	public void handle(TestAggregateCreated created) {
 		this.id = created.getId();
 	}

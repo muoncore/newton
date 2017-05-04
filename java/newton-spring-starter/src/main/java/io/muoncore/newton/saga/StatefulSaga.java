@@ -22,7 +22,7 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Agg
     private boolean complete = false;
 
     @Transient
-    private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnDomainEvent.class);
+    private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
     @Transient
     @Getter
