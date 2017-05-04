@@ -24,7 +24,7 @@ public class AggregateRootTest {
 		testAggregate.doA("ZZZ");
 		//THEN
 		assertEquals("A event raised and handled", "ZZZ", testAggregate.getAString());
-		assertTrue("New Operations contains AEvent", testAggregate.getNewOperations().contains(new AEvent("ZZZ")));
+		assertTrue("New Operations contains AEvent", ((AEvent)testAggregate.getNewOperations().get(0)).getValue().equals("ZZZ"));
 	}
 
 	@Test

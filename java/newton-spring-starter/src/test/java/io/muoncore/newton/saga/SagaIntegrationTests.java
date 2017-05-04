@@ -75,18 +75,8 @@ public class SagaIntegrationTests {
   @Test
   public void sagaCanBeStartedViaIntent() throws InterruptedException {
 
-    OrderRequestedEvent ev = new OrderRequestedEvent();
-
-    SagaCreated sagaCreated = sagaRepository.getSagasCreatedByEventId(ev.getId()).get(0);
-
-    SagaMonitor<AggregateRootId, TestSaga> monitor = sagaFactory.monitor(sagaCreated.getSagaId(), TestSaga.class);
-
-
-
-
-      TestSaga testSaga = sagaBus.dispatch(
+    TestSaga testSaga = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent())).waitForCompletion(TimeUnit.MINUTES, 1);
-
 
     assertTrue(testSaga.isComplete());
   }
@@ -167,7 +157,7 @@ public class SagaIntegrationTests {
 
   @Getter
   public static class OrderRequestedEvent implements NewtonEvent {
-    private final AggregateRootId id = new SimpleAggregateRootId();
+    private final AggregateRootId id = new AggregateRootId();
   }
 
   @Getter
@@ -175,7 +165,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
     private AggregateRootId orderId;
-    private final AggregateRootId id = new SimpleAggregateRootId();
+    private final AggregateRootId id = new AggregateRootId();
   }
 
   @Getter
@@ -183,7 +173,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class OrderShippedEvent implements NewtonEvent {
     private AggregateRootId orderId;
-    private final AggregateRootId id = new SimpleAggregateRootId();
+    private final AggregateRootId id = new AggregateRootId();
   }
 
   @Scope("prototype")

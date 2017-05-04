@@ -12,6 +12,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.CustomConversions;
+
+import java.util.Arrays;
 
 @Configuration
 @ConditionalOnClass(MongoClient.class)
@@ -41,5 +44,11 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
     return new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
   }
 
-
+  @Override
+  public CustomConversions customConversions() {
+    return new CustomConversions(Arrays.asList(
+      new StringToAggregateRootId(),
+      new AggregateRootIdToStirng()
+    ));
+  }
 }

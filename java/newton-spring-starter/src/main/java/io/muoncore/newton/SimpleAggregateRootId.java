@@ -6,11 +6,15 @@ import java.util.UUID;
 public class SimpleAggregateRootId extends AggregateRootId{
 
   public SimpleAggregateRootId(){
-    this.value = UUID.randomUUID().toString();
+    super(UUID.randomUUID().toString());
   }
 
   public SimpleAggregateRootId(String value){
-    this.value = value;
+    super(value);
   }
 
+  @Override
+  public String toString() {
+    return value;
+  }
 }

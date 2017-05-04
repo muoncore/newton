@@ -133,7 +133,7 @@ public class MuonEventSourceRepositoryTest {
       }
     });
 
-    Thread.sleep(500);
+    Thread.sleep(1500);
 
     assertEquals(2, events.size());
   }

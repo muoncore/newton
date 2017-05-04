@@ -148,11 +148,4 @@ public class SagaFactory implements ApplicationContextAware {
             return sagaRepository.load(id, sagaType).get();
         }
     }
-
-    @Data
-    @AllArgsConstructor
-    static class LifeCycleEvent {
-        private AggregateRootId id;
-        private NewtonEvent event;
-    }
 }

@@ -13,6 +13,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
+import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,8 @@ public class MongoSagaRepository implements SagaRepository {
 
   @Override
   public void saveNewSaga(Saga saga, NewtonEvent ev) {
+	  Assert.notNull(saga, "Saga is Required");
+	  Assert.notNull(saga.getId(), "Saga ID is Required");
     save(saga);
     updateSagaCreated(saga, ev);
   }

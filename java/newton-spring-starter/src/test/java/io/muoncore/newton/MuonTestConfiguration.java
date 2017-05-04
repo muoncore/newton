@@ -10,11 +10,14 @@ import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.memory.discovery.InMemDiscovery;
 import io.muoncore.memory.transport.InMemTransport;
 import io.muoncore.newton.cluster.LockService;
+import io.muoncore.newton.cluster.NoOpTenantContextAwareProcessor;
+import io.muoncore.newton.cluster.TenantContextAwareProcessor;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.DefaultEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -82,4 +85,10 @@ public class MuonTestConfiguration {
 	public SagaLoader sagaLoader() {
 		return interest -> (Class) MuonTestConfiguration.class.getClassLoader().loadClass(interest.getSagaClassName());
 	}
+
+  @ConditionalOnMissingBean(TenantContextAwareProcessor.class)
+  @Bean
+  public TenantContextAwareProcessor tenantContextAwareProcessor(){
+    return new NoOpTenantContextAwareProcessor();
+  }
 }
