@@ -7,9 +7,7 @@ import io.muoncore.codec.json.JsonOnlyCodecs;
 import io.muoncore.config.AutoConfiguration;
 import io.muoncore.config.MuonConfigBuilder;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.cluster.JGroupsLockService;
-import io.muoncore.newton.cluster.LockService;
-import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
+import io.muoncore.newton.cluster.*;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.AggregateEventClient;
@@ -68,8 +66,8 @@ public class MuonEventSourceConfiguration {
 
   @ConditionalOnMissingBean(StreamSubscriptionManager.class)
   @Bean
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService) {
-    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService);
+  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, TenantContextAwareProcessor tenantContextAwareProcessor) {
+    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, tenantContextAwareProcessor);
   }
 
   @ConditionalOnMissingBean(LockService.class)
@@ -83,6 +81,13 @@ public class MuonEventSourceConfiguration {
   public SagaLoader sagaLoader() {
     return interest -> (Class) Class.forName(interest.getSagaClassName());
   }
+
+  @ConditionalOnMissingBean(TenantContextAwareProcessor.class)
+  @Bean
+  public TenantContextAwareProcessor tenantContextAwareProcessor(){
+    return new NoOpTenantContextAwareProcessor();
+  }
+
 }
 
 

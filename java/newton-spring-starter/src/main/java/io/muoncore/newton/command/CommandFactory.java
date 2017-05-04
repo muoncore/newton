@@ -1,7 +1,7 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.AggregateRootId;;
-import org.springframework.beans.BeanUtils;
+import io.muoncore.newton.AggregateRootId;
+import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

@@ -2,6 +2,7 @@ package io.muoncore.newton;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -14,11 +15,14 @@ import java.util.function.Predicate;
 @Slf4j
 public abstract class UniqueAggregateDomainService<V> {
 
-	private Map<AggregateRootId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
+  @Value("${spring.application.name}")
+  private String appName;
+
+  private Map<AggregateRootId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private Class<? extends AggregateRoot> aggregateType;
-	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnViewEvent.class);
+	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
 	public UniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager, Class<? extends AggregateRoot> aggregateType) throws IOException {
 		this.streamSubscriptionManager = streamSubscriptionManager;
@@ -32,7 +36,13 @@ public abstract class UniqueAggregateDomainService<V> {
 
 	@PostConstruct
 	public void initSubscription() throws InterruptedException {
-		streamSubscriptionManager.localNonTrackingSubscription(aggregateType.getSimpleName(), this::handleEvent);
+		//todo: investigate AggregateRootContext annotation....
+
+		String streamName = aggregateType.getSimpleName();
+		if (this.appName != null){
+			streamName = this.appName.concat("/").concat(streamName);
+		}
+		streamSubscriptionManager.localNonTrackingSubscription(streamName, this::handleEvent);
 	}
 
 	public boolean isUnique(AggregateRootId thisId, V value) {

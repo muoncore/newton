@@ -1,9 +1,6 @@
 package io.muoncore.newton.query;
 
-import io.muoncore.newton.DynamicInvokeEventAdaptor;
-import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.OnViewEvent;
-import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,7 +16,7 @@ import java.util.function.Consumer;
 public abstract class BaseView {
 
   protected StreamSubscriptionManager streamSubscriptionManager;
-  private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnViewEvent.class);
+  private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
   private Set<String> subscribedStreams = new HashSet<>();
   private EventStreamProcessor eventStreamProcessor;
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.

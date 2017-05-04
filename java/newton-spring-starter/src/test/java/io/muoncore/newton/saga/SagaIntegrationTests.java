@@ -148,7 +148,7 @@ public class SagaIntegrationTests {
       System.out.println("Saga is started ... ");
     }
 
-    @OnDomainEvent
+    @EventHandler
     public void on(PaymentRecievedEvent payment) {
       System.out.println("Payment received, ordering shipping... ");
       //order a shipping
@@ -158,7 +158,7 @@ public class SagaIntegrationTests {
       );
     }
 
-    @OnDomainEvent
+    @EventHandler
     public void on(OrderShippedEvent shippedEvent) {
       System.out.println("Order shipped, saga is completed ... ");
       end();

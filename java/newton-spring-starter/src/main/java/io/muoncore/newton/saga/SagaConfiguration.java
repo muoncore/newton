@@ -3,6 +3,7 @@ package io.muoncore.newton.saga;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
+import io.muoncore.newton.cluster.TenantContextAwareProcessor;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.saga.mongo.MongoSagaRepository;
@@ -36,8 +37,8 @@ public class SagaConfiguration {
   }
 
   @Bean
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService) {
-    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService);
+  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, TenantContextAwareProcessor tenantContextAwareProcessor) {
+    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, tenantContextAwareProcessor);
   }
 
   @Bean

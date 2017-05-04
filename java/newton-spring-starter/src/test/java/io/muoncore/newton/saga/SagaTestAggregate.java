@@ -2,7 +2,7 @@ package io.muoncore.newton.saga;
 
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.AggregateRootId;
-import io.muoncore.newton.OnDomainEvent;
+import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import lombok.Data;
 
@@ -14,7 +14,7 @@ public class SagaTestAggregate extends AggregateRoot<AggregateRootId> {
     raiseEvent(new SagaIntegrationTests.OrderRequestedEvent());
   }
 
-  @OnDomainEvent
+  @EventHandler
   public void on(SagaIntegrationTests.OrderRequestedEvent ev) {
     setId(ev.getId());
   }
