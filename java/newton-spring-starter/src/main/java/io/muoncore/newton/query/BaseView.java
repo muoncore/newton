@@ -1,13 +1,16 @@
 package io.muoncore.newton.query;
 
-import io.muoncore.newton.*;
+import io.muoncore.newton.DynamicInvokeEventAdaptor;
+import io.muoncore.newton.EventHandler;
+import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -33,8 +36,18 @@ public abstract class BaseView {
 
     if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
 
-    String[] streams = s[0].streams();
+    List<String> streams = new ArrayList<>();
+    Arrays.stream(s[0].aggregateRoot()).forEach(aClass -> {
+      Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
+        streams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
+      });
+    });
 
+    streams.addAll(Arrays.asList(s[0].streams()));
+
+    if (streams.size() == 0){
+      throw new IllegalStateException("Invalid configuration. Either 'streams' or 'aggregateRoot' parameter must be specified!");
+    }
     for(String stream: streams) {
       if (!subscribedStreams.contains(stream)) {
         subscribedStreams.add(stream);
