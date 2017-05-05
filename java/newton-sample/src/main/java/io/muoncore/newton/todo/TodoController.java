@@ -16,6 +16,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/todos")
@@ -30,7 +31,7 @@ public class TodoController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> create(@RequestBody @Valid CreateRequest createRequest){
-    final AggregateRootId id = new AggregateRootId();
+    final AggregateRootId id = new AggregateRootId(UUID.randomUUID().toString());
     this.commandBus.dispatch(
       CommandIntent.builder(CreateTodoCommand.class.getName())
         .request(createRequest)

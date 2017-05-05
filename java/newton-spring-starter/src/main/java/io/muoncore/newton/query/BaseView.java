@@ -39,6 +39,7 @@ public abstract class BaseView {
     List<String> streams = new ArrayList<>();
     Arrays.stream(s[0].aggregateRoot()).forEach(aClass -> {
       Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
+        //todo: parse sPel if required
         streams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
       });
     });

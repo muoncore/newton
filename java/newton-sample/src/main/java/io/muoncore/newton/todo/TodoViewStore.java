@@ -14,12 +14,12 @@ import java.io.IOException;
 @Component
 //@NewtonView(streams = "newton-sample/Todo")
 @NewtonView(aggregateRoot = {Todo.class})
-public class TodoListDataStore extends SharedDatastoreView {
+public class TodoViewStore extends SharedDatastoreView {
 
   private MongoTemplate mongoTemplate;
 
   @Autowired
-  public TodoListDataStore(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor,MongoTemplate mongoTemplate1) throws IOException {
+  public TodoViewStore(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor, MongoTemplate mongoTemplate1) throws IOException {
     super(streamSubscriptionManager, eventStreamProcessor);
     this.mongoTemplate = mongoTemplate1;
   }

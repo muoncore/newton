@@ -1,12 +1,8 @@
 package io.muoncore.newton;
 
 import com.google.gson.annotations.SerializedName;
-import lombok.AllArgsConstructor;
-
-import java.util.UUID;
 
 //todo: try to rather make this an interface (consider gson serlization issues)
-@AllArgsConstructor
 public class AggregateRootId {
 
   @SerializedName("value")
@@ -16,9 +12,15 @@ public class AggregateRootId {
     return value;
   }
 
-  public AggregateRootId() {
-    this.value = UUID.randomUUID().toString();
+  public void setValue(String value){
+    this.value = value;
   }
+
+  public AggregateRootId(String value) {
+    this.value = value;
+  }
+
+  public AggregateRootId(){}
 
   @Override
   public String toString() {
