@@ -2,6 +2,7 @@ package io.muoncore.newton.cluster;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.query.EventStreamIndex;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -23,7 +24,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private EventClient eventClient;
   private EventStreamIndexStore eventStreamIndexStore;
   private LockService lockService;
-  private TenantContextAwareProcessor tenantContextAwareProcessor;
+  private EventStreamProcessor eventStreamProcessor;
 
   @Override
   public void localNonTrackingSubscription(String streamName, Consumer<NewtonEvent> onData) {
@@ -34,12 +35,8 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       EventReplayMode.REPLAY_THEN_LIVE,
       new EventSubscriber(event -> {
         log.debug("NewtonEvent received " + event);
-        tenantContextAwareProcessor.process(event, () -> {
-            final NewtonEvent newtonEvent = event.getPayload(MuonLookupUtils.getDomainClass(event));
-            onData.accept(newtonEvent);
-          }
-        );
-
+        final NewtonEvent newtonEvent = event.getPayload(MuonLookupUtils.getDomainClass(event));
+        eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
       }, throwable -> {
         log.warn("NewtonEvent subscription has ended, will attempt to reconnect in {}ms", RECONNECTION_BACKOFF);
         try {
@@ -92,11 +89,10 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
         log.debug("NewtonEvent received " + event);
         Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
         log.info("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
-        tenantContextAwareProcessor.process(event, () -> {
-          eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()));
-          onData.accept(event.getPayload(eventType));
-          }
-        );
+
+        eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()));
+        final NewtonEvent newtonEvent = event.getPayload(eventType);
+        eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
       }, onError));
   }
 

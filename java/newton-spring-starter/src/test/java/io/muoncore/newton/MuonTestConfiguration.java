@@ -10,8 +10,8 @@ import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.memory.discovery.InMemDiscovery;
 import io.muoncore.memory.transport.InMemTransport;
 import io.muoncore.newton.cluster.LockService;
-import io.muoncore.newton.cluster.NoOpTenantContextAwareProcessor;
-import io.muoncore.newton.cluster.TenantContextAwareProcessor;
+import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
+import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.DefaultEventClient;
@@ -86,9 +86,10 @@ public class MuonTestConfiguration {
 		return interest -> (Class) MuonTestConfiguration.class.getClassLoader().loadClass(interest.getSagaClassName());
 	}
 
-  @ConditionalOnMissingBean(TenantContextAwareProcessor.class)
   @Bean
-  public TenantContextAwareProcessor tenantContextAwareProcessor(){
-    return new NoOpTenantContextAwareProcessor();
+  @ConditionalOnMissingBean(EventStreamProcessor.class)
+  public EventStreamProcessor eventStreamProcessor() {
+    return new NoOpEventStreamProcessor();
   }
+
 }

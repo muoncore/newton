@@ -66,8 +66,8 @@ public class MuonEventSourceConfiguration {
 
   @ConditionalOnMissingBean(StreamSubscriptionManager.class)
   @Bean
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, TenantContextAwareProcessor tenantContextAwareProcessor) {
-    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, tenantContextAwareProcessor);
+  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
+    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, eventStreamProcessor);
   }
 
   @ConditionalOnMissingBean(LockService.class)
@@ -82,11 +82,6 @@ public class MuonEventSourceConfiguration {
     return interest -> (Class) Class.forName(interest.getSagaClassName());
   }
 
-  @ConditionalOnMissingBean(TenantContextAwareProcessor.class)
-  @Bean
-  public TenantContextAwareProcessor tenantContextAwareProcessor(){
-    return new NoOpTenantContextAwareProcessor();
-  }
 
 }
 
