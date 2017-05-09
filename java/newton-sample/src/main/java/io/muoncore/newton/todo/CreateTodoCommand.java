@@ -3,7 +3,7 @@ package io.muoncore.newton.todo;
 import io.muoncore.newton.command.Command;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import io.muoncore.newton.support.BusinessException;
-import io.muoncore.newton.support.DefaultAggregateRootId;
+import io.muoncore.newton.support.DocumentId;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -21,6 +21,9 @@ public class CreateTodoCommand implements Command{
 
   @Setter
   private String description;
+  @Setter
+  private DocumentId id;
+
 
   @Autowired
   public CreateTodoCommand(MuonEventSourceRepository<Todo> repository, UniqueTodoDescriptionDomainService uniqueTodoDescriptionDomainService) {
@@ -30,11 +33,11 @@ public class CreateTodoCommand implements Command{
 
   @Override
   public void execute() {
-    if (uniqueTodoDescriptionDomainService.exists(null, description)){
+    if (uniqueTodoDescriptionDomainService.exists(description)){
       throw new BusinessException("Todo description not unique!");
     }
 
-    Todo todo = new Todo(new DefaultAggregateRootId(), description);
+    Todo todo = new Todo(this.id, this.description);
     repository.save(todo);
   }
 }

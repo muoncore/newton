@@ -7,6 +7,9 @@ import io.muoncore.newton.query.NewtonView;
 import io.muoncore.newton.query.SharedDatastoreView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -32,4 +35,12 @@ public class TodoViewStore extends SharedDatastoreView {
 //      }
       mongoTemplate.save(new TodoListView(event.getId(),event.getDescription()));
   }
+
+  @EventHandler
+  public void handle(TodoDescriptionChangedEvent event){
+    Update update = new Update();
+    update.set("description",event.getDescription());
+    mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(event.getId().getObjectId())), update, Todo.class);
+  }
+
 }
