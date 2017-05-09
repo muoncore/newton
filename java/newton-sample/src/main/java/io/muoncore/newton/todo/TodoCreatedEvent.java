@@ -5,7 +5,7 @@ import io.muoncore.newton.support.DocumentId;
 import lombok.Getter;
 
 @Getter
-public class TodoCreatedEvent implements NewtonEvent {
+public class TodoCreatedEvent implements NewtonEvent<DocumentId> {
 
   private final DocumentId id;
   private final String description;

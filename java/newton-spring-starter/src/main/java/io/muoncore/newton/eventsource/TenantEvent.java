@@ -1,11 +1,10 @@
 package io.muoncore.newton.eventsource;
 
-import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
 import lombok.Getter;
 import lombok.Setter;
 
-public abstract class TenantEvent<A extends AggregateRootId> implements NewtonEvent {
+public abstract class TenantEvent<A> implements NewtonEvent {
 
   @Getter
   @Setter

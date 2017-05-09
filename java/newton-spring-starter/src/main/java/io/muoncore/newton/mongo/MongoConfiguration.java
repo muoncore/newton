@@ -45,12 +45,4 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
   public MongoTemplate mongoTemplate() throws Exception {
     return new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
   }
-
-  @Override
-  public CustomConversions customConversions() {
-    return new CustomConversions(Arrays.asList(
-      new StringToAggregateRootId(),
-      new AggregateRootIdToStirng()
-    ));
-  }
 }

@@ -48,19 +48,19 @@ public class DynamicInvokeEventAdaptorTest {
 
     @Data
     static class Event1 implements NewtonEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "1234";
     }
     @Data
     static class ParentEvent implements NewtonEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "4321";
     }
     interface GenericEvent extends NewtonEvent {}
     @Data
     static class NonExplicitMatchEvent implements NewtonEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "simples";
     }
     @Data
     static class EventWithParent extends NonExplicitMatchEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "rabbit";
     }
 }

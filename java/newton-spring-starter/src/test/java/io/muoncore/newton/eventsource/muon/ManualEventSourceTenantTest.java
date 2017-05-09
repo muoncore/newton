@@ -1,6 +1,5 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.QueryConfiguration;
@@ -43,7 +42,7 @@ public class ManualEventSourceTenantTest {
 	@Test
 	public void testTenantAggregateRoot() throws InterruptedException {
 		IntStream.rangeClosed(0, 100).forEach(i -> {
-			eventSourceRepository.save(new TestAggregate(new SimpleAggregateRootId()));
+			eventSourceRepository.save(new TestAggregate("hello-world"));
 		});
 
 		Thread.sleep(5000);
@@ -87,7 +86,7 @@ public class ManualEventSourceTenantTest {
 	public static class TestEventSourceRepository extends MuonEventSourceRepository<TestAggregate> {
 
 		public TestEventSourceRepository(Class<TestAggregate> type, AggregateEventClient aggregateEventClient, EventClient eventClient, String appName) {
-			super(type, aggregateEventClient, eventClient, appName);
+			super(type, aggregateEventClient, eventClient, new NoOpEventStreamProcessor(), appName);
 		}
 	}
 }

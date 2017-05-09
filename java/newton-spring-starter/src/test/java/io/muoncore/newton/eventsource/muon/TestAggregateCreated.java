@@ -1,7 +1,6 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -13,5 +12,5 @@ import lombok.ToString;
 @ToString
 public class TestAggregateCreated implements NewtonEvent {
 
-	private SimpleAggregateRootId id;
+	private String id;
 }

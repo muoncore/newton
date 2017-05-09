@@ -1,6 +1,6 @@
 package io.muoncore.newton.todo;
 
-import io.muoncore.newton.command.IdentifiableCommand;
+import io.muoncore.newton.command.Command;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.support.DocumentId;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class ChangeTodoDescriptionCommand implements IdentifiableCommand<DocumentId> {
+public class ChangeTodoDescriptionCommand implements Command {
 
   private DocumentId id;
   private String description;

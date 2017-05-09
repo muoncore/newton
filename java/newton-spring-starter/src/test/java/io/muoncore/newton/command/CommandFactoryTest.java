@@ -1,7 +1,5 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.AggregateRootId;
-import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,6 +15,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.UUID;
 
 import static org.junit.Assert.assertEquals;
 
@@ -48,8 +47,8 @@ public class CommandFactoryTest {
 	@Test
 	public void createFromCommandDefinition() throws Exception {
 		final TestRequest payload = new TestRequest("AAA");
-		final AggregateRootId id = new SimpleAggregateRootId();
-		final Class<TestPayloadCommand> type = TestPayloadCommand.class;
+		final String id = UUID.randomUUID().toString();
+    final Class<TestPayloadCommand> type = TestPayloadCommand.class;
 		Command cmd = commandFactory.create(type, payload, id, "tenantId");
 		Assert.assertNotNull(cmd);
 		//THEN - expect no exception
@@ -71,7 +70,7 @@ public class CommandFactoryTest {
 
   @Test
   public void createFromIdUsingReflection() throws Exception {
-    final AggregateRootId id = new AggregateRootId("1234");
+    final String id = "1234";
     Command cmd = commandFactory
       .create(TestCommand.class,null, id,null);
     Assert.assertNotNull(cmd);
@@ -106,26 +105,19 @@ public class CommandFactoryTest {
 		private String prop1;
 	}
 
+  @Data
 	public static class TestCommand implements Command {
-
-		protected AggregateRootId id;
+		protected String id;
 
 		@Override
 		public void execute() {
 		}
+	}
 
-		public void setId(AggregateRootId id) {
-			this.id = id;
-		}
-
-    public AggregateRootId getId() {
-      return id;
-    }
-  }
-
+	@Data
 	public static class TestIdCommand implements Command {
 
-		protected AggregateRootId id;
+		protected String id;
 
 		@Override
 		public void execute() {
@@ -134,16 +126,16 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(AggregateRootId id) {
+		public void setId(String id) {
 			this.id = id;
 		}
 	}
 
 
-	public static class TestPayloadCommand implements IdentifiableCommand {
+	public static class TestPayloadCommand implements Command {
 
     @Setter
-		protected AggregateRootId id;
+		protected String id;
 		@Setter
 		private String prop1;
 		@Setter
@@ -158,10 +150,6 @@ public class CommandFactoryTest {
 				throw new IllegalStateException("prop2 not expected to be specified!");
 			}
 			System.out.println("RUNNING");
-		}
-
-		public void setId(AggregateRootId id) {
-			this.id = id;
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package io.muoncore.newton.saga.mongo;
 
 import com.mongodb.BulkWriteResult;
-import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.saga.SagaCreated;
@@ -28,7 +27,7 @@ public class MongoSagaRepository implements SagaRepository {
 	}
 
   @Override
-  public <T extends Saga> Optional<T> load(AggregateRootId sagaIdentifier, Class<T> type) {
+  public <T extends Saga> Optional<T> load(String sagaIdentifier, Class<T> type) {
 		return Optional.ofNullable(
 				mongoTemplate.findById(sagaIdentifier, type, "sagas"));
 	}
@@ -66,7 +65,7 @@ public class MongoSagaRepository implements SagaRepository {
 		Query ops = new Query();
 
 		ops.addCriteria(
-				Criteria.where("sagaId").is(saga.getId().getValue())
+				Criteria.where("sagaId").is(saga.getId())
 		);
 
 		BulkWriteResult execute = mongoTemplate.bulkOps(BulkOperations.BulkMode.ORDERED, SagaInterest.class).remove(ops).execute();
@@ -88,12 +87,12 @@ public class MongoSagaRepository implements SagaRepository {
 	}
 
   @Override
-  public List<SagaCreated> getSagasCreatedByEventId(AggregateRootId id) {
+  public List<SagaCreated> getSagasCreatedByEventId(Object id) {
 
     Query ops = new Query();
 
     ops.addCriteria(
-      Criteria.where("eventId").is(id.getValue())
+      Criteria.where("eventId").is(id)
     );
 
 	  return mongoTemplate.find(ops, SagaCreated.class);

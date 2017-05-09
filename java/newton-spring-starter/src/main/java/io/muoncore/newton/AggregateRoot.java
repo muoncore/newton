@@ -3,9 +3,8 @@ package io.muoncore.newton;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AggregateRoot<Identifier extends AggregateRootId> {
+public abstract class AggregateRoot<T> {
 
-	protected Identifier id;
 	private long version;
 	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
@@ -16,16 +15,10 @@ public abstract class AggregateRoot<Identifier extends AggregateRootId> {
 		handleEvent(event);
 	}
 
+	public abstract T getId();
+
 	public long getVersion() {
 		return version;
-	}
-
-	public Identifier getId() {
-		return id;
-	}
-
-	public void setId(Identifier id) {
-		this.id = id;
 	}
 
 	public List<NewtonEvent> getNewOperations() {

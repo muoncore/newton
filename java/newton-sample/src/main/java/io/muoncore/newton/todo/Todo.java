@@ -4,12 +4,15 @@ import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.support.DocumentId;
+import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
 @AggregateConfiguration(context = "newton-sample")
 public class Todo extends AggregateRoot<DocumentId> {
 
+  @Getter
+  private DocumentId id;
   private String description;
 
   public Todo(){}
@@ -24,7 +27,7 @@ public class Todo extends AggregateRoot<DocumentId> {
 
   @EventHandler
   public void handle(TodoCreatedEvent event){
-    this.setId(event.getId());
+    this.id = event.getId();
     this.description = event.getDescription();
   }
 

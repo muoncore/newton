@@ -1,6 +1,5 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.AggregateRootId;
 import org.apache.commons.beanutils.BeanUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -22,11 +21,11 @@ public class CommandFactory implements ApplicationContextAware {
     return create(commandType, payload, null, null, tenantId);
   }
 
-  public Command create(Class<? extends Command> commandType, Object payload, AggregateRootId id, String tenantId) {
+  public Command create(Class<? extends Command> commandType, Object payload, Object id, String tenantId) {
     return create(commandType, payload, id, null, tenantId);
   }
 
-  public Command create(Class<? extends Command> commandType, Object payload, AggregateRootId id, Map<String, Object> additionalProperties, String tenantId) {
+  public Command create(Class<? extends Command> commandType, Object payload, Object id, Map<String, Object> additionalProperties, String tenantId) {
     Command command = loadFromSpringContext(commandType);
     if (payload != null) {
       command = decorateWithPayload(command, payload);
@@ -79,19 +78,15 @@ public class CommandFactory implements ApplicationContextAware {
     return command;
   }
 
-  private Command decorateWithId(Command command, AggregateRootId id) {
-    if (command instanceof IdentifiableCommand) {
-      ((IdentifiableCommand) command).setId(id);
-    } else {
-      final Method[] declaredMethods = command.getClass().getDeclaredMethods();
-      for (Method declaredMethod : declaredMethods) {
-        final Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-        if (parameterTypes.length == 1 && id.getClass().isAssignableFrom(parameterTypes[0])) {
-          try {
-            declaredMethod.invoke(command, id);
-          } catch (Exception e) {
-            throw new IllegalStateException("Unable to set id using reflection", e);
-          }
+  private Command decorateWithId(Command command, Object id) {
+    final Method[] declaredMethods = command.getClass().getDeclaredMethods();
+    for (Method declaredMethod : declaredMethods) {
+      final Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
+      if (parameterTypes.length == 1 && id.getClass().isAssignableFrom(parameterTypes[0])) {
+        try {
+          declaredMethod.invoke(command, id);
+        } catch (Exception e) {
+          throw new IllegalStateException("Unable to set id using reflection using method " + declaredMethod.toGenericString() + " and arg " + id + ":" + id.getClass(), e);
         }
       }
     }

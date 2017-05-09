@@ -3,16 +3,19 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.EventHandler;
-import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
+import lombok.Getter;
 
 @AggregateConfiguration(context = "${spring.application.name}")
-public class TestAggregate extends AggregateRoot<SimpleAggregateRootId> {
+public class TestAggregate extends AggregateRoot<String> {
+
+  @Getter
+  String id;
 
 	public TestAggregate() {
 	}
 
-	public TestAggregate(SimpleAggregateRootId id) {
+	public TestAggregate(String id) {
 		raiseEvent(new TestAggregateCreated(id));
 	}
 

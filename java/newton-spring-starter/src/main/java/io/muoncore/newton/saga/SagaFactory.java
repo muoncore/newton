@@ -4,11 +4,8 @@ package io.muoncore.newton.saga;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.saga.events.SagaEndEvent;
@@ -35,26 +32,27 @@ public class SagaFactory implements ApplicationContextAware {
         this.sagaRepository = sagaRepository;
     }
 
-    public void notifySagaLifeCycle(AggregateRootId id, SagaLifecycleEvent event) {
+    public void notifySagaLifeCycle(Object id, SagaLifecycleEvent event) {
         bus.post(event);
     }
 
-    public <ID extends AggregateRootId, T extends Saga<P, ID>, P extends NewtonEvent> SagaMonitor<ID, T> create(Class<T> sagaType, P payload) {
+    public <T extends Saga> SagaMonitor<T> create(Class<T> sagaType, NewtonEvent payload) {
         log.info("Creating new saga of type " + sagaType + " with payload " + payload);
         T saga = (T) loadFromSpringContext(sagaType);
         final T thesaga = saga;
-        thesaga.start(payload);
+
+        thesaga.startWith(payload);
 
         sagaRepository.saveNewSaga(saga, payload);
 
-        EventedSagaMonitor monitor = new EventedSagaMonitor<>(saga.getId(), sagaType);
+        EventedSagaMonitor monitor = new EventedSagaMonitor(saga.getId(), sagaType);
 
         processCommands(saga);
 
         return monitor;
     }
 
-    public <T extends Saga<? extends NewtonEvent, ID>,ID extends AggregateRootId> SagaMonitor<ID, T>monitor(AggregateRootId sagaId, Class<T> type) {
+    public <T extends Saga> SagaMonitor<T>monitor(String sagaId, Class<T> type) {
 
         Optional<T> saga = sagaRepository.load(sagaId, type);
         if (!saga.isPresent()) {
@@ -76,25 +74,25 @@ public class SagaFactory implements ApplicationContextAware {
         this.applicationContext = applicationContext;
     }
 
-    private <ID extends AggregateRootId, P extends NewtonEvent> Saga<P, ID> loadFromSpringContext(Class<? extends Saga> sagaType) {
+    private Saga loadFromSpringContext(Class<? extends Saga> sagaType) {
         return applicationContext.getBean(sagaType);
     }
 
-    class EventedSagaMonitor<ID extends AggregateRootId, T extends Saga<P, ID>, P extends NewtonEvent> implements SagaMonitor<ID, T> {
-        private ID id;
+    class EventedSagaMonitor<T extends Saga> implements SagaMonitor<T> {
+        private String id;
         private Class<T> sagaType;
         private List<SagaListener> listeners = new ArrayList<>();
         boolean finished;
         private BlockingQueue<SagaLifecycleEvent> events = new LinkedBlockingQueue<>();
 
-        public EventedSagaMonitor(ID id, Class<T> sagaType) {
+        public EventedSagaMonitor(String id, Class<T> sagaType) {
             this.id = id;
             this.sagaType = sagaType;
             bus.register(this);
         }
 
         @Override
-        public ID getId() {
+        public String getId() {
             return id;
         }
 

@@ -18,7 +18,8 @@ public abstract class UniqueAggregateDomainService<V> {
   @Value("${spring.application.name}")
   private String appName;
 
-  private Map<AggregateRootId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
+  //TODO, this is now object to value. Possibly this should be generified to match the ID we are interested in ...
+  private Map<Object, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private Class<? extends AggregateRoot> aggregateType;
@@ -45,7 +46,7 @@ public abstract class UniqueAggregateDomainService<V> {
 		streamSubscriptionManager.localNonTrackingSubscription(streamName, this::handleEvent);
 	}
 
-	public boolean isUnique(AggregateRootId thisId, V value) {
+	public boolean isUnique(Object thisId, V value) {
 		return !exists(thisId, value);
 	}
 
@@ -53,22 +54,22 @@ public abstract class UniqueAggregateDomainService<V> {
 	  return exists(null, value);
   }
 
-  public boolean exists(AggregateRootId thisId, V value) {
+  public boolean exists(Object thisId, V value) {
 		if (thisId != null) {
 			return entriesMap.entrySet().stream().anyMatch(x -> x.getValue().equals(value) && !x.getKey().equals(thisId));
 		}
 		return entriesMap.values().stream().anyMatch(v -> v.equals(value));
 	}
 
-	public void addValue(AggregateRootId id, V value) {
+	public void addValue(Object id, V value) {
 		entriesMap.put(id, value);
 	}
 
-	public void removeValue(AggregateRootId id) {
+	public void removeValue(Object id) {
 		entriesMap.remove(id);
 	}
 
-	public void updateValue(AggregateRootId id, V value) {
+	public void updateValue(Object id, V value) {
 		entriesMap.entrySet().stream()
 			.filter(entry -> entry.getKey().equals(id))
 			.findFirst()

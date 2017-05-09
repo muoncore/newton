@@ -1,9 +1,7 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.EventHandler;
-import io.muoncore.newton.SimpleAggregateRootId;
 import lombok.Data;
 import org.junit.Test;
 
@@ -28,11 +26,11 @@ public class StatefulSagaTest {
     }
 
 
-    public static class TestSaga extends StatefulSaga<MyEvent> {
+    public static class TestSaga extends StatefulSaga {
 
         public MyEvent event;
 
-        @Override
+        @StartSagaWith
         public void start(MyEvent event) {
 
         }
@@ -48,10 +46,10 @@ public class StatefulSagaTest {
 
     @Data
     static class MyEvent implements NewtonEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "hello-world";
     }
     @Data
     static class MyOtherEvent implements NewtonEvent {
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "hello-world";
     }
 }

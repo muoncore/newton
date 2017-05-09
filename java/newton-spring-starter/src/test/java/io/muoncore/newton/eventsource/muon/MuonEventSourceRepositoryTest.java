@@ -16,10 +16,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -46,7 +43,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test
 	public void load() throws Exception {
-    SimpleAggregateRootId id = new SimpleAggregateRootId();
+    String id = "simple-id";
 		client.publishDomainEvents(id.toString(), Collections.singletonList(
 			new TestAggregateCreated(id)
 		));
@@ -54,12 +51,12 @@ public class MuonEventSourceRepositoryTest {
 		TestAggregate aggregate = repository.load(id);
 		assertNotNull(aggregate);
 
-		assertEquals(id.getValue(), aggregate.getId().getValue());
+		assertEquals(id, aggregate.getId());
 	}
 
 	@Test
 	public void save() throws Exception {
-    SimpleAggregateRootId id = new SimpleAggregateRootId();
+    String id = UUID.randomUUID().toString();
 		TestAggregate customer = new TestAggregate(id);
 		repository.save(customer);
 
@@ -71,17 +68,17 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void throwsExceptionOnNonExistingAggregate() {
-		repository.load(new SimpleAggregateRootId());
+		repository.load("no-such-id-as-this");
 	}
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void withVersionThrowsExceptionOnNonExistingAggregate() {
-		repository.load(new SimpleAggregateRootId(), 5L);
+		repository.load("no-such-id-as-this", 5L);
 	}
 
 	@Test
 	public void canLoadWithVersion() {
-    AggregateRootId id = new SimpleAggregateRootId();
+    String id = "awesome-things";
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated(),
 			new TestAggregateCreated()
@@ -93,7 +90,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = OptimisticLockException.class)
 	public void throwsOptimisticLocExceptionOnBadVersion() {
-    AggregateRootId id = new SimpleAggregateRootId();
+    String id = "awesome-id";
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated()
 		));
@@ -103,7 +100,7 @@ public class MuonEventSourceRepositoryTest {
 
   @Test()
   public void canStreamAggregateEvents() throws InterruptedException {
-    AggregateRootId id = new SimpleAggregateRootId();
+    String id = "cool-id";
     client.publishDomainEvents(id.toString(), Arrays.asList(
       new TestAggregateCreated(), new TestAggregateCreated()
     ));

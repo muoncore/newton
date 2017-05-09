@@ -7,19 +7,24 @@ import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A Saga that maintains its state in a mutable store.
  */
-public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, AggregateRootId> {
+public abstract class StatefulSaga implements Saga {
 
-    protected AggregateRootId id = AggregateRootId.createRandom();
+    @Getter
+    protected String id = UUID.randomUUID().toString();
 
     @Getter
     private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);
     private long version;
     @Getter
     private boolean complete = false;
+
+    @Transient
+    private transient DynamicInvokeEventAdaptor startEventAdaptor = new DynamicInvokeEventAdaptor(this, StartSagaWith.class);
 
     @Transient
     private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
@@ -40,16 +45,8 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Agg
         return version;
     }
 
-    public AggregateRootId getId() {
-        return id;
-    }
-
-    public void setId(AggregateRootId id) {
-        this.id = id;
-    }
-
     protected <E extends NewtonEvent> void notifyOn(Class<E> type, String key, String value) {
-        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new SimpleAggregateRootId(), getId(), key, value));
+        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), UUID.randomUUID().toString(), getId(), key, value));
     }
 
     protected void end() {
@@ -61,11 +58,21 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Agg
     }
 
     @Override
+    public void startWith(NewtonEvent event) {
+      boolean eventHandled = startEventAdaptor.apply(event);
+
+      if (!eventHandled) {
+        throw new IllegalStateException("Undefined @SagaStartWith event handler method for event: ".concat(event.getClass().getName()));
+      }
+      version++;
+    }
+
+    @Override
     public void handle(NewtonEvent event) {
         boolean eventHandled = eventAdaptor.apply(event);
 
         if (!eventHandled) {
-            throw new IllegalStateException("Undefined domain event handler method for event: ".concat(event.getClass().getName()));
+            throw new IllegalStateException("Undefined @EventHandler method for event: ".concat(event.getClass().getName()));
         }
         version++;
     }

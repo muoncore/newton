@@ -1,8 +1,6 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.AggregateRootId;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.SimpleAggregateRootId;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
@@ -67,11 +65,11 @@ public class SagaStreamManagerTest {
 
         SagaWithEventHandler saga = mock(SagaWithEventHandler.class);
 
-        AggregateRootId sagaId = new SimpleAggregateRootId();
+        String sagaId = "12345";
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
                 TestSaga.class.getName(),
-                SagaWithEventHandler.class.getName(), new SimpleAggregateRootId(), sagaId, "hello", "world")));
+                SagaWithEventHandler.class.getName(), "££££123", sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithEventHandler.class;
 
@@ -102,10 +100,10 @@ public class SagaStreamManagerTest {
         ArgumentCaptor<Consumer<NewtonEvent>> eventStreamCaptor =  (ArgumentCaptor)ArgumentCaptor.forClass(Consumer.class);
         manager.processSaga(SagaWithCommands.class);
 
-        AggregateRootId sagaId = new SimpleAggregateRootId();
+        String sagaId = "1234";
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), new SimpleAggregateRootId(), sagaId, "hello", "world")));
+                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), "4321", sagaId, "hello", "world")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -132,10 +130,10 @@ public class SagaStreamManagerTest {
         ArgumentCaptor<Consumer<NewtonEvent>> eventStreamCaptor =  (ArgumentCaptor)ArgumentCaptor.forClass(Consumer.class);
         manager.processSaga(SagaWithCommands.class);
 
-        AggregateRootId sagaId = new SimpleAggregateRootId();
+        String sagaId = "1234";
 
         when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, new SimpleAggregateRootId(), "hello", "orld")));
+                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), sagaId, "4321", "hello", "orld")));
 
         Class<? extends Saga> type = SagaWithCommands.class;
 
@@ -157,17 +155,11 @@ public class SagaStreamManagerTest {
 
     @SagaStreamConfig(streams = {"stream", "stream2"})
     static class SagaWithConfig extends StatefulSaga {
-        @Override
-        public void start(NewtonEvent event) {
 
-        }
     }
 
     static class NoAnnotationSaga extends StatefulSaga {
-        @Override
-        public void start(NewtonEvent event) {
 
-        }
     }
     @SagaStreamConfig(streams = {"mystream"})
     static class SagaWithCommands implements Saga {
@@ -182,7 +174,7 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public AggregateRootId getId() {
+        public String getId() {
             return null;
         }
 
@@ -192,16 +184,16 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public void start(NewtonEvent event) {
-
-        }
-
-        @Override
         public void handle(NewtonEvent event) {
 
         }
 
         @Override
+        public void startWith(NewtonEvent event) {
+
+        }
+
+      @Override
         public List<SagaInterest> getNewSagaInterests() {
             return Collections.emptyList();
         }
@@ -216,7 +208,7 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public AggregateRootId getId() {
+        public String getId() {
             return null;
         }
 
@@ -226,14 +218,9 @@ public class SagaStreamManagerTest {
         }
 
         @Override
-        public void start(NewtonEvent event) {
-
-        }
-
+        public void startWith(NewtonEvent event) {}
         @Override
-        public void handle(NewtonEvent event) {
-
-        }
+        public void handle(NewtonEvent event) {}
         @Override
         public List<SagaInterest> getNewSagaInterests() {
             return Collections.emptyList();
@@ -242,6 +229,6 @@ public class SagaStreamManagerTest {
 
     static class SagaEvent implements NewtonEvent {
       @Getter
-      private final AggregateRootId id = new SimpleAggregateRootId();
+      private final String id = "hello-world";
     }
 }

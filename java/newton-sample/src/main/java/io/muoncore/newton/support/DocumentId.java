@@ -3,12 +3,11 @@ package io.muoncore.newton.support;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import io.muoncore.newton.AggregateRootId;
 import org.bson.types.ObjectId;
 
 import java.io.Serializable;
 
-public final class DocumentId extends AggregateRootId implements Serializable, Comparable<DocumentId>/*, AggregateRootId*/ {
+public final class DocumentId implements Serializable, Comparable<DocumentId>/*, AggregateRootId*/ {
 
 	private ObjectId objectId;
 

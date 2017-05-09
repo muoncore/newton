@@ -1,10 +1,10 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.*;
+import io.muoncore.newton.command.Command;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandConfiguration;
 import io.muoncore.newton.command.CommandIntent;
-import io.muoncore.newton.command.IdentifiableCommand;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.eventsource.muon.TestAggregate;
 import io.muoncore.newton.mongo.MongoConfiguration;
@@ -60,12 +60,12 @@ public class SagaIntegrationTests {
   public void sagaCanBeStartedViaStartEvent() throws InterruptedException {
 
     //save a domain class, triggering a save event
-    NewtonEvent<AggregateRootId> createEvent = testAggregateRepo.newInstance(SagaTestAggregate::new).getNewOperations().get(0);
+    NewtonEvent<String> createEvent = testAggregateRepo.newInstance(SagaTestAggregate::new).getNewOperations().get(0);
 
     Thread.sleep(1000);
     //lookup the saga via the ID
     List<SagaCreated> sagas = sagaRepository.getSagasCreatedByEventId(createEvent.getId());
-    SagaMonitor<AggregateRootId, ComplexSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), ComplexSaga.class);
+    SagaMonitor<ComplexSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), ComplexSaga.class);
 
     ComplexSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
 
@@ -83,7 +83,7 @@ public class SagaIntegrationTests {
 
   @Test
   public void sagaCanBeLoadedLater() {
-    SagaMonitor<AggregateRootId, TestSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<TestSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
     Optional<TestSaga> load = sagaRepository.load(sagaMonitor.getId(), TestSaga.class);
@@ -94,10 +94,10 @@ public class SagaIntegrationTests {
 
   @Test
   public void sagaCanBeMonitoredLater() {
-    SagaMonitor<AggregateRootId, TestSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<TestSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
 
-    SagaMonitor<AggregateRootId, TestSaga> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
+    SagaMonitor<TestSaga> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
 
     assertNotNull(monitor);
 
@@ -106,7 +106,7 @@ public class SagaIntegrationTests {
   @Test
   public void multiStepSagaWorkflow() {
 
-    SagaMonitor<AggregateRootId, ComplexSaga> sagaMonitor = sagaBus.dispatch(
+    SagaMonitor<ComplexSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
     ComplexSaga saga = sagaMonitor.waitForCompletion(TimeUnit.MINUTES, 1);
@@ -118,11 +118,11 @@ public class SagaIntegrationTests {
   @Scope("prototype")
   @Component
   @SagaStreamConfig(streams = {"TestAggregate", "user/SagaTestAggregate"})
-  public static class ComplexSaga extends StatefulSaga<OrderRequestedEvent> {
+  public static class ComplexSaga extends StatefulSaga {
 
-    private AggregateRootId orderId;
+    private String orderId;
 
-    @Override
+    @StartSagaWith
     public void start(OrderRequestedEvent event) {
       orderId = event.getId();
 
@@ -157,35 +157,34 @@ public class SagaIntegrationTests {
 
   @Getter
   public static class OrderRequestedEvent implements NewtonEvent {
-    private final AggregateRootId id = AggregateRootId.createRandom();
+    private final String id = "my-awesome";
   }
 
   @Getter
   @AllArgsConstructor
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
-    private AggregateRootId orderId;
-    private final AggregateRootId id = AggregateRootId.createRandom();
+    private String orderId;
+    private final String id = "12345";
   }
 
   @Getter
   @AllArgsConstructor
   @ToString
   public static class OrderShippedEvent implements NewtonEvent {
-    private AggregateRootId orderId;
-    private final AggregateRootId id = AggregateRootId.createRandom();
+    private String orderId;
+    private final String id = "4321";
   }
 
   @Scope("prototype")
   @Component
-  static class TakePayment implements IdentifiableCommand<AggregateRootId> {
+  public static class TakePayment implements Command {
 
     @Autowired
     private EventClient eventClient;
-    private AggregateRootId orderId;
+    private String orderId;
 
-    @Override
-    public void setId(AggregateRootId id) {
+    public void setId(String id) {
       this.orderId = id;
     }
 
@@ -208,14 +207,13 @@ public class SagaIntegrationTests {
   @Scope("prototype")
   @Component
   @Slf4j
-  static class ShipOrder implements IdentifiableCommand<AggregateRootId> {
+  public static class ShipOrder implements Command {
 
     @Autowired
     private EventClient eventClient;
-    private AggregateRootId orderId;
+    private String orderId;
 
-    @Override
-    public void setId(AggregateRootId id) {
+    public void setId(String id) {
       this.orderId = id;
     }
 

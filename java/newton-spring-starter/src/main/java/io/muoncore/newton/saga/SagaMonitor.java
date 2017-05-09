@@ -1,13 +1,9 @@
 package io.muoncore.newton.saga;
 
-
-import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.AggregateRootId;
-
 import java.util.concurrent.TimeUnit;
 
-public interface SagaMonitor<ID extends AggregateRootId, T extends Saga<? extends NewtonEvent, ID>> {
-    ID getId();
+public interface SagaMonitor<T extends Saga> {
+    String getId();
     /*
      * async interface (preferred!) Will use an internal dispatch pool and not block control thread.
      * You _will_ lose current thread local state.
