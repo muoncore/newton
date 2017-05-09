@@ -23,7 +23,7 @@ import java.util.List;
 @Slf4j
 public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
-  @Value("#{application.name}")
+  @Value("${spring.application.name}")
   private String appName;
 
   @Override
@@ -34,7 +34,7 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
       MuonLookupUtils.listAllAggregateRootClass().forEach(s -> {
 
-        String context = "#{application.name}";
+        String context;
         AggregateConfiguration a = s.getAnnotation(AggregateConfiguration.class);
 
         if (a != null) {
