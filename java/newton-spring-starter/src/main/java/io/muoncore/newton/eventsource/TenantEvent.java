@@ -5,13 +5,12 @@ import io.muoncore.newton.NewtonEvent;
 import lombok.Getter;
 import lombok.Setter;
 
-public class TenantEvent implements NewtonEvent {
+public abstract class TenantEvent<A extends AggregateRootId> implements NewtonEvent {
 
   @Getter
   @Setter
-  private AggregateRootId id;
-  @Getter
-  @Setter
   private String tenantId;
+
+  public abstract A getId();
 
 }

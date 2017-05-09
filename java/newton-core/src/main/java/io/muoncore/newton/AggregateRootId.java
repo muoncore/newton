@@ -29,6 +29,17 @@ public class AggregateRootId {
 
   @Override
   public boolean equals(Object o) {
-    return value.equals(o.toString());
+    if (this == o) return true;
+    if (!(o instanceof AggregateRootId)) return false;
+
+    AggregateRootId that = (AggregateRootId) o;
+
+    return value != null ? value.equals(that.value) : that.value == null;
   }
+
+  @Override
+  public int hashCode() {
+    return value != null ? value.hashCode() : 0;
+  }
+
 }

@@ -83,6 +83,11 @@ public class CommandFactory implements ApplicationContextAware {
 		if (command instanceof IdentifiableCommand) {
 			((IdentifiableCommand) command).setId(id);
 		}
+		//todo: set AggregateRootID via type definition
+//		else{
+//      final Method method = command.getClass().getDeclaredMethods();
+//
+//    }
 		return command;
 	}
 }
