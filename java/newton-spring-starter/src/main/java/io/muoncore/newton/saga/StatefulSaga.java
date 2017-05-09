@@ -13,7 +13,7 @@ import java.util.List;
  */
 public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, AggregateRootId> {
 
-    protected AggregateRootId id = new AggregateRootId();
+    protected AggregateRootId id = AggregateRootId.createRandom();
 
     @Getter
     private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);

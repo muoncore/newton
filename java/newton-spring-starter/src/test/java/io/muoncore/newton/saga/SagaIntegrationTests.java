@@ -157,7 +157,7 @@ public class SagaIntegrationTests {
 
   @Getter
   public static class OrderRequestedEvent implements NewtonEvent {
-    private final AggregateRootId id = new AggregateRootId();
+    private final AggregateRootId id = AggregateRootId.createRandom();
   }
 
   @Getter
@@ -165,7 +165,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
     private AggregateRootId orderId;
-    private final AggregateRootId id = new AggregateRootId();
+    private final AggregateRootId id = AggregateRootId.createRandom();
   }
 
   @Getter
@@ -173,7 +173,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class OrderShippedEvent implements NewtonEvent {
     private AggregateRootId orderId;
-    private final AggregateRootId id = new AggregateRootId();
+    private final AggregateRootId id = AggregateRootId.createRandom();
   }
 
   @Scope("prototype")

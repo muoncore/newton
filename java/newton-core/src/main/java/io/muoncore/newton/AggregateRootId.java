@@ -2,6 +2,8 @@ package io.muoncore.newton;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.UUID;
+
 //todo: try to rather make this an interface (consider gson serlization issues)
 public class AggregateRootId {
 
@@ -20,7 +22,12 @@ public class AggregateRootId {
     this.value = value;
   }
 
+  //todo: review - think this is required gson but this is dangerous to expose as it will cause nullpointers
   public AggregateRootId(){}
+
+  public static AggregateRootId createRandom(){
+    return new AggregateRootId(UUID.randomUUID().toString());
+  }
 
   @Override
   public String toString() {
