@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.5...HEAD)
+
+**Closed issues:**
+
+- Add in default codec for DocumentId [\#19](https://github.com/muoncore/newton/issues/19)
+
 ## [v0.0.5](https://github.com/muoncore/newton/tree/v0.0.5) (2017-05-02)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.4...v0.0.5)
 
