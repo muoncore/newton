@@ -49,7 +49,11 @@ public abstract class UniqueAggregateDomainService<V> {
 		return !exists(thisId, value);
 	}
 
-	public boolean exists(AggregateRootId thisId, V value) {
+  public boolean exists(V value) {
+	  return exists(null, value);
+  }
+
+  public boolean exists(AggregateRootId thisId, V value) {
 		if (thisId != null) {
 			return entriesMap.entrySet().stream().anyMatch(x -> x.getValue().equals(value) && !x.getKey().equals(thisId));
 		}

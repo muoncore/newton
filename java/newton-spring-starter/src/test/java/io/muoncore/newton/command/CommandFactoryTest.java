@@ -18,6 +18,8 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
 
+import static org.junit.Assert.assertEquals;
+
 @ActiveProfiles({"test"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {CommandFactoryTest.class, CommandConfiguration.class})
@@ -67,8 +69,20 @@ public class CommandFactoryTest {
 		commandFactory.create(TestPayloadCommand.class, null, null, Collections.singletonMap("propX", "Value"), null);
 	}
 
+  @Test
+  public void createFromIdUsingReflection() throws Exception {
+    final AggregateRootId id = new AggregateRootId("1234");
+    Command cmd = commandFactory
+      .create(TestCommand.class,null, id,null);
+    Assert.assertNotNull(cmd);
+    assertEquals(id, ((TestCommand)cmd).getId());
+    //THEN - expect no exception
+//    cmd.execute();
+  }
 
-	//CONFIGURATION
+
+
+  //CONFIGURATION
 	@Bean
 	public TestPayloadCommand testPayloadCommand() {
 		return new TestPayloadCommand();
@@ -103,7 +117,11 @@ public class CommandFactoryTest {
 		public void setId(AggregateRootId id) {
 			this.id = id;
 		}
-	}
+
+    public AggregateRootId getId() {
+      return id;
+    }
+  }
 
 	public static class TestIdCommand implements Command {
 
