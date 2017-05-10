@@ -17,8 +17,6 @@ public abstract class StatefulSaga implements Saga {
     @Getter
     protected String id = UUID.randomUUID().toString();
 
-    @Getter
-    private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);
     private long version;
     @Getter
     private boolean complete = false;
@@ -52,7 +50,6 @@ public abstract class StatefulSaga implements Saga {
     protected void end() {
         complete = true;
         raiseCommand(CommandIntent.builder(SagaEndCommand.class.getName())
-//                .correlate(getCorrelationId())
                 .id(getId()).build()
         );
     }

@@ -6,7 +6,6 @@ import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventResult;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-import io.muoncore.newton.CorrelationId;
 import io.muoncore.newton.saga.events.SagaEndEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -17,8 +16,6 @@ public class SagaEndCommand implements Command {
 
     @Setter
     private String id;
-    @Setter
-    private CorrelationId correlationId;
 
     @Autowired
     transient private EventClient eventClient;
