@@ -20,7 +20,7 @@ endif
 	#git push origin
 
 test:
-	SHORT_TEST=true ./gradlew check
+	./gradlew check
 
 clean:
 	./gradlew clean
