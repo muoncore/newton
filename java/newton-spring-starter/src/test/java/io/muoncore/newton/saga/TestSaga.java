@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component;
 @Scope("prototype")
 @Component
 @SagaStreamConfig(streams="user/SagaTestAggregate")
-public class TestSaga extends StatefulSaga<SagaIntegrationTests.OrderRequestedEvent> {
-  @Override
+public class TestSaga extends StatefulSaga {
+  @StartSagaWith
   public void start(SagaIntegrationTests.OrderRequestedEvent event) {
     end();
   }

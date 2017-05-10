@@ -1,6 +1,5 @@
 package io.muoncore.newton.command;
 
-import io.muoncore.newton.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,6 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.Collections;
+import java.util.UUID;
+
+import static org.junit.Assert.assertEquals;
 
 @ActiveProfiles({"test"})
 @RunWith(SpringRunner.class)
@@ -45,8 +47,8 @@ public class CommandFactoryTest {
 	@Test
 	public void createFromCommandDefinition() throws Exception {
 		final TestRequest payload = new TestRequest("AAA");
-		final DocumentId id = new DocumentId();
-		final Class<TestPayloadCommand> type = TestPayloadCommand.class;
+		final String id = UUID.randomUUID().toString();
+    final Class<TestPayloadCommand> type = TestPayloadCommand.class;
 		Command cmd = commandFactory.create(type, payload, id, "tenantId");
 		Assert.assertNotNull(cmd);
 		//THEN - expect no exception
@@ -66,8 +68,20 @@ public class CommandFactoryTest {
 		commandFactory.create(TestPayloadCommand.class, null, null, Collections.singletonMap("propX", "Value"), null);
 	}
 
+  @Test
+  public void createFromIdUsingReflection() throws Exception {
+    final String id = "1234";
+    Command cmd = commandFactory
+      .create(TestCommand.class,null, id,null);
+    Assert.assertNotNull(cmd);
+    assertEquals(id, ((TestCommand)cmd).getId());
+    //THEN - expect no exception
+//    cmd.execute();
+  }
 
-	//CONFIGURATION
+
+
+  //CONFIGURATION
 	@Bean
 	public TestPayloadCommand testPayloadCommand() {
 		return new TestPayloadCommand();
@@ -91,22 +105,19 @@ public class CommandFactoryTest {
 		private String prop1;
 	}
 
+  @Data
 	public static class TestCommand implements Command {
-
-		protected DocumentId id;
+		protected String id;
 
 		@Override
 		public void execute() {
 		}
-
-		public void setId(DocumentId id) {
-			this.id = id;
-		}
 	}
 
+	@Data
 	public static class TestIdCommand implements Command {
 
-		protected DocumentId id;
+		protected String id;
 
 		@Override
 		public void execute() {
@@ -115,16 +126,16 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(DocumentId id) {
+		public void setId(String id) {
 			this.id = id;
 		}
 	}
 
 
-	public static class TestPayloadCommand implements IdentifiableCommand {
+	public static class TestPayloadCommand implements Command {
 
     @Setter
-		protected DocumentId id;
+		protected String id;
 		@Setter
 		private String prop1;
 		@Setter
@@ -139,10 +150,6 @@ public class CommandFactoryTest {
 				throw new IllegalStateException("prop2 not expected to be specified!");
 			}
 			System.out.println("RUNNING");
-		}
-
-		public void setId(DocumentId id) {
-			this.id = id;
 		}
 	}
 }

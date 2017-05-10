@@ -1,6 +1,5 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.DocumentId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.ToString;
@@ -10,6 +9,6 @@ import lombok.ToString;
 @ToString
 public class SagaCreated {
     private String sagaClassName;
-    private DocumentId eventId;
-    private DocumentId sagaId;
+    private Object eventId;
+    private String sagaId;
 }

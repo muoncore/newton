@@ -1,7 +1,6 @@
 package io.muoncore.newton.command;
 
 import io.muoncore.newton.CorrelationId;
-import io.muoncore.newton.DocumentId;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -9,15 +8,15 @@ import java.util.Map;
 import java.util.Objects;
 
 @Getter
-public class CommandIntent<ID extends DocumentId> {
+public class CommandIntent {
 
 	private String type;
 	private Object payload;
 	private CorrelationId correlationId;
-	private ID id;
+	private Object id;
 	private Map<String, Object> additionalProperties = new HashMap<>();
 
-	public CommandIntent(String type, ID id, Object payload, Map<String, Object> additionalProperties, CorrelationId correlationId) {
+	public CommandIntent(String type, Object id, Object payload, Map<String, Object> additionalProperties, CorrelationId correlationId) {
 		this.type = type;
 		this.id = id;
 		this.payload = payload;
@@ -25,15 +24,15 @@ public class CommandIntent<ID extends DocumentId> {
 		this.correlationId = correlationId;
 	}
 
-	public static <ID extends DocumentId> CommandIntentBuilder<ID> builder(String type) {
-		return new CommandIntentBuilder<>(type);
+	public static CommandIntentBuilder builder(String type) {
+		return new CommandIntentBuilder(type);
 	}
 
-	public static class CommandIntentBuilder<ID extends DocumentId> {
+	public static class CommandIntentBuilder {
 
 		private String type;
 		private Object request;
-		private ID id;
+		private Object id;
 		private CorrelationId correlationId;
 		private Map<String, Object> additionalProperties = new HashMap<>();
 
@@ -46,7 +45,7 @@ public class CommandIntent<ID extends DocumentId> {
 			return this;
 		}
 
-		public CommandIntentBuilder id(ID id) {
+		public CommandIntentBuilder id(Object id) {
 			this.id = Objects.requireNonNull(id, "Id is null!");
 			return this;
 		}

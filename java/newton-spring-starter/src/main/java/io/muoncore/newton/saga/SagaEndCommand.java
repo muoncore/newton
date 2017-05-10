@@ -1,23 +1,22 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.command.Command;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventResult;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.CorrelationId;
-import io.muoncore.newton.command.IdentifiableCommand;
 import io.muoncore.newton.saga.events.SagaEndEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.muoncore.newton.saga.SagaStreamManager.SAGA_LIFECYCLE_STREAM;
 
 @Slf4j
-public class SagaEndCommand implements IdentifiableCommand {
+public class SagaEndCommand implements Command {
 
     @Setter
-    private DocumentId id;
+    private String id;
     @Setter
     private CorrelationId correlationId;
 

@@ -2,21 +2,24 @@ package io.muoncore.newton.eventsource.muon;
 
 
 import io.muoncore.newton.AggregateRoot;
-import io.muoncore.newton.OnDomainEvent;
-import io.muoncore.newton.DocumentId;
+import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
+import lombok.Getter;
 
 @AggregateConfiguration(context = "${spring.application.name}")
-public class TestAggregate extends AggregateRoot<DocumentId> {
+public class TestAggregate extends AggregateRoot<String> {
+
+  @Getter
+  String id;
 
 	public TestAggregate() {
 	}
 
-	public TestAggregate(DocumentId id) {
+	public TestAggregate(String id) {
 		raiseEvent(new TestAggregateCreated(id));
 	}
 
-	@OnDomainEvent
+	@EventHandler
 	public void handle(TestAggregateCreated created) {
 		this.id = created.getId();
 	}

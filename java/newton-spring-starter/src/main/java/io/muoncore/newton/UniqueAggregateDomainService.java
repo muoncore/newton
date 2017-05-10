@@ -2,6 +2,7 @@ package io.muoncore.newton;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -14,11 +15,15 @@ import java.util.function.Predicate;
 @Slf4j
 public abstract class UniqueAggregateDomainService<V> {
 
-	private Map<DocumentId, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
+  @Value("${spring.application.name}")
+  private String appName;
+
+  //TODO, this is now object to value. Possibly this should be generified to match the ID we are interested in ...
+  private Map<Object, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private Class<? extends AggregateRoot> aggregateType;
-	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnViewEvent.class);
+	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
 	public UniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager, Class<? extends AggregateRoot> aggregateType) throws IOException {
 		this.streamSubscriptionManager = streamSubscriptionManager;
@@ -32,29 +37,39 @@ public abstract class UniqueAggregateDomainService<V> {
 
 	@PostConstruct
 	public void initSubscription() throws InterruptedException {
-		streamSubscriptionManager.localNonTrackingSubscription(aggregateType.getSimpleName(), this::handleEvent);
+		//todo: investigate AggregateRootContext annotation....
+
+		String streamName = aggregateType.getSimpleName();
+		if (this.appName != null){
+			streamName = this.appName.concat("/").concat(streamName);
+		}
+		streamSubscriptionManager.localNonTrackingSubscription(streamName, this::handleEvent);
 	}
 
-	public boolean isUnique(DocumentId thisId, V value) {
+	public boolean isUnique(Object thisId, V value) {
 		return !exists(thisId, value);
 	}
 
-	public boolean exists(DocumentId thisId, V value) {
+  public boolean exists(V value) {
+	  return exists(null, value);
+  }
+
+  public boolean exists(Object thisId, V value) {
 		if (thisId != null) {
 			return entriesMap.entrySet().stream().anyMatch(x -> x.getValue().equals(value) && !x.getKey().equals(thisId));
 		}
 		return entriesMap.values().stream().anyMatch(v -> v.equals(value));
 	}
 
-	public void addValue(DocumentId id, V value) {
+	public void addValue(Object id, V value) {
 		entriesMap.put(id, value);
 	}
 
-	public void removeValue(DocumentId id) {
+	public void removeValue(Object id) {
 		entriesMap.remove(id);
 	}
 
-	public void updateValue(DocumentId id, V value) {
+	public void updateValue(Object id, V value) {
 		entriesMap.entrySet().stream()
 			.filter(entry -> entry.getKey().equals(id))
 			.findFirst()

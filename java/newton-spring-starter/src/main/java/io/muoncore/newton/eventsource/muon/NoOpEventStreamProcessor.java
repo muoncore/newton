@@ -17,7 +17,7 @@ public class NoOpEventStreamProcessor implements EventStreamProcessor {
     }
 
     @Override
-    public List<? extends NewtonEvent> processForLoad(List<NewtonEvent> events) {
+    public List<? extends NewtonEvent> processForLoad(List<? extends NewtonEvent> events) {
         return events;
     }
 }

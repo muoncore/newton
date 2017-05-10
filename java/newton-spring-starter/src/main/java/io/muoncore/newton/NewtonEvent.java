@@ -1,5 +1,5 @@
 package io.muoncore.newton;
 
-public interface NewtonEvent<A> {
-  A getId();
+public interface NewtonEvent<T> {
+  T getId();
 }

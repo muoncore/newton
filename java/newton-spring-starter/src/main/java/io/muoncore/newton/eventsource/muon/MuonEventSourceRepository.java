@@ -1,16 +1,15 @@
 package io.muoncore.newton.eventsource.muon;
 
+import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.DocumentId;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
+import io.muoncore.newton.eventsource.EventSourceRepository;
+import io.muoncore.newton.eventsource.OptimisticLockException;
+import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.EventClient;
-import io.muoncore.newton.AggregateRoot;
-import io.muoncore.newton.eventsource.EventSourceRepository;
-import io.muoncore.newton.eventsource.OptimisticLockException;
-import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
@@ -22,22 +21,28 @@ import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> implements EventSourceRepository<A> {
+public class MuonEventSourceRepository<A extends AggregateRoot> implements EventSourceRepository<A> {
 
 	private Class<A> aggregateType;
 	private AggregateEventClient aggregateEventClient;
 	private EventClient eventClient;
 	private final String boundedContextName;
+	private EventStreamProcessor processor;
 
-	public MuonEventSourceRepository(Class<A> type, AggregateEventClient aggregateEventClient, EventClient eventClient, String boundedContextName) {
+	public MuonEventSourceRepository(Class<A> type,
+                                   AggregateEventClient aggregateEventClient,
+                                   EventClient eventClient,
+                                   EventStreamProcessor eventStreamProcessor,
+                                   String boundedContextName) {
 		aggregateType = type;
+		this.processor = eventStreamProcessor;
 		this.aggregateEventClient = aggregateEventClient;
 		this.eventClient = eventClient;
 		this.boundedContextName = boundedContextName;
 	}
 
 	@Override
-	public A load(DocumentId aggregateIdentifier) {
+	public A load(Object aggregateIdentifier) {
 		try {
 			A aggregate = aggregateType.newInstance();
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
@@ -50,7 +55,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
 	}
 
 	@Override
-	public A load(DocumentId aggregateIdentifier, Long version) {
+	public A load(Object aggregateIdentifier, Long version) {
 		try {
 			A aggregate = (A) aggregateType.newInstance();
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
@@ -80,7 +85,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
 		emitForStreamProcessing(aggregate);
 	}
 
-  private Publisher<NewtonEvent> subscribe(DocumentId aggregateIdentifier, EventReplayMode mode) {
+  private Publisher<NewtonEvent> subscribe(Object aggregateIdentifier, EventReplayMode mode) {
 	  return sub -> eventClient.replay("/aggregate/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {
         public void onSubscribe(Subscription s) {
           sub.onSubscribe(s);
@@ -101,21 +106,21 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
   }
 
   @Override
-  public Publisher<NewtonEvent> replay(DocumentId aggregateIdentifier) {
+  public Publisher<NewtonEvent> replay(Object aggregateIdentifier) {
 	  return subscribe(aggregateIdentifier, EventReplayMode.REPLAY_ONLY);
   }
 
   @Override
-  public Publisher<NewtonEvent> subscribeColdHot(DocumentId aggregateIdentifier) {
+  public Publisher<NewtonEvent> subscribeColdHot(Object aggregateIdentifier) {
     return subscribe(aggregateIdentifier, EventReplayMode.REPLAY_THEN_LIVE);
   }
 
   @Override
-  public Publisher<NewtonEvent> subscribeHot(DocumentId aggregateIdentifier) {
+  public Publisher<NewtonEvent> subscribeHot(Object aggregateIdentifier) {
     return subscribe(aggregateIdentifier, EventReplayMode.LIVE_ONLY);
   }
 
-  private List<NewtonEvent> replayEvents(DocumentId id) {
+  private List<NewtonEvent> replayEvents(Object id) {
 		try {
 			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString())
 				.stream()
@@ -124,7 +129,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
 
 			if (events.size() == 0) throw new AggregateNotFoundException(id);
 
-			return events;
+			return (List<NewtonEvent>) processor.processForLoad(events);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
@@ -133,13 +138,13 @@ public class MuonEventSourceRepository<A extends AggregateRoot<DocumentId>> impl
 	private void emitForAggregatePersistence(A aggregate) {
 		aggregateEventClient.publishDomainEvents(
 			aggregate.getId().toString(),
-			aggregate.getNewOperations());
+      processor.processForPersistence(aggregate.getNewOperations()));
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
 		String streamName = boundedContextName + "/" + aggregate.getClass().getSimpleName();
 		log.debug("Emitting event on " + streamName);
-		aggregate.getNewOperations().forEach(
+    processor.processForPersistence(aggregate.getNewOperations()).forEach(
 			event -> eventClient.event(
 				ClientEvent
 					.ofType(event.getClass().getSimpleName())

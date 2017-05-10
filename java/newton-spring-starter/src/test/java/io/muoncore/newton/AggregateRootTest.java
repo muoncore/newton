@@ -24,7 +24,7 @@ public class AggregateRootTest {
 		testAggregate.doA("ZZZ");
 		//THEN
 		assertEquals("A event raised and handled", "ZZZ", testAggregate.getAString());
-		assertTrue("New Operations contains AEvent", testAggregate.getNewOperations().contains(new AEvent("ZZZ")));
+		assertTrue("New Operations contains AEvent", ((AEvent)testAggregate.getNewOperations().get(0)).getValue().equals("ZZZ"));
 	}
 
 	@Test
@@ -35,13 +35,16 @@ public class AggregateRootTest {
 		TestAggregateRoot testAggregate = new TestAggregateRoot();
 		//WHEN
 		testAggregate.doB("ZZZ");
+
+
 	}
 
 
 	@Data
   @AggregateConfiguration(context = "user")
-	public class TestAggregateRoot extends AggregateRoot {
+	public class TestAggregateRoot extends AggregateRoot<String> {
 
+	  private String id;
 		private String aString;
 
 		void doA(String a) {
@@ -52,7 +55,7 @@ public class AggregateRootTest {
 			raiseEvent(new BEvent());
 		}
 
-		@OnDomainEvent
+		@EventHandler
 		public void handle(AEvent aEvent) {
 			this.aString = aEvent.getValue();
 		}
@@ -62,12 +65,12 @@ public class AggregateRootTest {
 	@Data
 	@AllArgsConstructor
 	public class AEvent implements NewtonEvent {
-    private final DocumentId id = new DocumentId();
+    private final String id = "hello";
 		private String value;
 	}
 
 	@Data
 	public class BEvent implements NewtonEvent {
-    private final DocumentId id = new DocumentId();
+    private final String id = "world";
 	}
 }

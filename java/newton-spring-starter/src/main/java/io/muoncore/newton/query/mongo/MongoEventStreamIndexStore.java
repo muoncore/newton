@@ -6,6 +6,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Optional;
 
+//todo: get rid of Mongo store & replace with in-memory or prompt user to provide 1
 public class MongoEventStreamIndexStore implements EventStreamIndexStore {
 
 	private MongoTemplate mongoTemplate;

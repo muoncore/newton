@@ -8,6 +8,8 @@ buildscript {
     }
 }
 
+apply plugin:"groovy"
+
 repositories {
   mavenLocal()
 }
@@ -18,10 +20,11 @@ dependencies {
   compile("org.springframework.boot:spring-boot:$springVersion")
   compile("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
   compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
+  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
-  testCompile("io.muoncore:test-event-store:0.0.6-SNAPSHOT") {
+  testCompile("io.muoncore:test-event-store:0.0.6") {
     //exclude module:"slf4j-simple"
   }
 }

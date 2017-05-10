@@ -1,19 +1,22 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.*;
-import lombok.Getter;
 import io.muoncore.newton.command.CommandIntent;
+import lombok.Getter;
 import org.springframework.data.annotation.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * A Saga that maintains its state in a mutable store.
  */
-public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, DocumentId> {
+public abstract class StatefulSaga implements Saga {
 
-    protected DocumentId id = new DocumentId();
+    @Getter
+    protected String id = UUID.randomUUID().toString();
+
     @Getter
     private CorrelationId correlationId = new CorrelationId(CorrelationId.CorrelationType.SAGA);
     private long version;
@@ -21,7 +24,10 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Doc
     private boolean complete = false;
 
     @Transient
-    private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, OnDomainEvent.class);
+    private transient DynamicInvokeEventAdaptor startEventAdaptor = new DynamicInvokeEventAdaptor(this, StartSagaWith.class);
+
+    @Transient
+    private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
     @Transient
     @Getter
@@ -39,16 +45,8 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Doc
         return version;
     }
 
-    public DocumentId getId() {
-        return id;
-    }
-
-    public void setId(DocumentId id) {
-        this.id = id;
-    }
-
     protected <E extends NewtonEvent> void notifyOn(Class<E> type, String key, String value) {
-        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), new DocumentId(), getId(), key, value));
+        newSagaInterests.add(new SagaInterest(getClass().getName(), type.getName(), UUID.randomUUID().toString(), getId(), key, value));
     }
 
     protected void end() {
@@ -60,11 +58,21 @@ public abstract class StatefulSaga<T extends NewtonEvent> implements Saga<T, Doc
     }
 
     @Override
+    public void startWith(NewtonEvent event) {
+      boolean eventHandled = startEventAdaptor.apply(event);
+
+      if (!eventHandled) {
+        throw new IllegalStateException("Undefined @SagaStartWith event handler method for event: ".concat(event.getClass().getName()));
+      }
+      version++;
+    }
+
+    @Override
     public void handle(NewtonEvent event) {
         boolean eventHandled = eventAdaptor.apply(event);
 
         if (!eventHandled) {
-            throw new IllegalStateException("Undefined domain event handler method for event: ".concat(event.getClass().getName()));
+            throw new IllegalStateException("Undefined @EventHandler method for event: ".concat(event.getClass().getName()));
         }
         version++;
     }

@@ -19,7 +19,7 @@ public interface EventStreamProcessor {
     /**
      * Process events before they are passed through for persistence into Photon
      */
-    List<? extends NewtonEvent> processForLoad(List<NewtonEvent> events);
+    List<? extends NewtonEvent> processForLoad(List<? extends NewtonEvent> events);
 
     /**
      * Setup any necessary environment for a component to process this event.

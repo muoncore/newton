@@ -1,16 +1,11 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
-import io.muoncore.newton.DocumentId;
-import io.muoncore.newton.EnableNewton;
-import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.protocol.event.Event;
 import io.muoncore.protocol.event.client.AggregateEventClient;
-import io.muoncore.protocol.event.client.EventClient;
-import io.muoncore.newton.MuonTestConfiguration;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.reactivestreams.Subscriber;
@@ -18,17 +13,13 @@ import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
-import reactor.rx.broadcast.Broadcaster;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 //@Category({UnitIntegrationTest.class})
 @ActiveProfiles({"test", "log-events"})
@@ -44,24 +35,28 @@ public class MuonEventSourceRepositoryTest {
 	@Autowired
 	private AggregateEventClient client;
 
-	@Autowired
-	private TestEventSourceRepo repository;
+//	@Autowired
+//	private TestEventSourceRepo repository;
+
+  @Autowired
+  private MuonEventSourceRepository<TestAggregate> repository;
 
 	@Test
 	public void load() throws Exception {
-		DocumentId id = new DocumentId();
+    String id = "simple-id";
 		client.publishDomainEvents(id.toString(), Collections.singletonList(
-			new TestAggregateCreated()
+			new TestAggregateCreated(id)
 		));
 
 		TestAggregate aggregate = repository.load(id);
+		assertNotNull(aggregate);
 
 		assertEquals(id, aggregate.getId());
 	}
 
 	@Test
 	public void save() throws Exception {
-    DocumentId id = new DocumentId();
+    String id = UUID.randomUUID().toString();
 		TestAggregate customer = new TestAggregate(id);
 		repository.save(customer);
 
@@ -73,17 +68,17 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void throwsExceptionOnNonExistingAggregate() {
-		repository.load(new DocumentId());
+		repository.load("no-such-id-as-this");
 	}
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void withVersionThrowsExceptionOnNonExistingAggregate() {
-		repository.load(new DocumentId(), 5L);
+		repository.load("no-such-id-as-this", 5L);
 	}
 
 	@Test
 	public void canLoadWithVersion() {
-    DocumentId id = new DocumentId();
+    String id = "awesome-things";
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated(),
 			new TestAggregateCreated()
@@ -95,7 +90,7 @@ public class MuonEventSourceRepositoryTest {
 
 	@Test(expected = OptimisticLockException.class)
 	public void throwsOptimisticLocExceptionOnBadVersion() {
-    DocumentId id = new DocumentId();
+    String id = "awesome-id";
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated()
 		));
@@ -105,7 +100,7 @@ public class MuonEventSourceRepositoryTest {
 
   @Test()
   public void canStreamAggregateEvents() throws InterruptedException {
-    DocumentId id = new DocumentId();
+    String id = "cool-id";
     client.publishDomainEvents(id.toString(), Arrays.asList(
       new TestAggregateCreated(), new TestAggregateCreated()
     ));
@@ -135,18 +130,18 @@ public class MuonEventSourceRepositoryTest {
       }
     });
 
-    Thread.sleep(500);
+    Thread.sleep(1500);
 
     assertEquals(2, events.size());
   }
 
 
-  @Component
-	public static class TestEventSourceRepo extends MuonEventSourceRepository<TestAggregate> {
-
-		public TestEventSourceRepo(AggregateEventClient aggregateEventClient, EventClient eventClient) {
-			super(TestAggregate.class, aggregateEventClient, eventClient, "app-name");
-		}
-	}
+//  @Component
+//	public static class TestEventSourceRepo extends MuonEventSourceRepository<TestAggregate> {
+//
+//		public TestEventSourceRepo(AggregateEventClient aggregateEventClient, EventClient eventClient) {
+//			super(TestAggregate.class, aggregateEventClient, eventClient, "app-name");
+//		}
+//	}
 
 }
