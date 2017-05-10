@@ -1,12 +1,17 @@
 package io.muoncore.newton.command;
 
+import lombok.Getter;
 import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.util.StringUtils;
 
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.Map;
 
 public class CommandFactory implements ApplicationContextAware {
@@ -79,17 +84,16 @@ public class CommandFactory implements ApplicationContextAware {
   }
 
   private Command decorateWithId(Command command, Object id) {
-    final Method[] declaredMethods = command.getClass().getDeclaredMethods();
-    for (Method declaredMethod : declaredMethods) {
-      final Class<?>[] parameterTypes = declaredMethod.getParameterTypes();
-      if (parameterTypes.length == 1 && id.getClass().isAssignableFrom(parameterTypes[0])) {
-        try {
-          declaredMethod.invoke(command, id);
-        } catch (Exception e) {
-          throw new IllegalStateException("Unable to set id using reflection using method " + declaredMethod.toGenericString() + " and arg " + id + ":" + id.getClass(), e);
-        }
+
+    try {
+      PropertyDescriptor id1 = PropertyUtils.getPropertyDescriptor(command, "id");;
+      if (id1 != null) {
+        PropertyUtils.setProperty(command, "id", id);
       }
+    } catch (IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
+      throw new IllegalArgumentException("Unable to assign ID property to Command: ".concat(command.getClass().getSimpleName()), e);
     }
+
     return command;
   }
 }

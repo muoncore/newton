@@ -107,7 +107,11 @@ public class CommandFactoryTest {
 
   @Data
 	public static class TestCommand implements Command {
-		protected String id;
+		private String id;
+
+		public void setAd(String id) {
+      throw new IllegalArgumentException("THIS SHOULD NOT BE CALLD");
+    }
 
 		@Override
 		public void execute() {
