@@ -1,12 +1,20 @@
 # Change Log
 
-## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+## [v0.0.6](https://github.com/muoncore/newton/tree/v0.0.6) (2017-05-10)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.5...v0.0.6)
 
-[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.5...HEAD)
+**Implemented enhancements:**
+
+- Remove AggregateRootId type in favour of an annotation on the event class [\#25](https://github.com/muoncore/newton/issues/25)
 
 **Closed issues:**
 
+- Default context name to be the application name in aggregateroots [\#27](https://github.com/muoncore/newton/issues/27)
 - Add in default codec for DocumentId [\#19](https://github.com/muoncore/newton/issues/19)
+
+**Merged pull requests:**
+
+- Rework IDs, extensions [\#28](https://github.com/muoncore/newton/pull/28) ([daviddawson](https://github.com/daviddawson))
 
 ## [v0.0.5](https://github.com/muoncore/newton/tree/v0.0.5) (2017-05-02)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.4...v0.0.5)
