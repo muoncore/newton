@@ -1,5 +1,8 @@
 # Change Log
 
+## [v0.0.7](https://github.com/muoncore/newton/tree/v0.0.7) (2017-05-10)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.6...v0.0.7)
+
 ## [v0.0.6](https://github.com/muoncore/newton/tree/v0.0.6) (2017-05-10)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.5...v0.0.6)
 
