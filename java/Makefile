@@ -1,5 +1,5 @@
 
-install:
+install: test
 	./gradlew install
 
 snapshot: clean

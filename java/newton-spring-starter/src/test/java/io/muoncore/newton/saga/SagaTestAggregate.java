@@ -4,8 +4,10 @@ import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 @AggregateConfiguration(context = "user")
 public class SagaTestAggregate extends AggregateRoot<String> {
 
