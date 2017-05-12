@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.7...HEAD)
+
+**Implemented enhancements:**
+
+- Remove spring auto-config scanning & replace with @EnableNewton [\#30](https://github.com/muoncore/newton/issues/30)
+
 ## [v0.0.7](https://github.com/muoncore/newton/tree/v0.0.7) (2017-05-10)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.6...v0.0.7)
 
