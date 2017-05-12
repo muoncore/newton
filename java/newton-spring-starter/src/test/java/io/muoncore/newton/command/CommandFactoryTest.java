@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,11 +62,6 @@ public class CommandFactoryTest {
 		cmd.execute();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void createFromCommandDefinition_withAdditionalProperties_thatsUnkown() throws Exception {
-		commandFactory.create(TestPayloadCommand.class, null, null, Collections.singletonMap("propX", "Value"), null);
-	}
-
   @Test
   public void createFromIdUsingReflection() throws Exception {
     final String id = "1234";
@@ -79,6 +73,19 @@ public class CommandFactoryTest {
 //    cmd.execute();
   }
 
+  @Test
+  public void createFromAdditonalProperties_GenericList() throws Exception {
+    ArrayList<String> list = new ArrayList<>();
+    list.add("abc");
+    Map<String,Object> additionalProperties = new HashMap<>();
+    additionalProperties.put("list", list);
+
+    Command cmd = commandFactory
+      .create(TestCommand.class,null,null, additionalProperties, null);
+    Assert.assertNotNull(cmd);
+    //THEN
+    assertEquals(list, ((TestCommand)cmd).getList());
+  }
 
 
   //CONFIGURATION
@@ -108,6 +115,9 @@ public class CommandFactoryTest {
   @Data
 	public static class TestCommand implements Command {
 		private String id;
+
+		private List<String> list;
+
 
 		public void setAd(String id) {
       throw new IllegalArgumentException("THIS SHOULD NOT BE CALLD");

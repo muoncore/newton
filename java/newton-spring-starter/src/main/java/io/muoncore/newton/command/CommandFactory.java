@@ -1,17 +1,13 @@
 package io.muoncore.newton.command;
 
-import lombok.Getter;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.util.StringUtils;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collections;
 import java.util.Map;
 
 public class CommandFactory implements ApplicationContextAware {
@@ -54,14 +50,17 @@ public class CommandFactory implements ApplicationContextAware {
   }
 
   private Command decorateWithAdditionalProperties(Command cmd, Map<String, Object> additionalProperties) {
+
     try {
       if (additionalProperties.isEmpty()) {
         return cmd;
       }
-      for (String key : additionalProperties.keySet()) {
-        final Method method = cmd.getClass().getDeclaredMethod("set".concat(StringUtils.capitalize(key)), additionalProperties.get(key).getClass());
-        method.invoke(cmd, additionalProperties.get(key));
-      }
+      BeanUtils.populate(cmd, additionalProperties);
+
+//      for (String key : additionalProperties.keySet()) {
+//        final Method method = cmd.getClass().getDeclaredMethod("set".concat(StringUtils.capitalize(key)), additionalProperties.get(key).getClass());
+//        method.invoke(cmd, additionalProperties.get(key));
+//      }
       return cmd;
     } catch (Exception e) {
       throw new IllegalArgumentException("Unable to assign additional properties to Command: ".concat(cmd.getClass().getSimpleName()), e);
