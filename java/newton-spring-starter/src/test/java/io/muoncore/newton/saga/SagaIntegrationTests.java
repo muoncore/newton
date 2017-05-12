@@ -30,6 +30,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
@@ -157,7 +158,7 @@ public class SagaIntegrationTests {
 
   @Getter
   public static class OrderRequestedEvent implements NewtonEvent {
-    private final String id = "my-awesome";
+    private final String id = UUID.randomUUID().toString();
   }
 
   @Getter
@@ -165,7 +166,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
     private String orderId;
-    private final String id = "12345";
+    private final String id = UUID.randomUUID().toString();
   }
 
   @Getter
@@ -173,7 +174,7 @@ public class SagaIntegrationTests {
   @ToString
   public static class OrderShippedEvent implements NewtonEvent {
     private String orderId;
-    private final String id = "4321";
+    private final String id = UUID.randomUUID().toString();
   }
 
   @Scope("prototype")

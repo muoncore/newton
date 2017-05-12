@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.util.HashSet;
@@ -93,14 +94,21 @@ public class SagaStreamManager {
   }
 
   private void recordSagaCreatedByEvent(Class<? extends Saga> saga) {
-    if (saga.getGenericSuperclass() instanceof ParameterizedType) {
-      Class startEventClass = (Class)
-        ((ParameterizedType) saga.getGenericSuperclass())
-          .getActualTypeArguments()[0];
-      sagaStartCache.add(startEventClass, saga);
-    } else {
-      log.warn("Saga type {} is not a parameterized type. This is an error, and this Saga cannot be started via an event ", saga);
+    final Method[] methods = saga.getMethods();
+    for (Method method : methods) {
+      if (method.getName().startsWith("lambda$") || !method.isAnnotationPresent(StartSagaWith.class)) {
+        continue;
+      }
+      final Class<?>[] parameterTypes = method.getParameterTypes();
+      if (parameterTypes.length == 1) {
+        Class newtonEv = parameterTypes[0];
+        sagaStartCache.add(newtonEv, saga);
+        return;
+      }
     }
+
+    log.error(String.format("Saga type %s does not have @StartSagaWith. This is an error, and this Saga cannot be started via an event ", saga.getName()));
+//    throw new IllegalStateException(String.format("Saga type %s does not have @StartSagaWith. This is an error, and this Saga cannot be started via an event ", saga.getName()));
   }
 
   public void processEvent(NewtonEvent event) {
