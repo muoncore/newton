@@ -9,10 +9,10 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class UniqueTodoDescriptionDomainService extends UniqueAggregateDomainService<String> {
+public class UniqueTaskDescriptionDomainService extends UniqueAggregateDomainService<String> {
 
   @Autowired
-  public UniqueTodoDescriptionDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public UniqueTaskDescriptionDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
     super(streamSubscriptionManager);
   }
 
@@ -22,7 +22,7 @@ public class UniqueTodoDescriptionDomainService extends UniqueAggregateDomainSer
   }
 
   @EventHandler
-  public void handle(TodoCreatedEvent event){
+  public void handle(TaskCreatedEvent event){
     if (event.getDescription().equals("exception")){
       throw new RuntimeException("Unique name exception....");
     }

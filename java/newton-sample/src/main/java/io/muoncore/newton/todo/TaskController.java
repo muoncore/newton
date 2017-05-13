@@ -13,23 +13,26 @@ import org.springframework.web.util.UriComponentsBuilder;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.net.URI;
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/todos")
-public class TodoController {
+@RequestMapping("/api/tasks")
+public class TaskController {
 
   private CommandBus commandBus;
+  private TaskViewStore viewStore;
 
   @Autowired
-  public TodoController(CommandBus commandBus) {
+  public TaskController(CommandBus commandBus, TaskViewStore viewStore) {
     this.commandBus = commandBus;
+    this.viewStore = viewStore;
   }
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> create(@RequestBody @Valid CreateRequest createRequest){
     final DocumentId id = new DocumentId();
     this.commandBus.dispatch(
-      CommandIntent.builder(CreateTodoCommand.class.getName())
+      CommandIntent.builder(CreateTaskCommand.class.getName())
         .request(createRequest)
         .id(id)
         .build()
@@ -41,11 +44,21 @@ public class TodoController {
   @RequestMapping(value = "/{id}",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   public void changeDescription(@PathVariable("id") DocumentId id, @RequestBody @Valid ChangeDescriptionRequest request){
     this.commandBus.dispatch(
-      CommandIntent.builder(ChangeTodoDescriptionCommand.class.getName())
+      CommandIntent.builder(ChangeTaskDescriptionCommand.class.getName())
         .request(request)
         .id(id)
         .build()
     );
+  }
+
+  @RequestMapping(value = "/{id}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public TaskView getTask(@PathVariable("id") DocumentId id){
+    return viewStore.findById(id);
+  }
+
+  @RequestMapping(method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+  public List<TaskView> listAll(){
+    return viewStore.listAll();
   }
 
   @Data

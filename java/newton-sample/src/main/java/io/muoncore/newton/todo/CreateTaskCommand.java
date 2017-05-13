@@ -13,11 +13,11 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class CreateTodoCommand implements Command{
+public class CreateTaskCommand implements Command{
 
-  private MuonEventSourceRepository<Todo> repository;
+  private MuonEventSourceRepository<Task> repository;
 
-  private UniqueTodoDescriptionDomainService uniqueTodoDescriptionDomainService;
+  private UniqueTaskDescriptionDomainService uniqueTaskDescriptionDomainService;
 
   @Setter
   private String description;
@@ -26,18 +26,18 @@ public class CreateTodoCommand implements Command{
 
 
   @Autowired
-  public CreateTodoCommand(MuonEventSourceRepository<Todo> repository, UniqueTodoDescriptionDomainService uniqueTodoDescriptionDomainService) {
+  public CreateTaskCommand(MuonEventSourceRepository<Task> repository, UniqueTaskDescriptionDomainService uniqueTaskDescriptionDomainService) {
     this.repository = repository;
-    this.uniqueTodoDescriptionDomainService = uniqueTodoDescriptionDomainService;
+    this.uniqueTaskDescriptionDomainService = uniqueTaskDescriptionDomainService;
   }
 
   @Override
   public void execute() {
-    if (uniqueTodoDescriptionDomainService.exists(description)){
+    if (uniqueTaskDescriptionDomainService.exists(description)){
       throw new BusinessException("Todo description not unique!");
     }
 
-    Todo todo = new Todo(this.id, this.description);
-    repository.save(todo);
+    Task task = new Task(this.id, this.description);
+    repository.save(task);
   }
 }
