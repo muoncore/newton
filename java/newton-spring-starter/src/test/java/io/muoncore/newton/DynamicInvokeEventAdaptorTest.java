@@ -1,9 +1,10 @@
 package io.muoncore.newton;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by vagrant on 21/03/17.
@@ -60,6 +61,7 @@ public class DynamicInvokeEventAdaptorTest {
       private final String id = "simples";
     }
     @Data
+    @EqualsAndHashCode(callSuper = false)
     static class EventWithParent extends NonExplicitMatchEvent {
       private final String id = "rabbit";
     }

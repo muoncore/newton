@@ -12,6 +12,7 @@ import io.muoncore.memory.transport.InMemTransport;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
+import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.DefaultEventClient;
@@ -20,12 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
 
-@Profile("test")
+//@Profile("test")
 @Configuration
+@EnableNewton
+@Import(MongoConfiguration.class)
 public class MuonTestConfiguration {
 
 	@Autowired

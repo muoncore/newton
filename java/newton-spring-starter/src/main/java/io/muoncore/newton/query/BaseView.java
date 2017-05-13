@@ -17,7 +17,7 @@ public abstract class BaseView extends BaseStreamSubscriber {
 
   @Override
   protected List<String> streams() {
-    return Arrays.asList(getClass().getAnnotation(NewtonView.class).streams());
+    return Arrays.asList(getClass().getAnnotation(NewtonView.class).eventStreams());
   }
 
   @Override

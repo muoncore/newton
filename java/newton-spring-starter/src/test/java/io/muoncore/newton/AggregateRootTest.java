@@ -3,6 +3,7 @@ package io.muoncore.newton;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.hamcrest.Matchers;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,7 +12,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AggregateRootTest {
+public class  AggregateRootTest {
 
 	@Rule
 	public ExpectedException expectedException = ExpectedException.none();
@@ -41,6 +42,7 @@ public class AggregateRootTest {
 
 
 	@Data
+  @EqualsAndHashCode(callSuper = false)
   @AggregateConfiguration(context = "user")
 	public class TestAggregateRoot extends AggregateRoot<String> {
 

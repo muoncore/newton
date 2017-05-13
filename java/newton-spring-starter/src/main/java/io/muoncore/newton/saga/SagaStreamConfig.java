@@ -8,6 +8,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface SagaStreamConfig {
-    String[] streams();
+  String[] streams() default {};
   Class<? extends AggregateRoot>[] aggregateRoot()  default {};
 }

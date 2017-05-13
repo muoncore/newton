@@ -63,15 +63,23 @@ public class CommandFactoryTest {
 	}
 
   @Test
-  public void createFromIdUsingReflection() throws Exception {
+  public void createFromStringIdUsingReflection() throws Exception {
     final String id = "1234";
     Command cmd = commandFactory
       .create(TestCommand.class,null, id,null);
     Assert.assertNotNull(cmd);
     assertEquals(id, ((TestCommand)cmd).getId());
-    //THEN - expect no exception
-//    cmd.execute();
   }
+
+  @Test
+  public void createFromCustomIdUsingReflection() throws Exception {
+    final CustomId id = new CustomId("1234");
+    Command cmd = commandFactory
+      .create(TestCommandWithCustomId.class,null, id,null);
+    Assert.assertNotNull(cmd);
+    assertEquals(id, ((TestCommandWithCustomId)cmd).getId());
+  }
+
 
   @Test
   public void createFromAdditonalProperties_GenericList() throws Exception {
@@ -104,7 +112,13 @@ public class CommandFactoryTest {
 		return new TestIdCommand();
 	}
 
-	@Data
+  @Bean
+  public TestCommandWithCustomId testCommandWithCustomId() {
+    return new TestCommandWithCustomId();
+  }
+
+
+  @Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class TestRequest {
@@ -128,7 +142,20 @@ public class CommandFactoryTest {
 		}
 	}
 
-	@Data
+  public static class TestCommandWithCustomId implements Command {
+    @Setter private CustomId id;
+
+    @Override
+    public void execute() {
+    }
+
+    public CustomId getId(){
+      return this.id;
+    }
+  }
+
+
+  @Data
 	public static class TestIdCommand implements Command {
 
 		protected String id;
@@ -166,4 +193,17 @@ public class CommandFactoryTest {
 			System.out.println("RUNNING");
 		}
 	}
+
+	public static class CustomId{
+
+	  private String val;
+
+	  public CustomId(String val){
+	    this.val = val;
+    }
+
+    public String getVal() {
+      return val;
+    }
+  }
 }

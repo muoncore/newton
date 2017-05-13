@@ -9,7 +9,7 @@ import java.lang.annotation.*;
 @Documented
 public @interface NewtonView {
 
-    String[] streams() default {};
+    String[] eventStreams() default {};
 
     Class<? extends AggregateRoot>[] aggregateRoot()  default {};
 }
