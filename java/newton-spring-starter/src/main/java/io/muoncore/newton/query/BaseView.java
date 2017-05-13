@@ -4,13 +4,13 @@ import io.muoncore.newton.DynamicInvokeEventAdaptor;
 import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -32,24 +32,25 @@ public abstract class BaseView {
 
   private void processStreams() {
 
-    NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
+    //todo: re-implement @NewtonView
+//    NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
+//
+//    if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
+//
+//    List<String> eventStreams = new ArrayList<>();
+//    Arrays.stream(s[0].aggregateRoot()).forEach(aClass -> {
+//      Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
+//        //todo: parse sPel if required
+//        eventStreams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
+//      });
+//    });
+//
+//    eventStreams.addAll(Arrays.asList(s[0].eventStreams()));
 
-    if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
-
-    List<String> streams = new ArrayList<>();
-    Arrays.stream(s[0].aggregateRoot()).forEach(aClass -> {
-      Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
-        //todo: parse sPel if required
-        streams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
-      });
-    });
-
-    streams.addAll(Arrays.asList(s[0].streams()));
-
-    if (streams.size() == 0){
-      throw new IllegalStateException("Invalid configuration. Either 'streams' or 'aggregateRoot' parameter must be specified!");
+    if (eventStreams().length == 0){
+      throw new IllegalStateException("Invalid configuration. Either 'eventStreams' or 'aggregateRoot' parameter must be specified!");
     }
-    for(String stream: streams) {
+    for(String stream: eventStreams()) {
       if (!subscribedStreams.contains(stream)) {
         subscribedStreams.add(stream);
         run(stream).accept(event -> {
@@ -73,5 +74,7 @@ public abstract class BaseView {
   public void initSubscription() throws InterruptedException {
     processStreams();
   }
+
+  protected abstract String[] eventStreams();
 
 }
