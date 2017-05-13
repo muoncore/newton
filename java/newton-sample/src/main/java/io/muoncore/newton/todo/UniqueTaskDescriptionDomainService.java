@@ -18,7 +18,7 @@ public class UniqueTaskDescriptionDomainService extends UniqueAggregateDomainSer
 
   @Override
   protected String[] eventStreams() {
-    return new String[]{"newton-sample/Todo"};
+    return new String[]{"newton-sample/Task"};
   }
 
   @EventHandler
