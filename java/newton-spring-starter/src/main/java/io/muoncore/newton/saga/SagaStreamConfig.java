@@ -1,5 +1,7 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.newton.AggregateRoot;
+
 import java.lang.annotation.*;
 
 @Target({ElementType.TYPE})
@@ -7,4 +9,5 @@ import java.lang.annotation.*;
 @Documented
 public @interface SagaStreamConfig {
     String[] streams();
+  Class<? extends AggregateRoot>[] aggregateRoot()  default {};
 }

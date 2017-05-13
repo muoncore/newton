@@ -1,12 +1,16 @@
 package io.muoncore.newton.domainservice;
 
+import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
+import io.muoncore.newton.query.NewtonView;
 import io.muoncore.newton.streams.BaseStreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.function.Consumer;
 
 /**
@@ -26,5 +30,15 @@ public abstract class EventDrivenDomainService extends BaseStreamSubscriber {
     return consumer -> {
       streamSubscriptionManager.globallyUniqueSubscription(getClass().getSimpleName() + "-" + stream, stream, consumer);
     };
+  }
+
+  @Override
+  protected List<String> streams() {
+    return Arrays.asList(getClass().getAnnotation(NewtonDomainService.class).streams());
+  }
+
+  @Override
+  protected List<Class<? extends AggregateRoot>> aggregateRoots() {
+    return Arrays.asList(getClass().getAnnotation(NewtonDomainService.class).aggregateRoot());
   }
 }

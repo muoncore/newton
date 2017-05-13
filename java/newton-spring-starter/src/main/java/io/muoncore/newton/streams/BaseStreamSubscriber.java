@@ -1,12 +1,8 @@
 package io.muoncore.newton.streams;
 
-import io.muoncore.newton.DynamicInvokeEventAdaptor;
-import io.muoncore.newton.EventHandler;
-import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
-import io.muoncore.newton.query.NewtonView;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
@@ -31,21 +27,21 @@ public abstract class BaseStreamSubscriber {
     this.eventStreamProcessor = eventStreamProcessor;
   }
 
+  protected List<String> streams() { return Collections.emptyList(); };
+  protected List<Class<? extends AggregateRoot>> aggregateRoots() { return Collections.emptyList(); }
+
   private void processStreams() {
 
-    NewtonView[] s = getClass().getAnnotationsByType(NewtonView.class);
-
-    if (s.length == 0) throw new IllegalStateException("View does not have @NewtonView: " + this);
-
     List<String> streams = new ArrayList<>();
-    Arrays.stream(s[0].aggregateRoot()).forEach(aClass -> {
+
+    streams.addAll(streams());
+
+    aggregateRoots().forEach(aClass -> {
       Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
         //todo: parse sPel if required
         streams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
       });
     });
-
-    streams.addAll(Arrays.asList(s[0].streams()));
 
     if (streams.size() == 0){
       throw new IllegalStateException("Invalid configuration. Either 'streams' or 'aggregateRoot' parameter must be specified!");

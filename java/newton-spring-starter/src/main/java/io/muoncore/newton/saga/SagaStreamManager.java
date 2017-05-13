@@ -4,6 +4,7 @@ import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
+import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,10 +14,7 @@ import org.springframework.context.event.EventListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -79,7 +77,20 @@ public class SagaStreamManager {
 
     recordSagaCreatedByEvent(saga);
 
-    String[] streams = s[0].streams();
+    List<String> streams = new ArrayList<>();
+
+    streams.addAll(Arrays.asList(s[0].streams()));
+
+    Arrays.asList(s[0].aggregateRoot()).forEach(aClass -> {
+      Arrays.stream(aClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
+        //todo: parse sPel if required
+        streams.add(aggregateConfiguration.context().concat("/").concat(aClass.getSimpleName()));
+      });
+    });
+
+    if (streams.size() == 0){
+      throw new IllegalStateException("Invalid configuration. Either 'streams' or 'aggregateRoot' parameter must be specified!");
+    }
 
     for (String stream : streams) {
       if (!subscribedStreams.contains(stream)) {
