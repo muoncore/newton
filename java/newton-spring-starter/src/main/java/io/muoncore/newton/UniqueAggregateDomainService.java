@@ -2,32 +2,23 @@ package io.muoncore.newton;
 
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Predicate;
 
 @Slf4j
 public abstract class UniqueAggregateDomainService<V> {
 
-  @Value("${spring.application.name}")
-  private String appName;
-
   //TODO, this is now object to value. Possibly this should be generified to match the ID we are interested in ...
   private Map<Object, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
 
 	private StreamSubscriptionManager streamSubscriptionManager;
-	private Class<? extends AggregateRoot> aggregateType;
 	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
-	public UniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager, Class<? extends AggregateRoot> aggregateType) throws IOException {
+	public UniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
 		this.streamSubscriptionManager = streamSubscriptionManager;
-		this.aggregateType = aggregateType;
 	}
 
 	private void handleEvent(NewtonEvent event) {
@@ -37,16 +28,12 @@ public abstract class UniqueAggregateDomainService<V> {
 
 	@PostConstruct
 	public void initSubscription() throws InterruptedException {
-		//todo: investigate AggregateRootContext annotation....
-
-		String streamName = aggregateType.getSimpleName();
-		if (this.appName != null){
-			streamName = this.appName.concat("/").concat(streamName);
-		}
-		streamSubscriptionManager.localNonTrackingSubscription(streamName, this::handleEvent);
+    Arrays.stream(eventStreams()).forEach(stream-> streamSubscriptionManager.localNonTrackingSubscription(stream, this::handleEvent));
 	}
 
-	public boolean isUnique(Object thisId, V value) {
+  protected abstract String[] eventStreams();
+
+  public boolean isUnique(Object thisId, V value) {
 		return !exists(thisId, value);
 	}
 

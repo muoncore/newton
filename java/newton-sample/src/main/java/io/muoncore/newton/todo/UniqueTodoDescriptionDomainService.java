@@ -13,7 +13,12 @@ public class UniqueTodoDescriptionDomainService extends UniqueAggregateDomainSer
 
   @Autowired
   public UniqueTodoDescriptionDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
-    super(streamSubscriptionManager, Todo.class);
+    super(streamSubscriptionManager);
+  }
+
+  @Override
+  protected String[] eventStreams() {
+    return new String[]{"newton-sample/Todo"};
   }
 
   @EventHandler
