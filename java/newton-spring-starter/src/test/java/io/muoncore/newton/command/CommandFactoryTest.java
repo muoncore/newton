@@ -143,7 +143,8 @@ public class CommandFactoryTest {
 	}
 
   public static class TestCommandWithCustomId implements Command {
-    @Setter private CustomId id;
+
+	  @Setter private CustomId id;
 
     @Override
     public void execute() {
@@ -155,10 +156,9 @@ public class CommandFactoryTest {
   }
 
 
-  @Data
 	public static class TestIdCommand implements Command {
 
-		protected String id;
+		@Setter private String id;
 
 		@Override
 		public void execute() {
@@ -167,9 +167,6 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(String id) {
-			this.id = id;
-		}
 	}
 
 
