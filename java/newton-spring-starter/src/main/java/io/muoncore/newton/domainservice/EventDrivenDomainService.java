@@ -26,4 +26,9 @@ public abstract class EventDrivenDomainService extends BaseStreamSubscriber {
       streamSubscriptionManager.globallyUniqueSubscription(getClass().getSimpleName() + "-" + stream, stream, consumer);
     };
   }
+
+  @Override
+  protected String[] eventStreams() {
+    return new String[0];
+  }
 }
