@@ -5,6 +5,7 @@ import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -80,11 +81,9 @@ public class SagaStreamManager {
     List<String> streams = new ArrayList<>();
     streams.addAll(Arrays.asList(s[0].streams()));
 
-    Arrays.asList(s[0].aggregateRoots()).forEach(aggregateRootClass -> {
-      Arrays.stream(aggregateRootClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
-//        //todo: parse sPel if required
-        streams.add(aggregateConfiguration.context().concat("/").concat(aggregateRootClass.getSimpleName()));
-      });});
+    Arrays.asList(s[0].aggregateRoots()).forEach(aggregateRootClass ->
+      streams.add(AggregateRootUtil.getAggregateRootStream(aggregateRootClass))
+    );
 
     for (String stream : streams) {
       if (!subscribedStreams.contains(stream)) {

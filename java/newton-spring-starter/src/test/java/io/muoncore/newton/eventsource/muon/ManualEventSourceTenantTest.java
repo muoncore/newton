@@ -69,7 +69,7 @@ public class ManualEventSourceTenantTest {
 
 		@Bean
 		public EventSourceRepository<TestAggregate> eventSourceRepository(EventClient eventClient, AggregateEventClient aggregateEventClient) {
-			return new TestEventSourceRepository(TestAggregate.class, aggregateEventClient, eventClient, applicationName);
+			return new TestEventSourceRepository(TestAggregate.class, aggregateEventClient, eventClient);
 		}
 	}
 
@@ -85,8 +85,8 @@ public class ManualEventSourceTenantTest {
 
 	public static class TestEventSourceRepository extends MuonEventSourceRepository<TestAggregate> {
 
-		public TestEventSourceRepository(Class<TestAggregate> type, AggregateEventClient aggregateEventClient, EventClient eventClient, String appName) {
-			super(type, aggregateEventClient, eventClient, new NoOpEventStreamProcessor(), appName);
+		public TestEventSourceRepository(Class<TestAggregate> type, AggregateEventClient aggregateEventClient, EventClient eventClient) {
+			super(type, aggregateEventClient, eventClient, new NoOpEventStreamProcessor());
 		}
 	}
 }

@@ -2,6 +2,7 @@ package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.EnableNewton;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import javassist.*;
 import javassist.bytecode.ClassFile;
@@ -34,26 +35,18 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
       MuonLookupUtils.listAllAggregateRootClass().forEach(s -> {
 
-        String context;
-        AggregateConfiguration a = s.getAnnotation(AggregateConfiguration.class);
+        String streamName = AggregateRootUtil.getAggregateRootStream(s, appName);
 
-        if (a != null) {
-          context = a.context();
-        } else {
-          context = appName;
-        }
-
-        log.debug("AggregateRoot {} event stream is {}", s, context + "/" + s.getClass().getSimpleName());
+        log.debug("AggregateRoot {} event stream is {}", s, streamName);
 
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(makeRepo(s));
         ConstructorArgumentValues vals = new ConstructorArgumentValues();
         vals.addGenericArgumentValue(s);
-        vals.addGenericArgumentValue(context);
         beanDefinition.setConstructorArgumentValues(vals);
 
         registry.registerBeanDefinition("newtonRepo" + s.getSimpleName(), beanDefinition);
-        log.debug("Newton Repository in context {} is registered  {}", context, beanDefinition.getBeanClassName());
+        log.debug("Newton Repository emitting on stream {} is registered  {}", streamName, beanDefinition.getBeanClassName());
       });
 
     } catch (ClassNotFoundException e) {

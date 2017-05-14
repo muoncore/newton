@@ -3,11 +3,16 @@ package io.muoncore.newton.domainservice
 import io.muoncore.newton.AggregateRoot
 import io.muoncore.newton.StreamSubscriptionManager
 import io.muoncore.newton.eventsource.AggregateConfiguration
+import io.muoncore.newton.eventsource.AggregateRootUtil
 import spock.lang.Specification
 
 class EventDrivenDomainServiceSpec extends Specification {
 
   def "subscribes to both streams and aggregate roots"() {
+
+    //init aggregate
+    AggregateRootUtil.getAggregateRootStream(TestingAggregate, "defaultname")
+
     def domainservice = new EventDrivenDomainService(Mock(StreamSubscriptionManager)) {
       @Override
       protected List aggregateRoots() {

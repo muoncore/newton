@@ -2,6 +2,7 @@ package io.muoncore.newton.streams;
 
 import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.AggregateConfiguration;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
@@ -41,11 +42,7 @@ public abstract class BaseStreamSubscriber {
     List<String> streams = new ArrayList<>();
 
     streams.addAll(Arrays.asList(eventStreams()));
-    aggregateRoots().forEach(aggregateRootClass -> {
-      Arrays.stream(aggregateRootClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
-//        //todo: parse sPel if required
-        streams.add(aggregateConfiguration.context().concat("/").concat(aggregateRootClass.getSimpleName()));
-      });});
+    aggregateRoots().forEach(aggregateRootClass -> streams.add(AggregateRootUtil.getAggregateRootStream(aggregateRootClass)));
 
     return streams.toArray(new String[streams.size()]);
   }
