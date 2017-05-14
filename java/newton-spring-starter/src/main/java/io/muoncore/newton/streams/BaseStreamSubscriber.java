@@ -1,18 +1,16 @@
 package io.muoncore.newton.streams;
 
-import io.muoncore.newton.DynamicInvokeEventAdaptor;
-import io.muoncore.newton.EventHandler;
-import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.*;
+import io.muoncore.newton.eventsource.AggregateConfiguration;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class BaseStreamSubscriber {
@@ -31,7 +29,7 @@ public abstract class BaseStreamSubscriber {
     if (eventStreams() == null || eventStreams().length == 0){
       throw new IllegalStateException("Invalid configuration. EventStreams must be specified!");
     }
-    for(String stream: eventStreams()) {
+    for(String stream: getStreams()) {
       if (!subscribedStreams.contains(stream)) {
         subscribedStreams.add(stream);
         run(stream).accept(this::handleEvent);
@@ -39,7 +37,18 @@ public abstract class BaseStreamSubscriber {
     }
   }
 
-  protected abstract Consumer<Consumer<NewtonEvent>> run(String stream);
+  protected String[] getStreams() {
+    List<String> streams = new ArrayList<>();
+
+    streams.addAll(Arrays.asList(eventStreams()));
+    Arrays.asList(aggregateRoots()).forEach(aggregateRootClass -> {
+      Arrays.stream(aggregateRootClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
+//        //todo: parse sPel if required
+        streams.add(aggregateConfiguration.context().concat("/").concat(aggregateRootClass.getSimpleName()));
+      });});
+
+    return streams.toArray(new String[streams.size()]);
+  }
 
   private void handleEvent(NewtonEvent event) {
       if (!eventAdaptor.apply(event)) {
@@ -53,5 +62,7 @@ public abstract class BaseStreamSubscriber {
   }
 
   protected abstract String[] eventStreams();
+  protected abstract Class<AggregateRoot>[] aggregateRoots();
+  protected abstract Consumer<Consumer<NewtonEvent>> run(String stream);
 
 }
