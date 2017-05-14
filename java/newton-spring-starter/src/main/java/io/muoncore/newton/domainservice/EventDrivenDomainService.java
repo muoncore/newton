@@ -1,4 +1,4 @@
-package io.muoncore.newton.query;
+package io.muoncore.newton.domainservice;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
@@ -9,17 +9,14 @@ import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
- * Base class for views that mutate a shared data store.
- * This means that they will use a cluster lock to give process once semantics.
+ * Base class for domain services.
  *
- * This also handles unpacking tenancy information and applying it to the current Thread for
- * use in the mongo filters. As such, it should generally be used within the multi tenant services
- * as the base view.
+ * Manages event processing in a globally consistent manner.
  */
 @Slf4j
-public abstract class SharedDatastoreView extends BaseStreamSubscriber {
+public abstract class EventDrivenDomainService extends BaseStreamSubscriber {
 
-  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public EventDrivenDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
     super(streamSubscriptionManager);
   }
 
