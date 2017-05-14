@@ -12,8 +12,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
+import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
+import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StringUtils;
 
@@ -24,31 +26,29 @@ import java.util.List;
 @Slf4j
 public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
-  @Value("${spring.application.name}")
-  private String appName;
-
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
     try {
 
       initScan(importingClassMetadata);
 
-      MuonLookupUtils.listAllAggregateRootClass().forEach(s -> {
+      MuonLookupUtils.listAllAggregateRootClass().forEach(aggregateClass -> {
 
-        String streamName = AggregateRootUtil.getAggregateRootStream(s, appName);
+//        String streamName = AggregateRootUtil.getAggregateRootStream(s, appName);
 
-        log.debug("AggregateRoot {} event stream is {}", s, streamName);
+//        log.debug("AggregateRoot {} event stream is {}", s, streamName);
 
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-        beanDefinition.setBeanClass(makeRepo(s));
+        beanDefinition.setBeanClass(makeRepo(aggregateClass));
         ConstructorArgumentValues vals = new ConstructorArgumentValues();
-        vals.addGenericArgumentValue(s);
+        vals.addGenericArgumentValue(aggregateClass);
+        vals.addGenericArgumentValue("${spring.application.name}");
+
         beanDefinition.setConstructorArgumentValues(vals);
 
-        registry.registerBeanDefinition("newtonRepo" + s.getSimpleName(), beanDefinition);
-        log.debug("Newton Repository emitting on stream {} is registered  {}", streamName, beanDefinition.getBeanClassName());
+        registry.registerBeanDefinition("newtonRepo" + aggregateClass.getSimpleName(), beanDefinition);
+//        log.debug("Newton Repository emitting on stream {} is registered  {}", streamName, beanDefinition.getBeanClassName());
       });
-
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }

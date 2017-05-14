@@ -1,7 +1,6 @@
 package io.muoncore.newton.streams;
 
 import io.muoncore.newton.*;
-import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.AggregateRootUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,7 +10,6 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 @Slf4j
 public abstract class BaseStreamSubscriber {
@@ -22,20 +20,23 @@ public abstract class BaseStreamSubscriber {
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
   private Executor worker = Executors.newSingleThreadExecutor();
 
-  public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager/*, EventStreamProcessor eventStreamProcessor*/) throws IOException {
+  public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
     this.streamSubscriptionManager = streamSubscriptionManager;
   }
 
   private void processStreams() {
-    if (eventStreams() == null || eventStreams().length == 0){
-      throw new IllegalStateException("Invalid configuration. EventStreams must be specified!");
-    }
-    for(String stream: getStreams()) {
-      if (!subscribedStreams.contains(stream)) {
-        subscribedStreams.add(stream);
-        run(stream).accept(this::handleEvent);
+    worker.execute(() -> {
+      String[] streams = getStreams();
+      if (streams == null || streams.length == 0){
+        throw new IllegalStateException("Invalid configuration. EventStreams must be specified!");
       }
-    }
+      for(String stream: streams) {
+        if (!subscribedStreams.contains(stream)) {
+          subscribedStreams.add(stream);
+          run(stream).accept(this::handleEvent);
+        }
+      }
+    });
   }
 
   protected String[] getStreams() {
@@ -48,9 +49,11 @@ public abstract class BaseStreamSubscriber {
   }
 
   private void handleEvent(NewtonEvent event) {
+    worker.execute(() -> {
       if (!eventAdaptor.apply(event)) {
         log.debug("View {} did not accept event {}, which discarded by the view", getClass().getName(), event);
       }
+    });
   }
 
   @PostConstruct

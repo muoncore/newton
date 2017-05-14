@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -33,12 +34,12 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	public MuonEventSourceRepository(Class<A> type,
                                    AggregateEventClient aggregateEventClient,
                                    EventClient eventClient,
-                                   EventStreamProcessor eventStreamProcessor) {
+                                   EventStreamProcessor eventStreamProcessor, String appName) {
 		aggregateType = type;
 		this.processor = eventStreamProcessor;
 		this.aggregateEventClient = aggregateEventClient;
 		this.eventClient = eventClient;
-		this.streamName = AggregateRootUtil.getAggregateRootStream(type);
+		this.streamName = AggregateRootUtil.getAggregateRootStream(type, appName);
 	}
 
 	@Override

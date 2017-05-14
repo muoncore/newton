@@ -52,14 +52,16 @@ public class SagaStreamManager {
   public void onApplicationEvent(ApplicationReadyEvent onReadyEvent) {
     listenToLifecycleEvents();
 
-    MuonLookupUtils.listAllSagas().forEach(aClass -> {
-      try {
-        if (Modifier.isInterface(aClass.getModifiers()) ||
-          Modifier.isAbstract(aClass.getModifiers())) return;
-        processSaga(aClass);
-      } catch (IllegalStateException e) {
-        log.error("Unable to initialise saga " + aClass, e);
-      }
+    worker.execute(() -> {
+      MuonLookupUtils.listAllSagas().forEach(aClass -> {
+        try {
+          if (Modifier.isInterface(aClass.getModifiers()) ||
+            Modifier.isAbstract(aClass.getModifiers())) return;
+          processSaga(aClass);
+        } catch (IllegalStateException e) {
+          log.error("Unable to initialise saga " + aClass, e);
+        }
+      });
     });
   }
 
