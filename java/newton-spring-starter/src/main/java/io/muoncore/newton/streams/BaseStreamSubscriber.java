@@ -41,7 +41,7 @@ public abstract class BaseStreamSubscriber {
     List<String> streams = new ArrayList<>();
 
     streams.addAll(Arrays.asList(eventStreams()));
-    Arrays.asList(aggregateRoots()).forEach(aggregateRootClass -> {
+    aggregateRoots().forEach(aggregateRootClass -> {
       Arrays.stream(aggregateRootClass.getAnnotationsByType(AggregateConfiguration.class)).findFirst().ifPresent(aggregateConfiguration -> {
 //        //todo: parse sPel if required
         streams.add(aggregateConfiguration.context().concat("/").concat(aggregateRootClass.getSimpleName()));
@@ -61,8 +61,8 @@ public abstract class BaseStreamSubscriber {
     processStreams();
   }
 
-  protected abstract String[] eventStreams();
-  protected abstract Class<AggregateRoot>[] aggregateRoots();
+  protected String[] eventStreams() { return new String[0]; };
+  protected Collection<Class<? extends AggregateRoot>> aggregateRoots() { return Collections.emptySet(); }
   protected abstract Consumer<Consumer<NewtonEvent>> run(String stream);
 
 }

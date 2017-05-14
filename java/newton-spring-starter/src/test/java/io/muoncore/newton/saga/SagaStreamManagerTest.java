@@ -153,7 +153,7 @@ public class SagaStreamManagerTest {
     }
 
 
-    @SagaStreamConfig(streams = {"stream", "stream2"})
+    @SagaStreamConfig(streams = {"stream", "stream2"}, aggregateRoots = {})
     static class SagaWithConfig extends StatefulSaga {
 
     }
@@ -161,7 +161,7 @@ public class SagaStreamManagerTest {
     static class NoAnnotationSaga extends StatefulSaga {
 
     }
-    @SagaStreamConfig(streams = {"mystream"})
+    @SagaStreamConfig(streams = {"mystream"}, aggregateRoots = {})
     static class SagaWithCommands implements Saga {
         @Override
         public List<CommandIntent> getNewOperations() {
@@ -199,7 +199,7 @@ public class SagaStreamManagerTest {
         }
     }
 
-    @SagaStreamConfig(streams = {})
+    @SagaStreamConfig(streams = {}, aggregateRoots = {})
     static class SagaWithEventHandler implements Saga {
 
         @Override

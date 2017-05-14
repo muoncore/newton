@@ -10,9 +10,8 @@ class EventDrivenDomainServiceSpec extends Specification {
   def "subscribes to both streams and aggregate roots"() {
     def domainservice = new EventDrivenDomainService(Mock(StreamSubscriptionManager)) {
       @Override
-      protected Class<AggregateRoot>[] aggregateRoots() {
-        def ret = [TestingAggregate] as Class[]
-        return ret
+      protected List aggregateRoots() {
+        [TestingAggregate]
       }
 
       @Override

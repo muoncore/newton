@@ -118,7 +118,7 @@ public class SagaIntegrationTests {
 
   @Scope("prototype")
   @Component
-  @SagaStreamConfig(streams = {"TestAggregate", "user/SagaTestAggregate"})
+  @SagaStreamConfig(streams = {"TestAggregate"}, aggregateRoots = {SagaTestAggregate.class})
   public static class ComplexSaga extends StatefulSaga {
 
     private String orderId;
