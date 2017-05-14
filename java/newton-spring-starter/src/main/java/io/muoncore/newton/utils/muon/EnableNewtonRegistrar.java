@@ -40,8 +40,10 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
         if (a != null) {
           context = a.context();
         } else {
-          throw new IllegalArgumentException("Currently @AggregateConfiguration(context) is required");
+          context = appName;
         }
+
+        log.debug("AggregateRoot {} event stream is {}", s, context + "/" + s.getClass().getSimpleName());
 
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(makeRepo(s));
