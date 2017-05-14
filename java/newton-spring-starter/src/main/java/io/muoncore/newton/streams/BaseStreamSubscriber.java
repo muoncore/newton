@@ -1,4 +1,4 @@
-package io.muoncore.newton.query;
+package io.muoncore.newton.streams;
 
 import io.muoncore.newton.DynamicInvokeEventAdaptor;
 import io.muoncore.newton.EventHandler;
@@ -16,7 +16,7 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Slf4j
-public abstract class BaseView {
+public abstract class BaseStreamSubscriber {
 
   protected StreamSubscriptionManager streamSubscriptionManager;
   private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
@@ -25,7 +25,7 @@ public abstract class BaseView {
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
   private Executor worker = Executors.newSingleThreadExecutor();
 
-  public BaseView(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
+  public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
     this.streamSubscriptionManager = streamSubscriptionManager;
     this.eventStreamProcessor = eventStreamProcessor;
   }
