@@ -1,7 +1,7 @@
 package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.query.RebuildingStreamView;
+import io.muoncore.newton.streams.RebuildingStreamView;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
 import lombok.extern.slf4j.Slf4j;

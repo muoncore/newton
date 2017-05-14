@@ -6,6 +6,7 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
+@Deprecated
 public class StreamSubscriberThings {
 
   public static void main(String[] args) {

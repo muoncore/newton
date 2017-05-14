@@ -4,6 +4,7 @@ import io.muoncore.newton.AggregateRoot;
 
 import java.lang.annotation.*;
 
+@Deprecated
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

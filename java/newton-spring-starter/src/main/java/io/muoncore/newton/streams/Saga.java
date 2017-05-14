@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.lang.annotation.*;
 
+@Deprecated
 @StreamSubscriptionConfig(type= StreamSubscriptionType.GLOBAL_LOCK)
 @Scope("prototype")
 @Component
