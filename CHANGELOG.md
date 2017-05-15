@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
-
-[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.7...HEAD)
+## [v0.0.8](https://github.com/muoncore/newton/tree/v0.0.8) (2017-05-15)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.7...v0.0.8)
 
 **Implemented enhancements:**
 
