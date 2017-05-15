@@ -1,21 +1,16 @@
 package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.EnableNewton;
-import io.muoncore.newton.eventsource.AggregateConfiguration;
-import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import javassist.*;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.SignatureAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
-import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
-import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StringUtils;
 
@@ -34,10 +29,6 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
       MuonLookupUtils.listAllAggregateRootClass().forEach(aggregateClass -> {
 
-//        String streamName = AggregateRootUtil.getAggregateRootStream(s, appName);
-
-//        log.debug("AggregateRoot {} event stream is {}", s, streamName);
-
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
         beanDefinition.setBeanClass(makeRepo(aggregateClass));
         ConstructorArgumentValues vals = new ConstructorArgumentValues();
@@ -47,7 +38,6 @@ public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
         beanDefinition.setConstructorArgumentValues(vals);
 
         registry.registerBeanDefinition("newtonRepo" + aggregateClass.getSimpleName(), beanDefinition);
-//        log.debug("Newton Repository emitting on stream {} is registered  {}", streamName, beanDefinition.getBeanClassName());
       });
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
