@@ -1,11 +1,27 @@
 # Change Log
 
+## [v0.0.9](https://github.com/muoncore/newton/tree/v0.0.9) (2017-05-15)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.8...v0.0.9)
+
+**Implemented enhancements:**
+
+- Remove @NewtonView for now in favour of an abstract method on BaseView [\#24](https://github.com/muoncore/newton/issues/24)
+
+**Fixed bugs:**
+
+- Extend eventstreamprocessor with regards to deserialisation of TenantEvent if unwrapped.  [\#26](https://github.com/muoncore/newton/issues/26)
+
+**Merged pull requests:**
+
+- Rework APIs, make use more consistent. Extend hierarchies with domain services.  [\#33](https://github.com/muoncore/newton/pull/33) ([daviddawson](https://github.com/daviddawson))
+
 ## [v0.0.8](https://github.com/muoncore/newton/tree/v0.0.8) (2017-05-15)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.7...v0.0.8)
 
 **Implemented enhancements:**
 
 - Remove spring auto-config scanning & replace with @EnableNewton [\#30](https://github.com/muoncore/newton/issues/30)
+- Introduce abstract Base Domain Service [\#29](https://github.com/muoncore/newton/issues/29)
 
 ## [v0.0.7](https://github.com/muoncore/newton/tree/v0.0.7) (2017-05-10)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.6...v0.0.7)
