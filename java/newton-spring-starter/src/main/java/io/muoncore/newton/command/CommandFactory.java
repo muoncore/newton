@@ -10,6 +10,9 @@ import java.beans.PropertyDescriptor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 
+//todo: addtional validations:
+// 1. ensure Command class is public (silently fails ons setter)
+// 2. ensure class found on classpath
 public class CommandFactory implements ApplicationContextAware {
 
   private ApplicationContext applicationContext;

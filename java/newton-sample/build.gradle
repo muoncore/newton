@@ -20,6 +20,8 @@ repositories {
 	mavenCentral()
 }
 
+test.enabled = false
+
 
 dependencies {
   compile project(":newton-spring-starter")
