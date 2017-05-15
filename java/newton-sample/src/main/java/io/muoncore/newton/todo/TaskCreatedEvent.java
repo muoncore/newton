@@ -1,11 +1,12 @@
 package io.muoncore.newton.todo;
 
-import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.eventsource.TenantEvent;
 import io.muoncore.newton.support.DocumentId;
+import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Getter;
 
 @Getter
-public class TaskCreatedEvent implements NewtonEvent<DocumentId> {
+public class TaskCreatedEvent extends TenantEvent<DocumentId> {
 
   private final DocumentId id;
   private final String description;
@@ -13,5 +14,6 @@ public class TaskCreatedEvent implements NewtonEvent<DocumentId> {
   public TaskCreatedEvent(DocumentId id, String description) {
     this.id = id;
     this.description = description;
+    this.setTenantId(TenantContextHolder.getTenantId());
   }
 }

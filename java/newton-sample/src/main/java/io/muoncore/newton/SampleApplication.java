@@ -1,7 +1,10 @@
 package io.muoncore.newton;
 
+import io.muoncore.newton.eventsource.TenantEvent;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.mongo.MongoConfiguration;
+import io.muoncore.newton.support.TenantContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +22,7 @@ import java.util.function.Consumer;
 @EnableNewton
 @Import(MongoConfiguration.class)
 @Configuration
+@Slf4j
 public class SampleApplication {
 
 	public static void main(String[] args) {
@@ -40,6 +44,11 @@ public class SampleApplication {
 
       @Override
       public void executeWithinEventContext(NewtonEvent event, Consumer<NewtonEvent> exec) {
+        if (event instanceof TenantEvent){
+          final String tenantId = ((TenantEvent) event).getTenantId();
+          log.info("Setting tenant context: '{}'", tenantId);
+          TenantContextHolder.setTenantId(tenantId);
+        }
         exec.accept(event);
       }
     };

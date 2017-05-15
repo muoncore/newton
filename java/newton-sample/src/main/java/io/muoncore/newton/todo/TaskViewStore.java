@@ -5,6 +5,7 @@ import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.query.SharedDatastoreView;
 import io.muoncore.newton.support.DocumentId;
+import io.muoncore.newton.support.TenantContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -13,7 +14,6 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -44,8 +44,10 @@ public class TaskViewStore extends SharedDatastoreView {
 
   @EventHandler
   public void handle(TaskCreatedEvent event) {
-    System.err.println("T: " + event);
-    mongoTemplate.save(new TaskView(event.getId(), event.getDescription()));
+    if (TenantContextHolder.getTenantId() == null){
+      throw new IllegalStateException("Tenant context unavailable!!!!");
+    }
+    mongoTemplate.save(new TaskView(event.getId(), event.getDescription(), TenantContextHolder.getTenantId()));
   }
 
   @EventHandler

@@ -12,4 +12,5 @@ public class TaskView {
 
   private DocumentId id;
   private String description;
+  private String tenantId;
 }
