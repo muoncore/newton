@@ -17,7 +17,6 @@ public abstract class BaseStreamSubscriber {
   protected StreamSubscriptionManager streamSubscriptionManager;
   private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
   private Set<String> subscribedStreams = new HashSet<>();
-  //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
   private Executor worker = Executors.newSingleThreadExecutor();
 
   public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
@@ -49,11 +48,9 @@ public abstract class BaseStreamSubscriber {
   }
 
   private void handleEvent(NewtonEvent event) {
-    worker.execute(() -> {
-      if (!eventAdaptor.apply(event)) {
-        log.debug("View {} did not accept event {}, which discarded by the view", getClass().getName(), event);
-      }
-    });
+    if (!eventAdaptor.apply(event)) {
+      log.debug("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
+    }
   }
 
   @PostConstruct
