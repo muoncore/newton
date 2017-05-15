@@ -3,6 +3,7 @@ package io.muoncore.newton.todo;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.support.DocumentId;
+import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -30,6 +31,8 @@ public class TaskController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> create(@RequestBody @Valid CreateRequest createRequest){
+    //todo: remove once a better way is found to set tenantId
+    TenantContextHolder.setTenantId("test-tenant");
     final DocumentId id = new DocumentId();
     this.commandBus.dispatch(
       CommandIntent.builder(CreateTaskCommand.class.getName())
