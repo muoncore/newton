@@ -8,7 +8,6 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
-@AggregateConfiguration(context = "newton-sample")
 public class Task extends AggregateRoot<DocumentId> {
 
   @Getter

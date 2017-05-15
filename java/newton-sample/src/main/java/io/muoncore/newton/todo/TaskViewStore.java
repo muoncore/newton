@@ -1,5 +1,6 @@
 package io.muoncore.newton.todo;
 
+import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.query.SharedDatastoreView;
@@ -12,6 +13,9 @@ import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -26,8 +30,8 @@ public class TaskViewStore extends SharedDatastoreView {
   }
 
   @Override
-  protected String[] eventStreams() {
-    return new String[]{"newton-sample/Task"};
+  protected Collection<Class<? extends AggregateRoot>> aggregateRoots() {
+    return Collections.singletonList(Task.class);
   }
 
   public TaskView findById(DocumentId id) {
