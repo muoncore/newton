@@ -1,6 +1,5 @@
 package io.muoncore.newton.todo;
 
-import io.muoncore.newton.eventsource.TenantEvent;
 import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Getter;

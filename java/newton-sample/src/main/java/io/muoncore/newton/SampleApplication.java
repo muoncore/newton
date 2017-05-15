@@ -1,6 +1,6 @@
 package io.muoncore.newton;
 
-import io.muoncore.newton.eventsource.TenantEvent;
+import io.muoncore.newton.todo.TenantEvent;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.support.TenantContextHolder;
