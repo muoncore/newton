@@ -1,11 +1,13 @@
 package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.streams.RebuildingStreamView;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
+import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
@@ -19,6 +21,9 @@ public class MuonLookupUtils {
 	private static Map<String, Class<? extends Saga>> sagaTypeMappings;
 	private static Map<String, Class<? extends NewtonEvent>> eventTypeMappings;
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
+
+	private static Map<String, Class> views;
+
 	static CountDownLatch ready = new CountDownLatch(1);
 
 	static void init(String[] packages) {
@@ -38,8 +43,16 @@ public class MuonLookupUtils {
 
 		Reflections reflections = new Reflections(new ConfigurationBuilder()
       .addScanners(new SubTypesScanner())
+      .addScanners(new TypeAnnotationsScanner())
       .setUrls(urls));
-		final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
+
+    final Set<Class<?>> rebuildingViewTypes = reflections.getTypesAnnotatedWith(RebuildingStreamView.class);
+    views = new HashMap<>();
+    for (Class<?> cibecsEvent : rebuildingViewTypes) {
+      views.put(cibecsEvent.getSimpleName(), cibecsEvent);
+    }
+
+    final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
 		eventTypeMappings = new HashMap<>();
 		for (Class<? extends NewtonEvent> cibecsEvent : eventTypes) {
 			eventTypeMappings.put(cibecsEvent.getSimpleName(), cibecsEvent);

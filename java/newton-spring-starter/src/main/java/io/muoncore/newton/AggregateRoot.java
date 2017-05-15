@@ -6,7 +6,7 @@ import java.util.List;
 public abstract class AggregateRoot<T> {
 
 	private long version;
-	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
+	private transient DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
 	private transient List<NewtonEvent> newOperations = new ArrayList<>();
 

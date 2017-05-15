@@ -1,9 +1,11 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
-import io.muoncore.newton.*;
+import io.muoncore.newton.MuonTestConfiguration;
+import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.OptimisticLockException;
+import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.protocol.event.Event;
 import io.muoncore.protocol.event.client.AggregateEventClient;
 import org.junit.Test;
@@ -11,9 +13,7 @@ import org.junit.runner.RunWith;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
-import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
@@ -21,12 +21,8 @@ import java.util.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-//@Category({UnitIntegrationTest.class})
-@ActiveProfiles({"test", "log-events"})
-@Import({MuonTestConfiguration.class})
 @RunWith(SpringRunner.class)
-@Configuration
-@EnableNewton
+@ContextConfiguration(classes = {MuonTestConfiguration.class, MongoConfiguration.class})
 public class MuonEventSourceRepositoryTest {
 
 	@Autowired

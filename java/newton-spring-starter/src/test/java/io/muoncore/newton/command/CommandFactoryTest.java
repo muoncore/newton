@@ -14,8 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import java.util.Collections;
-import java.util.UUID;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 
@@ -63,22 +62,38 @@ public class CommandFactoryTest {
 		cmd.execute();
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void createFromCommandDefinition_withAdditionalProperties_thatsUnkown() throws Exception {
-		commandFactory.create(TestPayloadCommand.class, null, null, Collections.singletonMap("propX", "Value"), null);
-	}
-
   @Test
-  public void createFromIdUsingReflection() throws Exception {
+  public void createFromStringIdUsingReflection() throws Exception {
     final String id = "1234";
     Command cmd = commandFactory
       .create(TestCommand.class,null, id,null);
     Assert.assertNotNull(cmd);
     assertEquals(id, ((TestCommand)cmd).getId());
-    //THEN - expect no exception
-//    cmd.execute();
   }
 
+  @Test
+  public void createFromCustomIdUsingReflection() throws Exception {
+    final CustomId id = new CustomId("1234");
+    Command cmd = commandFactory
+      .create(TestCommandWithCustomId.class,null, id,null);
+    Assert.assertNotNull(cmd);
+    assertEquals(id, ((TestCommandWithCustomId)cmd).getId());
+  }
+
+
+  @Test
+  public void createFromAdditonalProperties_GenericList() throws Exception {
+    ArrayList<String> list = new ArrayList<>();
+    list.add("abc");
+    Map<String,Object> additionalProperties = new HashMap<>();
+    additionalProperties.put("list", list);
+
+    Command cmd = commandFactory
+      .create(TestCommand.class,null,null, additionalProperties, null);
+    Assert.assertNotNull(cmd);
+    //THEN
+    assertEquals(list, ((TestCommand)cmd).getList());
+  }
 
 
   //CONFIGURATION
@@ -97,7 +112,13 @@ public class CommandFactoryTest {
 		return new TestIdCommand();
 	}
 
-	@Data
+  @Bean
+  public TestCommandWithCustomId testCommandWithCustomId() {
+    return new TestCommandWithCustomId();
+  }
+
+
+  @Data
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class TestRequest {
@@ -109,6 +130,9 @@ public class CommandFactoryTest {
 	public static class TestCommand implements Command {
 		private String id;
 
+		private List<String> list;
+
+
 		public void setAd(String id) {
       throw new IllegalArgumentException("THIS SHOULD NOT BE CALLD");
     }
@@ -118,10 +142,23 @@ public class CommandFactoryTest {
 		}
 	}
 
-	@Data
+  public static class TestCommandWithCustomId implements Command {
+
+	  @Setter private CustomId id;
+
+    @Override
+    public void execute() {
+    }
+
+    public CustomId getId(){
+      return this.id;
+    }
+  }
+
+
 	public static class TestIdCommand implements Command {
 
-		protected String id;
+		@Setter private String id;
 
 		@Override
 		public void execute() {
@@ -130,9 +167,6 @@ public class CommandFactoryTest {
 			}
 		}
 
-		public void setId(String id) {
-			this.id = id;
-		}
 	}
 
 
@@ -156,4 +190,17 @@ public class CommandFactoryTest {
 			System.out.println("RUNNING");
 		}
 	}
+
+	public static class CustomId{
+
+	  private String val;
+
+	  public CustomId(String val){
+	    this.val = val;
+    }
+
+    public String getVal() {
+      return val;
+    }
+  }
 }

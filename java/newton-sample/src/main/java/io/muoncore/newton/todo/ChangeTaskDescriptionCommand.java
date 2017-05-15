@@ -11,21 +11,21 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
-public class ChangeTodoDescriptionCommand implements Command {
+public class ChangeTaskDescriptionCommand implements Command {
 
   private DocumentId id;
   private String description;
-  private EventSourceRepository<Todo> todoRepository;
+  private EventSourceRepository<Task> todoRepository;
 
   @Autowired
-  public ChangeTodoDescriptionCommand(EventSourceRepository<Todo> todoRepository) {
+  public ChangeTaskDescriptionCommand(EventSourceRepository<Task> todoRepository) {
     this.todoRepository = todoRepository;
   }
 
   @Override
   public void execute() {
-    final Todo todo = this.todoRepository.load(this.id);
-    todo.changeDescription(this.description);
+    final Task task = this.todoRepository.load(this.id);
+    task.changeDescription(this.description);
   }
 
   public void setId(DocumentId id) {

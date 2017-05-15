@@ -4,18 +4,18 @@ import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
+import io.muoncore.newton.eventsource.AggregateConfiguration;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -52,14 +52,16 @@ public class SagaStreamManager {
   public void onApplicationEvent(ApplicationReadyEvent onReadyEvent) {
     listenToLifecycleEvents();
 
-    MuonLookupUtils.listAllSagas().forEach(aClass -> {
-      try {
-        if (Modifier.isInterface(aClass.getModifiers()) ||
-          Modifier.isAbstract(aClass.getModifiers())) return;
-        processSaga(aClass);
-      } catch (IllegalStateException e) {
-        log.error("Unable to initialise saga " + aClass, e);
-      }
+    worker.execute(() -> {
+      MuonLookupUtils.listAllSagas().forEach(aClass -> {
+        try {
+          if (Modifier.isInterface(aClass.getModifiers()) ||
+            Modifier.isAbstract(aClass.getModifiers())) return;
+          processSaga(aClass);
+        } catch (IllegalStateException e) {
+          log.error("Unable to initialise saga " + aClass, e);
+        }
+      });
     });
   }
 
@@ -78,7 +80,12 @@ public class SagaStreamManager {
 
     recordSagaCreatedByEvent(saga);
 
-    String[] streams = s[0].streams();
+    List<String> streams = new ArrayList<>();
+    streams.addAll(Arrays.asList(s[0].streams()));
+
+    Arrays.asList(s[0].aggregateRoots()).forEach(aggregateRootClass ->
+      streams.add(AggregateRootUtil.getAggregateRootStream(aggregateRootClass))
+    );
 
     for (String stream : streams) {
       if (!subscribedStreams.contains(stream)) {
@@ -93,14 +100,21 @@ public class SagaStreamManager {
   }
 
   private void recordSagaCreatedByEvent(Class<? extends Saga> saga) {
-    if (saga.getGenericSuperclass() instanceof ParameterizedType) {
-      Class startEventClass = (Class)
-        ((ParameterizedType) saga.getGenericSuperclass())
-          .getActualTypeArguments()[0];
-      sagaStartCache.add(startEventClass, saga);
-    } else {
-      log.warn("Saga type {} is not a parameterized type. This is an error, and this Saga cannot be started via an event ", saga);
+    final Method[] methods = saga.getMethods();
+    for (Method method : methods) {
+      if (method.getName().startsWith("lambda$") || !method.isAnnotationPresent(StartSagaWith.class)) {
+        continue;
+      }
+      final Class<?>[] parameterTypes = method.getParameterTypes();
+      if (parameterTypes.length == 1) {
+        Class newtonEv = parameterTypes[0];
+        sagaStartCache.add(newtonEv, saga);
+        return;
+      }
     }
+
+    log.error(String.format("Saga type %s does not have @StartSagaWith. This is an error, and this Saga cannot be started via an event ", saga.getName()));
+//    throw new IllegalStateException(String.format("Saga type %s does not have @StartSagaWith. This is an error, and this Saga cannot be started via an event ", saga.getName()));
   }
 
   public void processEvent(NewtonEvent event) {

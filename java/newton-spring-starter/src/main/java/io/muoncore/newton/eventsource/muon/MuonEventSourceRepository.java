@@ -3,6 +3,7 @@ package io.muoncore.newton.eventsource.muon;
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -26,19 +28,18 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	private Class<A> aggregateType;
 	private AggregateEventClient aggregateEventClient;
 	private EventClient eventClient;
-	private final String boundedContextName;
 	private EventStreamProcessor processor;
+	private String streamName;
 
 	public MuonEventSourceRepository(Class<A> type,
                                    AggregateEventClient aggregateEventClient,
                                    EventClient eventClient,
-                                   EventStreamProcessor eventStreamProcessor,
-                                   String boundedContextName) {
+                                   EventStreamProcessor eventStreamProcessor, String appName) {
 		aggregateType = type;
 		this.processor = eventStreamProcessor;
 		this.aggregateEventClient = aggregateEventClient;
 		this.eventClient = eventClient;
-		this.boundedContextName = boundedContextName;
+		this.streamName = AggregateRootUtil.getAggregateRootStream(type, appName);
 	}
 
 	@Override
@@ -142,7 +143,6 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
-		String streamName = boundedContextName + "/" + aggregate.getClass().getSimpleName();
 		log.debug("Emitting event on " + streamName);
     processor.processForPersistence(aggregate.getNewOperations()).forEach(
 			event -> eventClient.event(

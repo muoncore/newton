@@ -2,7 +2,7 @@ package io.muoncore.newton.query;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
+import io.muoncore.newton.streams.BaseStreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -17,10 +17,10 @@ import java.util.function.Consumer;
  * as the base view.
  */
 @Slf4j
-public abstract class SharedDatastoreView extends BaseView {
+public abstract class SharedDatastoreView extends BaseStreamSubscriber {
 
-  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
-    super(streamSubscriptionManager, eventStreamProcessor);
+  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+    super(streamSubscriptionManager);
   }
 
   @Override

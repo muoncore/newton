@@ -8,8 +8,9 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TodoListView {
+public class TaskView {
 
   private DocumentId id;
   private String description;
+  private String tenantId;
 }

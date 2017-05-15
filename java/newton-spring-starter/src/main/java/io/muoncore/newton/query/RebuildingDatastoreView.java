@@ -2,7 +2,7 @@ package io.muoncore.newton.query;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
+import io.muoncore.newton.streams.BaseStreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -13,15 +13,13 @@ import java.util.function.Consumer;
  * This means that they will not use a lock of any kind, with each instance running independently
  */
 @Slf4j
-public abstract class RebuildingDatastoreView extends BaseView {
+public abstract class RebuildingDatastoreView extends BaseStreamSubscriber {
 
-  public RebuildingDatastoreView(StreamSubscriptionManager streamSubscriptionManager, EventStreamProcessor eventStreamProcessor) throws IOException {
-    super(streamSubscriptionManager, eventStreamProcessor);
+  public RebuildingDatastoreView(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+    super(streamSubscriptionManager);
   }
 
   protected Consumer<Consumer<NewtonEvent>> run(String stream) {
-    return consumer -> {
-      streamSubscriptionManager.localNonTrackingSubscription(stream, consumer);
-    };
+    return consumer -> streamSubscriptionManager.localNonTrackingSubscription(stream, consumer);
   }
 }

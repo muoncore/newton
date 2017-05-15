@@ -14,6 +14,8 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.util.Collections;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Slf4j
@@ -25,6 +27,8 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private EventStreamIndexStore eventStreamIndexStore;
   private LockService lockService;
   private EventStreamProcessor eventStreamProcessor;
+  //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
+  private final Executor worker = Executors.newSingleThreadExecutor();
 
   @Override
   public void localNonTrackingSubscription(String streamName, Consumer<NewtonEvent> onData) {
@@ -36,7 +40,9 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       new EventSubscriber(event -> {
         log.debug("NewtonEvent received " + event);
         final NewtonEvent newtonEvent = event.getPayload(MuonLookupUtils.getDomainClass(event));
-        eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
+        worker.execute(() -> {
+          eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
+        });
       }, throwable -> {
         log.warn("NewtonEvent subscription has ended, will attempt to reconnect in {}ms", RECONNECTION_BACKOFF);
         try {
@@ -92,7 +98,9 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()));
         final NewtonEvent newtonEvent = event.getPayload(eventType);
-        eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
+        worker.execute(() -> {
+          eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
+        });
       }, onError));
   }
 

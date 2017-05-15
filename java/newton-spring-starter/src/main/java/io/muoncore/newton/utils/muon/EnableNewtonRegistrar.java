@@ -1,13 +1,11 @@
 package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.EnableNewton;
-import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import javassist.*;
 import javassist.bytecode.ClassFile;
 import javassist.bytecode.SignatureAttribute;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConstructorArgumentValues;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.GenericBeanDefinition;
@@ -23,37 +21,24 @@ import java.util.List;
 @Slf4j
 public class EnableNewtonRegistrar implements ImportBeanDefinitionRegistrar {
 
-  @Value("${spring.application.name}")
-  private String appName;
-
   @Override
   public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata, BeanDefinitionRegistry registry) {
     try {
 
       initScan(importingClassMetadata);
 
-      MuonLookupUtils.listAllAggregateRootClass().forEach(s -> {
-
-        String context;
-        AggregateConfiguration a = s.getAnnotation(AggregateConfiguration.class);
-
-        if (a != null) {
-          context = a.context();
-        } else {
-          throw new IllegalArgumentException("Currently @AggregateConfiguration(context) is required");
-        }
+      MuonLookupUtils.listAllAggregateRootClass().forEach(aggregateClass -> {
 
         GenericBeanDefinition beanDefinition = new GenericBeanDefinition();
-        beanDefinition.setBeanClass(makeRepo(s));
+        beanDefinition.setBeanClass(makeRepo(aggregateClass));
         ConstructorArgumentValues vals = new ConstructorArgumentValues();
-        vals.addGenericArgumentValue(s);
-        vals.addGenericArgumentValue(context);
+        vals.addGenericArgumentValue(aggregateClass);
+        vals.addGenericArgumentValue("${spring.application.name}");
+
         beanDefinition.setConstructorArgumentValues(vals);
 
-        registry.registerBeanDefinition("newtonRepo" + s.getSimpleName(), beanDefinition);
-        log.debug("Newton Repository in context {} is registered  {}", context, beanDefinition.getBeanClassName());
+        registry.registerBeanDefinition("newtonRepo" + aggregateClass.getSimpleName(), beanDefinition);
       });
-
     } catch (ClassNotFoundException e) {
       e.printStackTrace();
     }

@@ -8,31 +8,30 @@ import lombok.Getter;
 
 import javax.validation.constraints.NotNull;
 
-@AggregateConfiguration(context = "newton-sample")
-public class Todo extends AggregateRoot<DocumentId> {
+public class Task extends AggregateRoot<DocumentId> {
 
   @Getter
   private DocumentId id;
   private String description;
 
-  public Todo(){}
+  public Task(){}
 
-  public Todo(@NotNull DocumentId id, @NotNull String description){
-    raiseEvent(new TodoCreatedEvent(id, description));
+  public Task(@NotNull DocumentId id, @NotNull String description){
+    raiseEvent(new TaskCreatedEvent(id, description));
   }
 
   public void changeDescription(String description) {
-    raiseEvent(new TodoDescriptionChangedEvent(this.id, description));
+    raiseEvent(new TaskDescriptionChangedEvent(this.id, description));
   }
 
   @EventHandler
-  public void handle(TodoCreatedEvent event){
+  public void handle(TaskCreatedEvent event){
     this.id = event.getId();
     this.description = event.getDescription();
   }
 
   @EventHandler
-  public void handle(TodoDescriptionChangedEvent event){
+  public void handle(TaskDescriptionChangedEvent event){
     this.description = event.getDescription();
   }
 

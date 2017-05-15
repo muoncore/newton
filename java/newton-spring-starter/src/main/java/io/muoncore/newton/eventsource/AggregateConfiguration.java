@@ -6,5 +6,5 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface AggregateConfiguration {
-  String context() default "${spring.application.name}";
+  String context();
 }
