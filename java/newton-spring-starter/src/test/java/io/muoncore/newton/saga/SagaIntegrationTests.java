@@ -61,7 +61,7 @@ public class SagaIntegrationTests {
   public void sagaCanBeStartedViaStartEvent() throws InterruptedException {
 
     //save a domain class, triggering a save event
-    NewtonEvent<String> createEvent = testAggregateRepo.newInstance(SagaTestAggregate::new).getNewOperations().get(0);
+    NewtonEvent<String> createEvent = testAggregateRepo.save(new SagaTestAggregate()).get(0);
 
     Thread.sleep(1000);
     //lookup the saga via the ID

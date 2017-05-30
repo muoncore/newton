@@ -1,5 +1,7 @@
 package io.muoncore.newton.command;
 
+import io.muoncore.api.MuonFuture;
+
 public interface CommandBus {
-	void dispatch(CommandIntent commandIntent);
+	MuonFuture<CommandResult> dispatch(CommandIntent commandIntent);
 }

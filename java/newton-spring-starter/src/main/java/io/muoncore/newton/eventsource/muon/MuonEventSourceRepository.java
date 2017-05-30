@@ -16,8 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -81,9 +81,12 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	}
 
 	@Override
-	public void save(A aggregate) {
+	public List<NewtonEvent> save(A aggregate) {
 		emitForAggregatePersistence(aggregate);
 		emitForStreamProcessing(aggregate);
+		List<NewtonEvent> events = new ArrayList<>(aggregate.getNewOperations());
+		aggregate.getNewOperations().clear();
+		return events;
 	}
 
   private Publisher<NewtonEvent> subscribe(Object aggregateIdentifier, EventReplayMode mode) {
