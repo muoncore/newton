@@ -5,7 +5,6 @@ import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.streams.BaseStreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -15,7 +14,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class RebuildingDatastoreView extends BaseStreamSubscriber {
 
-  public RebuildingDatastoreView(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public RebuildingDatastoreView(StreamSubscriptionManager streamSubscriptionManager)  {
     super(streamSubscriptionManager);
   }
 

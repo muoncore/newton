@@ -19,7 +19,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class SharedDatastoreView extends BaseStreamSubscriber {
 
-  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public SharedDatastoreView(StreamSubscriptionManager streamSubscriptionManager) {
     super(streamSubscriptionManager);
   }
 
