@@ -26,7 +26,7 @@ public abstract class BaseStreamSubscriber {
     worker.execute(() -> {
       String[] streams = getStreams();
       if (streams == null || streams.length == 0){
-        throw new IllegalStateException("Invalid configuration. EventStreams must be specified!");
+        throw new IllegalStateException(String.format("Invalid configuration. EventStreams must be specified for '%s'", this.getClass().getName()));
       }
       for(String stream: streams) {
         if (!subscribedStreams.contains(stream)) {
