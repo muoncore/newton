@@ -15,14 +15,14 @@ public class CommandResult {
 
   public Optional<List<NewtonEvent>> getSuccess() {
     if (events == null) {
-      return Optional.empty()
+      return Optional.empty();
     }
     return Optional.of(events);
   }
 
   public Optional<CommandFailedEvent> getFailure() {
     if (failure == null) {
-      return Optional.empty()
+      return Optional.empty();
     }
     return Optional.of(failure);
   }
