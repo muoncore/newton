@@ -25,7 +25,10 @@ public class SimpleCommandBus implements CommandBus {
 			return new ImmediateReturnFuture<>(new CommandResult(command.executeAndReturnEvents(), null));
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(String.format("Command of type '%s' does not exist", commandIntent.getType()));
-		} catch (Exception e) {
+		} catch (CommandCreateException e){
+		  throw e;
+    }
+		catch (Exception e) {
 		  return new ImmediateReturnFuture<>(
 		    new CommandResult(Collections.emptyList(), new CommandFailedEvent(commandIntent.getType(), e.getMessage(), e))
       );
