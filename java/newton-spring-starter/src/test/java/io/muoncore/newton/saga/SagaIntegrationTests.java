@@ -20,6 +20,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
@@ -122,10 +124,14 @@ public class SagaIntegrationTests {
   public static class ComplexSaga extends StatefulSaga {
 
     private String orderId;
+    @Autowired
+    private ApplicationContext context;
 
     @StartSagaWith
     public void start(OrderRequestedEvent event) {
       orderId = event.getId();
+
+      System.out.println("App name is " + context.getApplicationName());
 
       System.out.println("Got order id  " + orderId);
 
@@ -141,6 +147,7 @@ public class SagaIntegrationTests {
 
     @EventHandler
     public void on(PaymentRecievedEvent payment) {
+      System.out.println("App name is " + context.getApplicationName());
       System.out.println("Payment received, ordering shipping... ");
       //order a shipping
       raiseCommand(CommandIntent.builder(ShipOrder.class.getName())
