@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.saga.events.SagaEndEvent;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -30,6 +31,10 @@ public class SagaFactory implements ApplicationContextAware {
     public SagaFactory(SagaRepository sagaRepository, CommandBus commandBus) {
         this.commandBus = commandBus;
         this.sagaRepository = sagaRepository;
+    }
+
+    public void autowire(Saga saga) {
+      applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(saga, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
     }
 
     public void notifySagaLifeCycle(Object id, SagaLifecycleEvent event) {

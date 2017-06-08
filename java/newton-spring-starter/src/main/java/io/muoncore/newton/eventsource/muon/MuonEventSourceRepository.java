@@ -2,10 +2,7 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.eventsource.AggregateNotFoundException;
-import io.muoncore.newton.eventsource.AggregateRootUtil;
-import io.muoncore.newton.eventsource.EventSourceRepository;
-import io.muoncore.newton.eventsource.OptimisticLockException;
+import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
@@ -16,8 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
-import org.springframework.beans.factory.annotation.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.stream.Collectors;
@@ -47,6 +44,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 		try {
 			A aggregate = aggregateType.newInstance();
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
+			if (aggregate.isDeleted()) throw new AggregateNotFoundException(aggregateIdentifier);
 			return aggregate;
 		} catch (AggregateNotFoundException e) {
 			throw e;
@@ -81,10 +79,19 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	}
 
 	@Override
-	public void save(A aggregate) {
+	public List<NewtonEvent> save(A aggregate) {
 		emitForAggregatePersistence(aggregate);
 		emitForStreamProcessing(aggregate);
+		List<NewtonEvent> events = new ArrayList<>(aggregate.getNewOperations());
+		aggregate.getNewOperations().clear();
+		return events;
 	}
+
+  @Override
+  public List<NewtonEvent> delete(A aggregate) {
+    aggregate.getNewOperations().add(new AggregateDeletedEvent(aggregate.getId()));
+    return save(aggregate);
+  }
 
   private Publisher<NewtonEvent> subscribe(Object aggregateIdentifier, EventReplayMode mode) {
 	  return sub -> eventClient.replay("/aggregate/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {

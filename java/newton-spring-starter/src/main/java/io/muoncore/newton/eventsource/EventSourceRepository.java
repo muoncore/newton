@@ -4,6 +4,7 @@ import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
 import org.reactivestreams.Publisher;
 
+import java.util.List;
 import java.util.concurrent.Callable;
 
 /**
@@ -32,7 +33,14 @@ public interface EventSourceRepository<A extends AggregateRoot> {
   /**
    * Persist an existing aggregate root.
    */
-	void save(A aggregate);
+	List<NewtonEvent> save(A aggregate);
+
+  /**
+   * Delete this aggregate root. Its events may still be retrievable via replay, however a call to `load` will throw
+   * AggregateNotFoundException
+   * @param aggregate
+   */
+	List<NewtonEvent> delete(A aggregate);
 
   /**
    * Cold replay of the event contents of an aggregate root.

@@ -134,6 +134,7 @@ public class SagaStreamManager {
         }
         Optional<? extends Saga> saga = sagaRepository.load(interest.getSagaId(), sagaLoader.loadSagaClass(interest));
         saga.ifPresent(saga1 -> {
+          sagaFactory.autowire(saga1);
           saga1.handle(event);
           sagaRepository.save(saga1);
           processCommands(saga1);

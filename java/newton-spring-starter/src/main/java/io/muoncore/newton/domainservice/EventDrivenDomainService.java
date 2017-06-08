@@ -5,7 +5,6 @@ import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.streams.BaseStreamSubscriber;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.function.Consumer;
 
 /**
@@ -16,7 +15,7 @@ import java.util.function.Consumer;
 @Slf4j
 public abstract class EventDrivenDomainService extends BaseStreamSubscriber {
 
-  public EventDrivenDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public EventDrivenDomainService(StreamSubscriptionManager streamSubscriptionManager){
     super(streamSubscriptionManager);
   }
 

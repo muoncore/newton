@@ -1,7 +1,18 @@
+|===
+| Master Build | License
+| image:https://img.shields.io/teamcity/http/teamcity.simplicityitself.com/e/OpenSource_Newton_PublishSnapshot.svg[Status]
+| image:https://img.shields.io/github/license/muoncore/newton.svg[]
+|===
+
 # Newton
 
 Newton is a Polyglot Distributed DDD Framework designed for building complex event based Microservice applications using CQRS principles, Event Sourcing and Stream Processing. 
 
 It provides Event Sourced Aggregates, Stream Processed Views and Distributed Sagas. It enables you to build highly complex transactional systems that are naturally distributed, event oriented and give event based transactional semantics.
 
+|===
+| Master Build | License
+| image:https://img.shields.io/teamcity/http/teamcity.simplicityitself.com/e/OpenSource_MuonReleases_Libraries_StackStreamSnapshot.svg[Status]
+| image:https://img.shields.io/github/license/muoncore/stack-reactive-streams.svg[]
+|===
 

@@ -5,7 +5,6 @@ import io.muoncore.newton.eventsource.AggregateRootUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.annotation.PostConstruct;
-import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -19,7 +18,7 @@ public abstract class BaseStreamSubscriber {
   private Set<String> subscribedStreams = new HashSet<>();
   private Executor worker = Executors.newSingleThreadExecutor();
 
-  public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
+  public BaseStreamSubscriber(StreamSubscriptionManager streamSubscriptionManager) {
     this.streamSubscriptionManager = streamSubscriptionManager;
   }
 
@@ -27,7 +26,7 @@ public abstract class BaseStreamSubscriber {
     worker.execute(() -> {
       String[] streams = getStreams();
       if (streams == null || streams.length == 0){
-        throw new IllegalStateException("Invalid configuration. EventStreams must be specified!");
+        throw new IllegalStateException(String.format("Invalid configuration. EventStreams must be specified for '%s'", this.getClass().getName()));
       }
       for(String stream: streams) {
         if (!subscribedStreams.contains(stream)) {
@@ -49,7 +48,7 @@ public abstract class BaseStreamSubscriber {
 
   private void handleEvent(NewtonEvent event) {
     if (!eventAdaptor.apply(event)) {
-      log.debug("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
+      log.warn("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
     }
   }
 
