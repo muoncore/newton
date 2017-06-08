@@ -48,7 +48,7 @@ public abstract class BaseStreamSubscriber {
 
   private void handleEvent(NewtonEvent event) {
     if (!eventAdaptor.apply(event)) {
-      log.warn("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
+      log.debug("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
     }
   }
 
