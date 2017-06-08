@@ -1,5 +1,14 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...HEAD)
+
+**Closed issues:**
+
+- Allow deleting of aggregate roots via repo.delete [\#38](https://github.com/muoncore/newton/issues/38)
+- Add a return path for the Command Bus [\#37](https://github.com/muoncore/newton/issues/37)
+
 ## [v0.0.9](https://github.com/muoncore/newton/tree/v0.0.9) (2017-05-15)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.8...v0.0.9)
 
