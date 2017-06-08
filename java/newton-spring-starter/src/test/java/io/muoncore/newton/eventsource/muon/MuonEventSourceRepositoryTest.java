@@ -3,6 +3,7 @@ package io.muoncore.newton.eventsource.muon;
 import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.newton.MuonTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.eventsource.AggregateDeletedEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.newton.mongo.MongoConfiguration;
@@ -61,6 +62,30 @@ public class MuonEventSourceRepositoryTest {
 		assertEquals(1, events.size());
 		assertEquals(TestAggregateCreated.class.getSimpleName(), events.get(0).getEventType());
 	}
+
+  @Test
+  public void deleteCreatesDeletedEvent() throws Exception {
+    String id = UUID.randomUUID().toString();
+    TestAggregate customer = new TestAggregate(id);
+    repository.save(customer);
+
+    repository.delete(customer);
+
+    List<Event> events = client.loadAggregateRoot(id.toString());
+
+    assertEquals(2, events.size());
+    assertEquals(AggregateDeletedEvent.class.getSimpleName(), events.get(1).getEventType());
+  }
+
+  @Test(expected = AggregateNotFoundException.class)
+  public void loadDeletedAggregateThrowsException() throws Exception {
+    String id = UUID.randomUUID().toString();
+    TestAggregate customer = new TestAggregate(id);
+    repository.save(customer);
+    repository.delete(customer);
+
+    repository.load(id);
+  }
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void throwsExceptionOnNonExistingAggregate() {

@@ -36,6 +36,13 @@ public interface EventSourceRepository<A extends AggregateRoot> {
 	List<NewtonEvent> save(A aggregate);
 
   /**
+   * Delete this aggregate root. Its events may still be retrievable via replay, however a call to `load` will throw
+   * AggregateNotFoundException
+   * @param aggregate
+   */
+	List<NewtonEvent> delete(A aggregate);
+
+  /**
    * Cold replay of the event contents of an aggregate root.
    */
 	Publisher<NewtonEvent> replay(Object aggregateIdentifier);
