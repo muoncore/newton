@@ -50,8 +50,9 @@ public class JGroupsLockService implements LockService {
 				} catch (Exception ex) {
 					log.warn("Locked process has failed with an exception, and {} has been unlocked", name);
 					log.warn("Locking Process failed with exception", ex);
-					lock.unlock();
-				}
+				} finally {
+          lock.unlock();
+        }
 			}
 		});
 	}
