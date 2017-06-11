@@ -2,7 +2,7 @@ package io.muoncore.newton.todo;
 
 import io.muoncore.newton.EventHandler;
 import io.muoncore.newton.StreamSubscriptionManager;
-import io.muoncore.newton.UniqueAggregateDomainService;
+import io.muoncore.newton.InMemoryUniqueAggregateDomainService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.io.IOException;
 
 @Component
 @Slf4j
-public class UniqueTaskDescriptionDomainService extends UniqueAggregateDomainService<String> {
+public class UniqueTaskDescriptionDomainService extends InMemoryUniqueAggregateDomainService<String> {
 
   @Autowired
   public UniqueTaskDescriptionDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {

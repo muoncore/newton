@@ -1,71 +1,15 @@
 package io.muoncore.newton;
 
+public interface UniqueAggregateDomainService<V> {
+  boolean isUnique(Object thisId, V value);
 
-import lombok.extern.slf4j.Slf4j;
+  boolean exists(V value);
 
-import javax.annotation.PostConstruct;
-import java.io.IOException;
-import java.util.*;
-import java.util.function.Predicate;
+  boolean exists(Object thisId, V value);
 
-@Slf4j
-public abstract class UniqueAggregateDomainService<V> {
+  void addValue(Object id, V value);
 
-  //TODO, this is now object to value. Possibly this should be generified to match the ID we are interested in ...
-  private Map<Object, V> entriesMap = Collections.synchronizedMap(new HashMap<>());
+  void removeValue(Object id);
 
-	private StreamSubscriptionManager streamSubscriptionManager;
-	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
-
-	public UniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager) throws IOException {
-		this.streamSubscriptionManager = streamSubscriptionManager;
-	}
-
-	private void handleEvent(NewtonEvent event) {
-	  log.debug("Accepting event for view " + getClass() + ": " + event);
-		eventAdaptor.accept(event);
-	}
-
-	@PostConstruct
-	public void initSubscription() throws InterruptedException {
-    Arrays.stream(eventStreams()).forEach(stream-> streamSubscriptionManager.localNonTrackingSubscription(stream, this::handleEvent));
-	}
-
-  protected abstract String[] eventStreams();
-
-  public boolean isUnique(Object thisId, V value) {
-		return !exists(thisId, value);
-	}
-
-  public boolean exists(V value) {
-	  return exists(null, value);
-  }
-
-  public boolean exists(Object thisId, V value) {
-		if (thisId != null) {
-			return entriesMap.entrySet().stream().anyMatch(x -> x.getValue().equals(value) && !x.getKey().equals(thisId));
-		}
-		return entriesMap.values().stream().anyMatch(v -> v.equals(value));
-	}
-
-	public void addValue(Object id, V value) {
-		entriesMap.put(id, value);
-	}
-
-	public void removeValue(Object id) {
-		entriesMap.remove(id);
-	}
-
-	public void updateValue(Object id, V value) {
-		entriesMap.entrySet().stream()
-			.filter(entry -> entry.getKey().equals(id))
-			.findFirst()
-			.ifPresent(entry -> entry.setValue(value));
-	}
-
-	protected Optional<V> find(Predicate<V> predicate) {
-		return entriesMap.values().stream().filter(predicate).findFirst();
-	}
-
-
+  void updateValue(Object id, V value);
 }
