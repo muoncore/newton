@@ -1,5 +1,7 @@
 package io.muoncore.newton;
 
+import java.util.Optional;
+
 public interface UniqueAggregateDomainService<V> {
   boolean isUnique(Object thisId, V value);
 
@@ -12,4 +14,6 @@ public interface UniqueAggregateDomainService<V> {
   void removeValue(Object id);
 
   void updateValue(Object id, V value);
+
+  Optional<Object> find(V value);
 }

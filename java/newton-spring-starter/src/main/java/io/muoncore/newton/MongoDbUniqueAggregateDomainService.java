@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.core.query.Update;
 import javax.annotation.PostConstruct;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
 public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAggregateDomainService<V> {
@@ -76,8 +77,13 @@ public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAg
     this.mongoTemplate.updateFirst(new Query(Criteria.where("objId").is(id).and("objType").is(this.getClass().getCanonicalName())),update,UniquenessConstraintEntry.class);
 	}
 
+  @Override
+  public Optional<Object> find(V value) {
+    return Optional.ofNullable(
+      this.mongoTemplate.findOne(new Query(Criteria.where("objValue").is(value).and("objType").is(this.getClass().getCanonicalName())), UniquenessConstraintEntry.class));
+  }
 
-	@Data
+  @Data
   @Document(collection = "_uniqueness_constraint")
 	private static class UniquenessConstraintEntry<V> {
 
