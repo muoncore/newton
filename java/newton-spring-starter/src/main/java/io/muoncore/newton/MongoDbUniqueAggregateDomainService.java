@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -62,7 +63,7 @@ public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAg
 
 	@Override
   public void removeValue(Object id) {
-		this.mongoTemplate.remove(new Query(Criteria.where("objId").is(id).and("objType").is(this.getClass().getCanonicalName())));
+		this.mongoTemplate.remove(new Query(Criteria.where("objId").is(id).and("objType").is(this.getClass().getCanonicalName())), UniquenessConstraintEntry.class);
 	}
 
 	@Override
@@ -80,8 +81,8 @@ public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAg
   @Document(collection = "_uniqueness_constraint")
 	private static class UniquenessConstraintEntry<V> {
 
-    @NonNull private Object objId;
-    @NonNull private String objType;
+    @Indexed @NonNull private Object objId;
+    @Indexed @NonNull private String objType;
     @NonNull private V value;
 
   }
