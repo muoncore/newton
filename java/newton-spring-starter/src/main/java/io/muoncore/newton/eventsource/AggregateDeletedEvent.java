@@ -4,8 +4,5 @@ import io.muoncore.newton.NewtonEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@Getter
-@AllArgsConstructor
-public class AggregateDeletedEvent implements NewtonEvent<Object> {
-  private Object id;
+public interface AggregateDeletedEvent<T> extends NewtonEvent<T> {
 }
