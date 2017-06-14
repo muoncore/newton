@@ -18,6 +18,7 @@ public class LocalOnlyLockService implements LockService {
     log.info("Starting to wait on the lock " + name);
 
     pool.execute(() -> {
+      Thread.currentThread().setName("Lock-" + name);
       log.info("In executor " + name);
       Lock lock = new ReentrantLock();
 
