@@ -1,6 +1,7 @@
 package io.muoncore.newton;
 
 import io.muoncore.newton.eventsource.AggregateDeletedEvent;
+import io.muoncore.newton.eventsource.GenericAggregateDeletedEvent;
 import lombok.Getter;
 
 import java.util.ArrayList;
@@ -32,17 +33,20 @@ public abstract class AggregateRoot<T> {
 
 	public void handleEvent(NewtonEvent event) {
 
-	  if (event instanceof AggregateDeletedEvent) {
-	    deleted = true;
-	    version++;
-	    return;
+	  this.deleted = (event instanceof AggregateDeletedEvent);
+
+	  if (!this.deleted) {
+      boolean eventHandled = eventAdaptor.apply(event);
+      if (!eventHandled) {
+        throw new IllegalStateException("Undefined domain event handler method for event: ".concat(event.getClass().getName()));
+      }
     }
 
-		boolean eventHandled = eventAdaptor.apply(event);
-
-		if (!eventHandled) {
-			throw new IllegalStateException("Undefined domain event handler method for event: ".concat(event.getClass().getName()));
-		}
 		version++;
 	}
+
+	public void delete() {
+    this.getNewOperations().add(new GenericAggregateDeletedEvent((Object)this.getId()));
+  }
+
 }

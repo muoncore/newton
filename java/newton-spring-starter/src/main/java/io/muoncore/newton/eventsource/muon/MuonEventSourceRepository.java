@@ -89,7 +89,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 
   @Override
   public List<NewtonEvent> delete(A aggregate) {
-    aggregate.getNewOperations().add(new AggregateDeletedEvent(aggregate.getId()));
+    aggregate.delete();
     return save(aggregate);
   }
 
