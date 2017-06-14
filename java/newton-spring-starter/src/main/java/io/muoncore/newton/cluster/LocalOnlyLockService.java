@@ -39,6 +39,7 @@ public class LocalOnlyLockService implements LockService {
           log.warn("Locking Process failed with exception", ex);
         } finally {
           lock.unlock();
+          log.info("Global lock '{}' released!", name);
         }
       }
     });

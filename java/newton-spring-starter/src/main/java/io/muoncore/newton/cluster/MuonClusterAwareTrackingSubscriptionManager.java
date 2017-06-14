@@ -8,7 +8,6 @@ import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
@@ -19,7 +18,6 @@ import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 
 @Slf4j
-@AllArgsConstructor
 public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscriptionManager {
 
   private final int RECONNECTION_BACKOFF = 5000;
@@ -29,6 +27,13 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private EventStreamProcessor eventStreamProcessor;
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
   private final Executor worker = Executors.newSingleThreadExecutor();
+
+  public MuonClusterAwareTrackingSubscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
+    this.eventClient = eventClient;
+    this.eventStreamIndexStore = eventStreamIndexStore;
+    this.lockService = lockService;
+    this.eventStreamProcessor = eventStreamProcessor;
+  }
 
   @Override
   public void localNonTrackingSubscription(String streamName, Consumer<NewtonEvent> onData) {
@@ -77,11 +82,9 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   }
 
   public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
-
     log.debug("Subscribing to event stream '{}'...", streamName);
 
-    EventStreamIndex eventStreamIndex = eventStreamIndexStore.findOneById(subscriptionName)
-      .orElse(new EventStreamIndex(streamName, 0L));
+    EventStreamIndex eventStreamIndex = getEventStreamIndex(subscriptionName, streamName);
 
     Long lastSeen = eventStreamIndex.getLastSeen() + 1;
 
@@ -102,6 +105,11 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
         });
       }, onError));
   }
+
+  private EventStreamIndex getEventStreamIndex(String subscriptionName, String streamName) {
+    return eventStreamIndexStore.findOneById(subscriptionName).orElse(new EventStreamIndex(streamName, 0L));
+  }
+
 
   static class EventSubscriber implements Subscriber<io.muoncore.protocol.event.Event> {
 
