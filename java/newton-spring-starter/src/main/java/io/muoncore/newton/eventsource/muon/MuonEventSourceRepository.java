@@ -132,7 +132,14 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 		try {
 			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString())
 				.stream()
-				.map(event -> event.getPayload(MuonLookupUtils.getDomainClass(event)))
+				.map(event -> {
+          Class<? extends NewtonEvent> domainClass = MuonLookupUtils.getDomainClass(event);
+          if (domainClass == null) {
+            log.error("Unable to load event {} for domain class {}", event.getEventType(), this.aggregateType);
+            throw new IllegalStateException("Unable to load aggregate with id " + id + " as event type " + event.getEventType() + " could not be found");
+          }
+          return event.getPayload(domainClass);
+        })
 				.collect(Collectors.toList());
 
 			if (events.size() == 0) throw new AggregateNotFoundException(id);
