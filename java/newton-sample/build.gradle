@@ -1,13 +1,13 @@
 buildscript {
-	ext {
-		springBootVersion = '1.5.2.RELEASE'
-	}
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
-	}
+  ext {
+    springBootVersion = '1.5.2.RELEASE'
+  }
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+  }
 }
 
 apply plugin: 'java'
@@ -17,11 +17,10 @@ apply plugin: 'org.springframework.boot'
 sourceCompatibility = 1.8
 
 repositories {
-	mavenCentral()
+  mavenCentral()
 }
 
 test.enabled = false
-
 
 dependencies {
   compile project(":newton-spring-starter")
@@ -30,9 +29,10 @@ dependencies {
   compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
   compile('org.springframework.boot:spring-boot-starter-web')
 
-	testCompile('org.springframework.boot:spring-boot-starter-test')
-	testCompile('org.spockframework:spock-core:1.1-groovy-2.4-rc-3')
-	testCompile('com.github.javafaker:javafaker:0.13')
+  testCompile('org.springframework.boot:spring-boot-starter-test')
+  testCompile('org.spockframework:spock-core:1.1-groovy-2.4')
+  testCompile('org.spockframework:spock-spring:1.1-groovy-2.4')
+  testCompile('com.github.javafaker:javafaker:0.13')
   testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
 
   runtime("io.muoncore:muon-transport-amqp:7.2.10")

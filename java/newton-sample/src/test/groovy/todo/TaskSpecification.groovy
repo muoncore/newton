@@ -2,7 +2,7 @@ package todo
 
 import com.github.javafaker.Faker
 import groovyx.net.http.RESTClient
-import org.junit.ClassRule
+import org.junit.Rule
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -19,16 +19,16 @@ class TaskSpecification extends Specification {
   @Shared
   def id, description
 
-  @ClassRule
-  @Shared
+  @Rule
   EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-sample", "Task")
 
   def "Create a new task"() {
     when:
+
     def resp = rc.post(
       path: '/api/tasks',
       body: [
-        description: faker.lorem().word()
+        description: faker.lorem().word().concat(new Date().toString())
       ]
     )
 
@@ -59,6 +59,7 @@ class TaskSpecification extends Specification {
     }
 
   }
+
 
   def "Get task details"() {
     when:
