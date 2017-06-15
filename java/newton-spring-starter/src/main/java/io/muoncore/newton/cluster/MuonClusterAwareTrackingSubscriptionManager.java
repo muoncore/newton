@@ -96,7 +96,12 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       new EventSubscriber(event -> {
         log.debug("NewtonEvent received: " + event);
         Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
-        log.info("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
+        if (log.isTraceEnabled()) {
+          log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
+        }
+        else{
+          log.info(event.toString());
+        }
 
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
         final NewtonEvent newtonEvent = event.getPayload(eventType);

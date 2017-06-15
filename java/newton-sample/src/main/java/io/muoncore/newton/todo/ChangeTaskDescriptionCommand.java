@@ -26,6 +26,7 @@ public class ChangeTaskDescriptionCommand implements Command {
   public void execute() {
     final Task task = this.todoRepository.load(this.id);
     task.changeDescription(this.description);
+    todoRepository.save(task);
   }
 
   public void setId(DocumentId id) {
