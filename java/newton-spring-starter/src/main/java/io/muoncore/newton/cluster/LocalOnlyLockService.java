@@ -30,15 +30,23 @@ public class LocalOnlyLockService implements LockService {
         try {
           log.info("Obtained global lock '{}', executing local task on this node", name);
           exec.execute(() -> {
-            lock.unlock();
-            latch.countDown();
+            synchronized (lock) {
+              try {
+                lock.unlock();
+                latch.countDown();
+              } catch (IllegalMonitorStateException e) {
+                log.info("{} is already unlocked", name);
+              }
+            }
           });
           latch.await();
         } catch (Exception ex) {
           log.warn("Locked process has failed with an exception, and {} has been unlocked", name);
           log.warn("Locking Process failed with exception", ex);
         } finally {
-          lock.unlock();
+          synchronized (lock) {
+            lock.unlock();
+          }
           log.info("Global lock '{}' released!", name);
         }
       }

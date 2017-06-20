@@ -21,3 +21,11 @@ buildscript {
 
 apply plugin: 'io.muoncore.release'
 
+project.subprojects.each {
+  it.repositories {
+    mavenLocal()
+    jcenter()
+    maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon' }
+    maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon-snapshot' }
+  }
+}
