@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...HEAD)
 
+**Fixed bugs:**
+
+- Event not on classpath throws Nullpointer when processed outside originating bounded context [\#45](https://github.com/muoncore/newton/issues/45)
+
 **Closed issues:**
 
+- Add a LocalOnlyLockService  [\#39](https://github.com/muoncore/newton/issues/39)
 - Allow deleting of aggregate roots via repo.delete [\#38](https://github.com/muoncore/newton/issues/38)
 - Add a return path for the Command Bus [\#37](https://github.com/muoncore/newton/issues/37)
 
