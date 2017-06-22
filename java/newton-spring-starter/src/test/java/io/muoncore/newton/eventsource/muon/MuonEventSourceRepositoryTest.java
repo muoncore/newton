@@ -5,6 +5,7 @@ import io.muoncore.newton.MuonTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.AggregateDeletedEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
+import io.muoncore.newton.eventsource.GenericAggregateDeletedEvent;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.protocol.event.Event;
@@ -74,7 +75,7 @@ public class MuonEventSourceRepositoryTest {
     List<Event> events = client.loadAggregateRoot(id.toString());
 
     assertEquals(2, events.size());
-    assertEquals(AggregateDeletedEvent.class.getSimpleName(), events.get(1).getEventType());
+    assertEquals(GenericAggregateDeletedEvent.class.getSimpleName(), events.get(1).getEventType());
   }
 
   @Test(expected = AggregateNotFoundException.class)
