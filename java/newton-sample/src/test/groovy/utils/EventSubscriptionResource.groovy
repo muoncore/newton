@@ -8,59 +8,52 @@ import org.reactivestreams.Subscription
 
 class EventSubscriptionResource extends ExternalResource {
 
-	EventClient eventClient
-	private String streamName
-	private String serviceId
+  EventClient eventClient
+  private String streamName
+  private String serviceId
 
-	def events = []
+  def events = []
 
-	EventSubscriptionResource(def serviceId, def streamName) {
-		this.serviceId = serviceId
-		this.streamName = streamName
-	}
+  EventSubscriptionResource(def serviceId, def streamName) {
+    this.serviceId = serviceId
+    this.streamName = streamName
+  }
 
-	def getEventsRaised() {
-		return this.events
-	}
+  def getEventsRaised() {
+    return this.events
+  }
 
-	def clearAllEventsRaised(){
-		this.events.clear()
-	}
+  @Override
+  protected void before() throws Throwable {
+    this.eventClient = MuonEventClientHelper.create(this.serviceId)
 
-	def getEventClient(){
-		return this.eventClient;
-	}
+    this.eventClient.replay(this.serviceId.concat("/").concat(streamName), EventReplayMode.LIVE_ONLY, ["from": 0], new Subscriber() {
+      @Override
+      void onSubscribe(Subscription s) {
+        s.request(Integer.MAX_VALUE)
+      }
 
-	@Override
-	protected void before() throws Throwable {
-		this.eventClient = MuonEventClientHelper.create(this.serviceId)
+      @Override
+      void onNext(Object o) {
+        events << o
+      }
 
-		this.eventClient.replay(this.serviceId.concat("/").concat(streamName), EventReplayMode.LIVE_ONLY, ["from": 0], new Subscriber() {
-			@Override
-			void onSubscribe(Subscription s) {
-				s.request(Integer.MAX_VALUE)
-			}
+      @Override
+      void onError(Throwable t) {
+        t.printStackTrace()
+      }
 
-			@Override
-			void onNext(Object o) {
-				events << o
-			}
-
-			@Override
-			void onError(Throwable t) {
-				t.printStackTrace()
-			}
-
-			@Override
-			void onComplete() {
-				println "Completed"
-			}
-		})
+      @Override
+      void onComplete() {
+        println "Completed"
+      }
+    })
 
 
-	}
+  }
 
-	@Override
-	protected void after() {
-	}
+  @Override
+  protected void after() {
+    this.events.clear()
+  }
 }

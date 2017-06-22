@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 public class TaskCreatedEvent extends TenantEvent<DocumentId> {
 
+
   private final DocumentId id;
   private final String description;
 

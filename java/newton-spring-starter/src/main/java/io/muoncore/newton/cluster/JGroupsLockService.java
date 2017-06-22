@@ -32,6 +32,7 @@ public class JGroupsLockService implements LockService {
     log.info("Starting to wait on the lock " + name);
 
 		pool.execute(() -> {
+      Thread.currentThread().setName("Lock-" + name);
       log.info("In executor " + name);
 			Lock lock = lockService.getLock(name);
 
@@ -50,8 +51,9 @@ public class JGroupsLockService implements LockService {
 				} catch (Exception ex) {
 					log.warn("Locked process has failed with an exception, and {} has been unlocked", name);
 					log.warn("Locking Process failed with exception", ex);
-					lock.unlock();
-				}
+				} finally {
+          lock.unlock();
+        }
 			}
 		});
 	}

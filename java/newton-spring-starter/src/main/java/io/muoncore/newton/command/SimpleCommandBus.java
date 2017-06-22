@@ -2,10 +2,12 @@ package io.muoncore.newton.command;
 
 import io.muoncore.api.ImmediateReturnFuture;
 import io.muoncore.api.MuonFuture;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 
+@Slf4j
 public class SimpleCommandBus implements CommandBus {
 
 	private CommandFactory commandFactory;
@@ -29,6 +31,7 @@ public class SimpleCommandBus implements CommandBus {
 		  throw e;
     }
 		catch (Exception e) {
+		  log.error("Unable to execute command: " + commandIntent.getType(),e);
 		  return new ImmediateReturnFuture<>(
 		    new CommandResult(Collections.emptyList(), new CommandFailedEvent(commandIntent.getType(), e.getMessage(), e))
       );

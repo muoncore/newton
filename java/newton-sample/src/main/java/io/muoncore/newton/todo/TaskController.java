@@ -1,10 +1,12 @@
 package io.muoncore.newton.todo;
 
+import com.google.common.base.Stopwatch;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tasks")
+@Slf4j
 public class TaskController {
 
   private CommandBus commandBus;
@@ -46,12 +49,14 @@ public class TaskController {
 
   @RequestMapping(value = "/{id}",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   public void changeDescription(@PathVariable("id") DocumentId id, @RequestBody @Valid ChangeDescriptionRequest request){
+    final Stopwatch stopwatch = Stopwatch.createStarted();
     this.commandBus.dispatch(
       CommandIntent.builder(ChangeTaskDescriptionCommand.class.getName())
         .request(request)
         .id(id)
         .build()
     );
+    log.info("Duration:" + stopwatch.stop().toString());
   }
 
   @RequestMapping(value = "/{id}",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)

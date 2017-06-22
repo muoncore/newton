@@ -1,8 +1,9 @@
 package todo
 
 import com.github.javafaker.Faker
+import com.google.common.base.Stopwatch
 import groovyx.net.http.RESTClient
-import org.junit.ClassRule
+import org.junit.Rule
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -19,16 +20,16 @@ class TaskSpecification extends Specification {
   @Shared
   def id, description
 
-  @ClassRule
-  @Shared
+  @Rule
   EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-sample", "Task")
 
   def "Create a new task"() {
     when:
+
     def resp = rc.post(
       path: '/api/tasks',
       body: [
-        description: faker.lorem().word()
+        description: faker.lorem().word().concat(new Date().toString())
       ]
     )
 
@@ -43,6 +44,7 @@ class TaskSpecification extends Specification {
   }
 
   def "Change task description"() {
+    def st = Stopwatch.createStarted()
     this.description = faker.lorem().word()
     when:
     def resp = rc.put(
@@ -53,12 +55,14 @@ class TaskSpecification extends Specification {
     )
     then:
     resp.status == 200
-
-    new PollingConditions(timeout: 5).eventually {
-      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
-    }
-
+    System.err.println("Call duration:" + st.stop())
+//    new PollingConditions(timeout: 5).eventually {
+//      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
+//    }
+    where:
+    i << (1..25)
   }
+
 
   def "Get task details"() {
     when:

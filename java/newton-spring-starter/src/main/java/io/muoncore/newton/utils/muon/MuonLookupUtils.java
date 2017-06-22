@@ -54,8 +54,8 @@ public class MuonLookupUtils {
 
     final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
 		eventTypeMappings = new HashMap<>();
-		for (Class<? extends NewtonEvent> cibecsEvent : eventTypes) {
-			eventTypeMappings.put(cibecsEvent.getSimpleName(), cibecsEvent);
+		for (Class<? extends NewtonEvent> newtonEvent : eventTypes) {
+			eventTypeMappings.put(newtonEvent.getSimpleName(), newtonEvent);
 		}
 
 		final Set<Class<? extends AggregateRoot>> aggregateRootTypes = reflections.getSubTypesOf(AggregateRoot.class);

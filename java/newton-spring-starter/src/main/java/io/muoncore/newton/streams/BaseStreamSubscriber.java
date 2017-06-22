@@ -3,8 +3,8 @@ package io.muoncore.newton.streams;
 import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.AggregateRootUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 
-import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -48,12 +48,12 @@ public abstract class BaseStreamSubscriber {
 
   private void handleEvent(NewtonEvent event) {
     if (!eventAdaptor.apply(event)) {
-      log.warn("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
+      log.debug("Subscriber {} did not accept event {}, which has been discarded", getClass().getName(), event);
     }
   }
 
-  @PostConstruct
-  public void initSubscription() throws InterruptedException {
+  @org.springframework.context.event.EventListener
+  public void onApplicationEvent(ApplicationReadyEvent onReadyEvent) {
     processStreams();
   }
 

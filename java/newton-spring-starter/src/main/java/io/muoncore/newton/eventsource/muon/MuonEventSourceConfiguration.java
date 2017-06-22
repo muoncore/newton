@@ -73,7 +73,7 @@ public class MuonEventSourceConfiguration {
   @ConditionalOnMissingBean(LockService.class)
   @Bean
   public LockService lockService() throws Exception {
-    return new JGroupsLockService();
+    return new LocalOnlyLockService();
   }
 
   @ConditionalOnMissingBean(SagaLoader.class)
