@@ -2,6 +2,7 @@ package io.muoncore.newton.cluster;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
+import io.muoncore.newton.eventsource.EventTypeNotFound;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.query.EventStreamIndex;
 import io.muoncore.newton.query.EventStreamIndexStore;
@@ -104,7 +105,12 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
         }
 
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
-        final NewtonEvent newtonEvent = event.getPayload(eventType);
+        NewtonEvent newtonEvent;
+        if (eventType == null) {
+          newtonEvent = new EventTypeNotFound(event.getOrderId(), event);
+        } else {
+          newtonEvent = event.getPayload(eventType);
+        }
         worker.execute(() -> {
           eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
         });
