@@ -51,10 +51,17 @@ public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAg
 
   @Override
   public boolean exists(Object thisId, V value) {
-		if (thisId != null) {
-		  return this.mongoTemplate.exists(new Query(Criteria.where("value").is(value).and("objType").is(this.getClass().getCanonicalName())),UniquenessConstraintEntry.class);
-		}
-    return this.mongoTemplate.exists(new Query(Criteria.where("value").is(value).and("objType").is(this.getClass().getCanonicalName()).and("objId").ne(thisId)),UniquenessConstraintEntry.class);
+		if (thisId == null) {
+		  return this.mongoTemplate.exists(
+		            new Query(Criteria.where("value").is(value).and("objType").is(this.getClass().getCanonicalName())),
+                UniquenessConstraintEntry.class
+      );
+		} else {
+      return this.mongoTemplate.exists(
+                new Query(Criteria.where("value").is(value).and("objType").is(this.getClass().getCanonicalName()).and("objId").ne(thisId)),
+                UniquenessConstraintEntry.class
+      );
+    }
 	}
 
 	@Override
