@@ -111,7 +111,7 @@ public class MuonEventSourceRepositoryTest {
 	}
 
 	@Test(expected = OptimisticLockException.class)
-	public void throwsOptimisticLocExceptionOnBadVersion() {
+	public void throwsOptimisticLockExceptionOnBadVersion() {
     String id = "awesome-id";
 		client.publishDomainEvents(id.toString(), Arrays.asList(
 			new TestAggregateCreated()

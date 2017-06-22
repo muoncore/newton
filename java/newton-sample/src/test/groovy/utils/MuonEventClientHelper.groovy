@@ -10,7 +10,7 @@ import io.muoncore.protocol.event.client.EventClient
 class MuonEventClientHelper {
 
 	static EventClient create(String serviceId) {
-		return create(serviceId, "amqp://guest:guest@localhost")
+		return create(serviceId, "amqp://muon:microservices@localhost")
 	}
 
 	static EventClient create(String serviceId, String amqpUrl) {

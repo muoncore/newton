@@ -7,6 +7,7 @@ import org.junit.Rule
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
+import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
 import utils.EventSubscriptionResource
 
@@ -43,7 +44,8 @@ class TaskSpecification extends Specification {
 
   }
 
-  def "Change task description"() {
+  @Unroll
+  def "Change task description run #i"() {
     def st = Stopwatch.createStarted()
     this.description = faker.lorem().word()
     when:
