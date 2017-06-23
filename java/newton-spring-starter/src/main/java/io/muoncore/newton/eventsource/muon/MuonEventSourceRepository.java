@@ -1,12 +1,12 @@
 package io.muoncore.newton.eventsource.muon;
 
+import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;

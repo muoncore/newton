@@ -12,6 +12,7 @@ public class Task extends AggregateRoot<DocumentId> {
 
   @Getter
   private DocumentId id;
+  @Getter
   private String description;
 
   public Task(){}
