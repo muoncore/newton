@@ -1,15 +1,14 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
+import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.MuonTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
-import io.muoncore.newton.eventsource.AggregateDeletedEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
 import io.muoncore.newton.eventsource.GenericAggregateDeletedEvent;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.protocol.event.Event;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.reactivestreams.Subscriber;
@@ -42,7 +41,7 @@ public class MuonEventSourceRepositoryTest {
 	@Test
 	public void load() throws Exception {
     String id = "simple-id";
-		client.publishDomainEvents(id.toString(), Collections.singletonList(
+		client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
 			new TestAggregateCreated(id)
 		));
 
@@ -58,7 +57,7 @@ public class MuonEventSourceRepositoryTest {
 		TestAggregate customer = new TestAggregate(id);
 		repository.save(customer);
 
-		List<Event> events = client.loadAggregateRoot(id.toString());
+		List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class);
 
 		assertEquals(1, events.size());
 		assertEquals(TestAggregateCreated.class.getSimpleName(), events.get(0).getEventType());
@@ -72,7 +71,7 @@ public class MuonEventSourceRepositoryTest {
 
     repository.delete(customer);
 
-    List<Event> events = client.loadAggregateRoot(id.toString());
+    List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class);
 
     assertEquals(2, events.size());
     assertEquals(GenericAggregateDeletedEvent.class.getSimpleName(), events.get(1).getEventType());
@@ -101,7 +100,7 @@ public class MuonEventSourceRepositoryTest {
 	@Test
 	public void canLoadWithVersion() {
     String id = "awesome-things";
-		client.publishDomainEvents(id.toString(), Arrays.asList(
+		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
 			new TestAggregateCreated(),
 			new TestAggregateCreated()
 		));
@@ -113,7 +112,7 @@ public class MuonEventSourceRepositoryTest {
 	@Test(expected = OptimisticLockException.class)
 	public void throwsOptimisticLockExceptionOnBadVersion() {
     String id = "awesome-id";
-		client.publishDomainEvents(id.toString(), Arrays.asList(
+		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
 			new TestAggregateCreated()
 		));
 
@@ -123,7 +122,7 @@ public class MuonEventSourceRepositoryTest {
   @Test()
   public void canStreamAggregateEvents() throws InterruptedException {
     String id = "cool-id";
-    client.publishDomainEvents(id.toString(), Arrays.asList(
+    client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
       new TestAggregateCreated(), new TestAggregateCreated()
     ));
 

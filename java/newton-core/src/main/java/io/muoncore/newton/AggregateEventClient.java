@@ -36,12 +36,12 @@ public class AggregateEventClient {
    * @param id
    * @param events
    */
-  public void publishDomainEvents(String id, List events) {
+  public void publishDomainEvents(String id, Class type, List events) {
     events.forEach(domainEvent -> {
       ClientEvent persistEvent = ClientEvent
         .ofType(domainEvent.getClass().getSimpleName())
         .payload(domainEvent)
-        .stream("/aggregate/" + id)
+        .stream("/aggregate/" + type.getSimpleName() + "/" + id)
         .build();
 
       EventResult result = client.event(persistEvent);
@@ -52,12 +52,12 @@ public class AggregateEventClient {
     });
   }
 
-  public List<Event> loadAggregateRoot(String id) throws InterruptedException {
+  public List<Event> loadAggregateRoot(String id, Class type) throws InterruptedException {
 
     CountDownLatch latch = new CountDownLatch(1);
     List<Event> events = new ArrayList<>();
 
-    client.replay("/aggregate/" + id, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
+    client.replay("/aggregate/" + type.getSimpleName() + "/" + id, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
       @Override
       public void onSubscribe(Subscription s) {
         s.request(Long.MAX_VALUE);
@@ -65,6 +65,8 @@ public class AggregateEventClient {
 
       @Override
       public void onNext(Event o) {
+
+        log.info("Event received " + id);
         events.add(o);
       }
 
