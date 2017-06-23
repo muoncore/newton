@@ -4,8 +4,13 @@
 
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...HEAD)
 
+**Implemented enhancements:**
+
+- Aggregates with shared Ids try to load events that's not part of the aggregate [\#47](https://github.com/muoncore/newton/issues/47)
+
 **Fixed bugs:**
 
+- Aggregates with shared Ids try to load events that's not part of the aggregate [\#47](https://github.com/muoncore/newton/issues/47)
 - Event not on classpath throws Nullpointer when processed outside originating bounded context [\#45](https://github.com/muoncore/newton/issues/45)
 
 **Closed issues:**
