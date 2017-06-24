@@ -1,43 +1,146 @@
 package todo
 
+import io.muoncore.newton.EventHandler
+import io.muoncore.newton.NewtonEvent
 import io.muoncore.newton.SampleApplication
+import io.muoncore.newton.StreamSubscriptionManager
+import io.muoncore.newton.domainservice.EventDrivenDomainService
+import io.muoncore.newton.eventsource.EventTypeNotFound
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository
 import io.muoncore.newton.support.DocumentId
+import io.muoncore.newton.support.TenantContextHolder
 import io.muoncore.newton.todo.Task
+import io.muoncore.newton.todo.TenantEvent
+import io.muoncore.protocol.event.ClientEvent
+import io.muoncore.protocol.event.client.EventClient
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.stereotype.Component
 import org.springframework.test.context.ActiveProfiles
 import spock.lang.Specification
+import spock.util.concurrent.PollingConditions
+
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicInteger
 
 @ActiveProfiles("test")
-@SpringBootTest(classes = [MuonTestConfig, SampleApplication])
+@SpringBootTest(classes = [MuonTestConfig, SampleApplication, FailConfig])
 class MissingEventSpec extends Specification {
+
+  @Autowired
+  MyEventService eventService
+
+  @Autowired
+  EventClient eventClient
 
   @Autowired
   MuonEventSourceRepository<Task> repo
 
-  def "when receives a non existent event type, is cast to EventTypeNotFound"() {
+  def "can replay aggregate streams in parallel"() {
 
     Task task = repo.newInstance { new Task(new DocumentId(), "Hi!") }
 
-    when: "emit an event with an unmappable type"
+
+    sleep 1000
+    when:
+
+    def num = new AtomicInteger(1)
+
+    def latch = new CountDownLatch(40)
+
     20.times {
 
       def exec = {
-        Task t = repo.load(task.id)
-        t.changeDescription("Hello" + it)
-        repo.save(t)
+        try {
+          TenantContextHolder.setTenantId("hello")
+          Task t = repo.load(task.id)
+          t.changeDescription("Hello" + num.addAndGet(1))
+          repo.save(t)
+          TenantContextHolder.setTenantId(null)
+        } finally {
+          latch.countDown()
+          println "COUNTDOWN $num"
+        }
       }
 
-      Thread.start exec
+      exec()
+      exec()
+//      Thread.start exec
 //      Thread.start exec
     }
 
-    sleep(200)
+    latch.await()
+//    sleep(500)
 
     task = repo.load(task.id)
 
     then:
-    task.description == "Hello19"
+    task.description == "Hello41"
   }
+
+  def "event service can emit events"() {
+    when:
+    println "EMIT WAS " + eventClient.event(ClientEvent.ofType(FirstEvent.simpleName).stream("newstream").payload(new FirstEvent(id:"12345")).build()).status
+
+    then:
+    new PollingConditions().eventually {
+      eventService.ev2?.id
+    }
+  }
+}
+
+
+@Configuration
+class FailConfig {
+
+  @Bean MyEventService ev(StreamSubscriptionManager s) { return new MyEventService(s)}
+
+}
+
+@Component
+class MyEventService extends EventDrivenDomainService {
+
+  @Autowired
+  EventClient client
+
+  EventTypeNotFound ev;
+  SecondEvent ev2
+
+  MyEventService(StreamSubscriptionManager streamSubscriptionManager) {
+    super(streamSubscriptionManager)
+    println "Made a service!"
+  }
+
+  @EventHandler
+  void on(EventTypeNotFound eventTypeNotFound){
+    this.ev = eventTypeNotFound;
+  }
+
+  @EventHandler
+  void on(FirstEvent eventTypeNotFound){
+    println "Got MyEvent"
+    client.event(ClientEvent.ofType(SecondEvent.simpleName).stream("newstream").payload(new SecondEvent(id:"12345")).build())
+  }
+
+  @EventHandler
+  void on(SecondEvent eventTypeNotFound){
+    println "Got other event"
+    ev2 = eventTypeNotFound
+  }
+
+  @Override
+  protected String[] getStreams() {
+    ["mystream", "newstream"]
+  }
+}
+
+
+class SecondEvent extends TenantEvent<String> {
+  String id
+}
+
+class FirstEvent extends TenantEvent<String> {
+  String id
 }

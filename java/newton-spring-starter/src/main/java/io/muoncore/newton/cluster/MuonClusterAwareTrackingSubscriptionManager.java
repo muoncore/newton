@@ -10,10 +10,14 @@ import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -83,7 +87,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   }
 
   public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
-    log.debug("Subscribing to event stream '{}'...", streamName);
+    log.info("Subscribing to event stream {} '{}'...", subscriptionName, streamName);
 
     EventStreamIndex eventStreamIndex = getEventStreamIndex(subscriptionName, streamName);
 
@@ -95,7 +99,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       EventReplayMode.REPLAY_THEN_LIVE,
       Collections.singletonMap("from", lastSeen),
       new EventSubscriber(event -> {
-        log.debug("NewtonEvent received: " + event);
+        log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
         Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
         if (log.isTraceEnabled()) {
           log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());

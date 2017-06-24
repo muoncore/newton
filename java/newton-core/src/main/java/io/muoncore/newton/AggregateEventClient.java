@@ -65,8 +65,6 @@ public class AggregateEventClient {
 
       @Override
       public void onNext(Event o) {
-
-        log.info("Event received " + id);
         events.add(o);
       }
 
@@ -78,7 +76,6 @@ public class AggregateEventClient {
 
       @Override
       public void onComplete() {
-        log.info("EVent replay is completed, events are " + events.size());
         latch.countDown();
       }
     });
