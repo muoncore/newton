@@ -3,8 +3,10 @@ package io.muoncore.newton.todo;
 import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Getter;
+import lombok.ToString;
 
 @Getter
+@ToString
 public class TaskCreatedEvent extends TenantEvent<DocumentId> {
 
 

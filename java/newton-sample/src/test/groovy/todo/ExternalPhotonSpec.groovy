@@ -4,15 +4,19 @@ import io.muoncore.newton.EventHandler
 import io.muoncore.newton.NewtonEvent
 import io.muoncore.newton.SampleApplication
 import io.muoncore.newton.StreamSubscriptionManager
+import io.muoncore.newton.TodoSaga
 import io.muoncore.newton.domainservice.EventDrivenDomainService
 import io.muoncore.newton.eventsource.EventTypeNotFound
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository
+import io.muoncore.newton.saga.SagaFactory
+import io.muoncore.newton.saga.SagaRepository
 import io.muoncore.newton.support.DocumentId
 import io.muoncore.newton.support.TenantContextHolder
 import io.muoncore.newton.todo.Task
 import io.muoncore.newton.todo.TenantEvent
 import io.muoncore.protocol.event.ClientEvent
 import io.muoncore.protocol.event.client.EventClient
+import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
@@ -25,7 +29,7 @@ import spock.util.concurrent.PollingConditions
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 
-@ActiveProfiles("test")
+@ActiveProfiles(["test", "functional"])
 @SpringBootTest(classes = [MuonTestConfig, SampleApplication, FailConfig])
 class MissingEventSpec extends Specification {
 
@@ -37,6 +41,9 @@ class MissingEventSpec extends Specification {
 
   @Autowired
   MuonEventSourceRepository<Task> repo
+
+  @Autowired
+  SagaRepository sagaRepository
 
   def "can replay aggregate streams in parallel"() {
 
@@ -88,6 +95,19 @@ class MissingEventSpec extends Specification {
     new PollingConditions().eventually {
       eventService.ev2?.id
     }
+  }
+
+  def "can start a saga via an event"() {
+    when:
+    def events = repo.save(new Task(new DocumentId(), "Hi!"))
+
+    println "Event is $events"
+    sleep(500)
+    def sagas = sagaRepository.getSagasCreatedByEventId(events[0].id)
+
+    then:
+    sagas.size() == 1
+    sagas[0] instanceof TodoSaga
   }
 }
 
