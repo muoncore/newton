@@ -15,6 +15,7 @@
 
 **Closed issues:**
 
+- Saga lifecycle subscription seems to always subscribe from the start of the stream [\#48](https://github.com/muoncore/newton/issues/48)
 - Add a LocalOnlyLockService  [\#39](https://github.com/muoncore/newton/issues/39)
 - Allow deleting of aggregate roots via repo.delete [\#38](https://github.com/muoncore/newton/issues/38)
 - Add a return path for the Command Bus [\#37](https://github.com/muoncore/newton/issues/37)
