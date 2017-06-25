@@ -27,12 +27,9 @@ public class MuonEventSourceConfiguration {
   @Value("${spring.application.name}")
   private String applicationName;
 
-  @Value("${muon.amqp.url}")
-  private String amqpUrl;
-
   @Bean
   @Profile("!test")
-  public Muon muon(Codecs codecs) {
+  public Muon muon(Codecs codecs, @Value("${muon.amqp.url}") String amqpUrl){
     AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier(applicationName)
       .addWriter(autoConfiguration -> {
         autoConfiguration.getProperties().put("amqp.transport.url", amqpUrl);
