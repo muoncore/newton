@@ -5,6 +5,7 @@ import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.query.SharedDatastoreView;
 import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 
 @Component
+@Slf4j
 public class TaskViewStore extends SharedDatastoreView {
 
   private MongoTemplate mongoTemplate;
@@ -55,6 +57,7 @@ public class TaskViewStore extends SharedDatastoreView {
 
   @EventHandler
   public void handle(TaskDescriptionChangedEvent event) {
+    log.info("Processing description update into view " + event);
     Update update = new Update();
     update.set("description", event.getDescription());
     mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(event.getId().getObjectId())), update, Task.class);

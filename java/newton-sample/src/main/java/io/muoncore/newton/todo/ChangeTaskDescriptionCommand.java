@@ -3,6 +3,7 @@ package io.muoncore.newton.todo;
 import io.muoncore.newton.command.Command;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.support.DocumentId;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -11,6 +12,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 
 @Component
 @Scope(SCOPE_PROTOTYPE)
+@Slf4j
 public class ChangeTaskDescriptionCommand implements Command {
 
   private DocumentId id;
@@ -24,9 +26,13 @@ public class ChangeTaskDescriptionCommand implements Command {
 
   @Override
   public void execute() {
-    final Task task = this.todoRepository.load(this.id);
-    task.changeDescription(this.description);
-    todoRepository.save(task);
+    try {
+      final Task task = this.todoRepository.load(this.id);
+      task.changeDescription(this.description);
+      log.info("Saved taks with info {}", todoRepository.save(task));
+    } catch (Throwable e) {
+      log.error("Error trapped in command! " + e.getMessage(), e);
+    }
   }
 
   public void setId(DocumentId id) {

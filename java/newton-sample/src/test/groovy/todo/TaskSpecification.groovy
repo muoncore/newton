@@ -4,6 +4,7 @@ import com.github.javafaker.Faker
 import com.google.common.base.Stopwatch
 import groovyx.net.http.RESTClient
 import org.junit.Rule
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -22,7 +23,8 @@ class TaskSpecification extends Specification {
   def id, description
 
   @Rule
-  EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-sample", "Task")
+  EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-event-helper", "Task")
+
 
   def "Create a new task"() {
     when:
@@ -65,7 +67,6 @@ class TaskSpecification extends Specification {
 //    i << (1..25)
   }
 
-
   def "Get task details"() {
     when:
     def resp = rc.get(
@@ -85,6 +86,4 @@ class TaskSpecification extends Specification {
     resp.status == 200
     resp.data.size() >= 1
   }
-
-
 }

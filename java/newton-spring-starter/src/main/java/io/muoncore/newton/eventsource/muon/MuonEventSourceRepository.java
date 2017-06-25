@@ -158,14 +158,16 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
-		log.debug("Emitting event on " + streamName);
     processor.processForPersistence(aggregate.getNewOperations()).forEach(
-			event -> eventClient.event(
-				ClientEvent
-					.ofType(event.getClass().getSimpleName())
-					.stream(streamName)
-					.payload(event)
-					.build()
-			));
+			event -> {
+        log.debug("Emitting {} event on {}", event, streamName);
+        eventClient.event(
+          ClientEvent
+            .ofType(event.getClass().getSimpleName())
+            .stream(streamName)
+            .payload(event)
+            .build()
+        );
+      });
 	}
 }
