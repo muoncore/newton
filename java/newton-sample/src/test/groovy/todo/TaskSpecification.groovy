@@ -58,11 +58,11 @@ class TaskSpecification extends Specification {
     then:
     resp.status == 200
     System.err.println("Call duration:" + st.stop())
-//    new PollingConditions(timeout: 5).eventually {
-//      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
-//    }
-    where:
-    i << (1..25)
+    new PollingConditions(timeout: 5).eventually {
+      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
+    }
+//    where:
+//    i << (1..25)
   }
 
 

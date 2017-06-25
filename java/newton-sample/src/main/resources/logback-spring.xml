@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <include resource="mu/cibecs/common/logging/logback.xml"/>
+
+    <logger name="io.muoncore.newton" level="DEBUG"/>
+    <logger name="io.muoncore.channel" level="INFO"/>
+    <logger name="io.muoncore.extension" level="INFO"/>
+
+
+</configuration>
