@@ -2,7 +2,7 @@
 
 dependencies {
   compile "io.muoncore:muon-core:7.3.2"
-  compile "io.muoncore.protocol:stack-event:0.0.1-SNAPSHOT"
+  compile "io.muoncore.protocol:stack-event:0.0.1"
   compile 'org.reflections:reflections:0.9.11'
 
   compile 'org.jgroups:jgroups:4.0.1.Final'
