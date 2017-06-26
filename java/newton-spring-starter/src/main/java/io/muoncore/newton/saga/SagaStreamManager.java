@@ -147,7 +147,7 @@ public class SagaStreamManager {
   }
 
   private void startSagasFor(NewtonEvent event) {
-    List<Class<? extends Saga>> sagas = sagaStartCache.find(event.getClass());
+    Set<Class<? extends Saga>> sagas = sagaStartCache.find(event.getClass());
 
     log.debug("Will starts Sagas {}", sagas);
 
@@ -155,7 +155,7 @@ public class SagaStreamManager {
   }
 
   private void processCommands(Saga saga) {
-    for (CommandIntent intent : (List<CommandIntent>) saga.getNewOperations()) {
+    for (CommandIntent intent : saga.getNewOperations()) {
       commandBus.dispatch(intent);
     }
     saga.getNewOperations().clear();
