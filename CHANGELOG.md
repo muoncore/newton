@@ -11,7 +11,12 @@
 **Fixed bugs:**
 
 - Aggregates with shared Ids try to load events that's not part of the aggregate [\#47](https://github.com/muoncore/newton/issues/47)
+- Sagas are being started more than once for the same event [\#46](https://github.com/muoncore/newton/issues/46)
 - Event not on classpath throws Nullpointer when processed outside originating bounded context [\#45](https://github.com/muoncore/newton/issues/45)
+- Endless loop when submitting an event during another event being processed [\#44](https://github.com/muoncore/newton/issues/44)
+- Restarting photon causes any further event processing to fail on clients [\#41](https://github.com/muoncore/newton/issues/41)
+- Unable to load aggregate even though it exists [\#40](https://github.com/muoncore/newton/issues/40)
+- Debugging using breakpoints causes any further event processing from happening [\#22](https://github.com/muoncore/newton/issues/22)
 
 **Closed issues:**
 
