@@ -1,8 +1,7 @@
 # Change Log
 
-## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
-
-[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...HEAD)
+## [v0.0.10](https://github.com/muoncore/newton/tree/v0.0.10) (2017-06-28)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...v0.0.10)
 
 **Implemented enhancements:**
 
@@ -24,6 +23,10 @@
 - Add a LocalOnlyLockService  [\#39](https://github.com/muoncore/newton/issues/39)
 - Allow deleting of aggregate roots via repo.delete [\#38](https://github.com/muoncore/newton/issues/38)
 - Add a return path for the Command Bus [\#37](https://github.com/muoncore/newton/issues/37)
+
+**Merged pull requests:**
+
+- 0.0.10 milestone complete [\#50](https://github.com/muoncore/newton/pull/50) ([daviddawson](https://github.com/daviddawson))
 
 ## [v0.0.9](https://github.com/muoncore/newton/tree/v0.0.9) (2017-05-15)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.8...v0.0.9)
