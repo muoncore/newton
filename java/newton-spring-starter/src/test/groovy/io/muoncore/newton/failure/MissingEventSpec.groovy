@@ -1,8 +1,8 @@
 package io.muoncore.newton.failure
 
-import io.muoncore.newton.EnableNewton
 import io.muoncore.newton.EventHandler
 import io.muoncore.newton.MuonTestConfiguration
+import io.muoncore.newton.NewtonEvent
 import io.muoncore.newton.StreamSubscriptionManager
 import io.muoncore.newton.domainservice.EventDrivenDomainService
 import io.muoncore.newton.eventsource.EventTypeNotFound
@@ -37,6 +37,16 @@ class MissingEventSpec extends Specification {
       eventService.ev?.payload?.eventType == "NonExistingClass"
     }
   }
+
+  def "event service can emit events"() {
+    when:
+    println "EMIT WAS " + eventClient.event(ClientEvent.ofType(InitialEventType.simpleName).stream("newstream").payload(new InitialEventType(id:"12345")).build()).status
+
+    then:
+    new PollingConditions().eventually {
+      eventService.ev2
+    }
+  }
 }
 
 @Configuration
@@ -49,19 +59,44 @@ class FailConfig {
 @Component
 class MyEventService extends EventDrivenDomainService {
 
+  @Autowired
+  EventClient client
+
   EventTypeNotFound ev;
+  SubsequentEvent ev2
 
   MyEventService(StreamSubscriptionManager streamSubscriptionManager) {
     super(streamSubscriptionManager)
   }
 
   @EventHandler
-  public void on(EventTypeNotFound eventTypeNotFound){
+  void on(EventTypeNotFound eventTypeNotFound){
     this.ev = eventTypeNotFound;
+  }
+
+  @EventHandler
+  void on(InitialEventType eventTypeNotFound){
+    println "Got MyEvent"
+    client.event(ClientEvent.ofType(SubsequentEvent.simpleName).stream("newstream").payload(new SubsequentEvent(id:"12345")).build())
+  }
+
+  @EventHandler
+  void on(SubsequentEvent eventTypeNotFound){
+    println "Got other event"
+    ev2 = eventTypeNotFound
   }
 
   @Override
   protected String[] getStreams() {
-    ["mystream"]
+    ["mystream", "newstream"]
   }
+}
+
+
+class SubsequentEvent implements NewtonEvent<String> {
+  String id
+}
+
+class InitialEventType implements NewtonEvent<String> {
+  String id
 }

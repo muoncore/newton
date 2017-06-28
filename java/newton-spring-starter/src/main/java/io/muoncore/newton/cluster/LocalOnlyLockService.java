@@ -36,6 +36,7 @@ public class LocalOnlyLockService implements LockService {
                 latch.countDown();
               } catch (IllegalMonitorStateException e) {
                 log.info("{} is already unlocked", name);
+                latch.countDown();
               }
             }
           });
@@ -47,7 +48,12 @@ public class LocalOnlyLockService implements LockService {
           synchronized (lock) {
             lock.unlock();
           }
-          log.info("Global lock '{}' released!", name);
+          log.info("Global lock '{}' released! Will try again in 500ms", name);
+          try {
+            Thread.sleep(500);
+          } catch (InterruptedException e) {
+            log.error("Failure while waiting", e);
+          }
         }
       }
     });

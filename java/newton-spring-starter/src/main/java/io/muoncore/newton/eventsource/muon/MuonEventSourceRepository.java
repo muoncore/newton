@@ -1,12 +1,12 @@
 package io.muoncore.newton.eventsource.muon;
 
+import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
@@ -94,7 +94,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   }
 
   private Publisher<NewtonEvent> subscribe(Object aggregateIdentifier, EventReplayMode mode) {
-	  return sub -> eventClient.replay("/aggregate/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {
+	  return sub -> eventClient.replay("/aggregate/" + aggregateType.getSimpleName() + "/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {
         public void onSubscribe(Subscription s) {
           sub.onSubscribe(s);
         }
@@ -130,7 +130,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 
   private List<NewtonEvent> replayEvents(Object id) {
 		try {
-			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString())
+			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString(), aggregateType)
 				.stream()
 				.map(event -> {
           Class<? extends NewtonEvent> domainClass = MuonLookupUtils.getDomainClass(event);
@@ -153,18 +153,21 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	private void emitForAggregatePersistence(A aggregate) {
 		aggregateEventClient.publishDomainEvents(
 			aggregate.getId().toString(),
+      aggregateType,
       processor.processForPersistence(aggregate.getNewOperations()));
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
-		log.debug("Emitting event on " + streamName);
     processor.processForPersistence(aggregate.getNewOperations()).forEach(
-			event -> eventClient.event(
-				ClientEvent
-					.ofType(event.getClass().getSimpleName())
-					.stream(streamName)
-					.payload(event)
-					.build()
-			));
+			event -> {
+        log.debug("Emitting {} event on {}", event, streamName);
+        eventClient.event(
+          ClientEvent
+            .ofType(event.getClass().getSimpleName())
+            .stream(streamName)
+            .payload(event)
+            .build()
+        );
+      });
 	}
 }

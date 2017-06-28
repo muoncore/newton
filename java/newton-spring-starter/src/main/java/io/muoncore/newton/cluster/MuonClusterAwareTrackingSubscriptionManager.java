@@ -10,10 +10,11 @@ import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
-import java.util.Collections;
+import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
@@ -83,25 +84,25 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   }
 
   public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
-    log.debug("Subscribing to event stream '{}'...", streamName);
-
     EventStreamIndex eventStreamIndex = getEventStreamIndex(subscriptionName, streamName);
 
     Long lastSeen = eventStreamIndex.getLastSeen() + 1;
 
-    log.trace("Will play data from " + lastSeen);
+    log.info("Subscribing from index {} to event stream {} '{}'", lastSeen, subscriptionName, streamName);
+
+    Map args = new HashMap();
+    args.put("from", lastSeen);
+    args.put("sub-name", subscriptionName);
+
     eventClient.replay(
       streamName,
       EventReplayMode.REPLAY_THEN_LIVE,
-      Collections.singletonMap("from", lastSeen),
+      args,
       new EventSubscriber(event -> {
-        log.debug("NewtonEvent received: " + event);
+        log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
         Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
         if (log.isTraceEnabled()) {
           log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
-        }
-        else{
-          log.info(event.toString());
         }
 
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
@@ -144,14 +145,14 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
     @Override
     public void onError(Throwable throwable) {
+      log.error("Error in subscription ", throwable);
       onError.accept(throwable);
     }
 
     @Override
     public void onComplete() {
+      log.error("Subscription has completed cleanly, this is unexpected with REPLAY_THEN_LIVE");
       onError.accept(new IllegalStateException("The event store has terminated a stream subscription cleanly. This is not expected with REPLAY_THEN_LIVE"));
     }
   }
-
-
 }

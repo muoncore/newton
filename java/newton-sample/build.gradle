@@ -31,11 +31,10 @@ dependencies {
 
   testCompile('org.springframework.boot:spring-boot-starter-test')
   testCompile('org.spockframework:spock-core:1.1-groovy-2.4')
-  testCompile('org.spockframework:spock-spring:1.1-groovy-2.4')
   testCompile('com.github.javafaker:javafaker:0.13')
   testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
 
-  runtime "io.muoncore.transport:muon-amqp:0.0.1-SNAPSHOT"
+  runtime "io.muoncore.transport:muon-amqp:0.0.7"
   runtime("org.reactivestreams:reactive-streams:1.0.0.final")
 
 }

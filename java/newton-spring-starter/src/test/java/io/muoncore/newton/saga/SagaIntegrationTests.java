@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -72,6 +73,8 @@ public class SagaIntegrationTests {
 
     ComplexSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
 
+    System.out.println("SAGAS =" + sagas);
+    assertEquals(1, sagas.size());
     assertTrue(saga.isComplete());
   }
 
@@ -142,7 +145,7 @@ public class SagaIntegrationTests {
         .id(orderId)
         .build()
       );
-      System.out.println("Saga is started ... ");
+      System.out.println("Saga is started ... " + id);
     }
 
     @EventHandler

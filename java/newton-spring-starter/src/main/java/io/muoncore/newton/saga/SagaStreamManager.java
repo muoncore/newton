@@ -4,7 +4,6 @@ import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
-import io.muoncore.newton.eventsource.AggregateConfiguration;
 import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -14,7 +13,6 @@ import org.springframework.context.event.EventListener;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.ParameterizedType;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
@@ -147,15 +145,17 @@ public class SagaStreamManager {
   }
 
   private void startSagasFor(NewtonEvent event) {
-    List<Class<? extends Saga>> sagas = sagaStartCache.find(event.getClass());
+    Set<Class<? extends Saga>> sagas = sagaStartCache.find(event.getClass());
 
-    log.debug("Will starts Sagas {}", sagas);
+    if (sagas.size() > 0){
+      log.debug("Will starts Sagas {}", sagas);
+    }
 
     sagas.forEach(sagaClass -> sagaFactory.create(sagaClass, event));
   }
 
   private void processCommands(Saga saga) {
-    for (CommandIntent intent : (List<CommandIntent>) saga.getNewOperations()) {
+    for (CommandIntent intent : saga.getNewOperations()) {
       commandBus.dispatch(intent);
     }
     saga.getNewOperations().clear();

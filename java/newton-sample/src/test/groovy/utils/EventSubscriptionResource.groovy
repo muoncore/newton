@@ -25,9 +25,10 @@ class EventSubscriptionResource extends ExternalResource {
 
   @Override
   protected void before() throws Throwable {
+    println "Starting event capture rule"
     this.eventClient = MuonEventClientHelper.create(this.serviceId)
 
-    this.eventClient.replay(this.serviceId.concat("/").concat(streamName), EventReplayMode.LIVE_ONLY, ["from": 0], new Subscriber() {
+    this.eventClient.replay("newton-sample".concat("/").concat(streamName), EventReplayMode.LIVE_ONLY, ["from": 0, "sub-name": "event-capture-test-${streamName}"], new Subscriber() {
       @Override
       void onSubscribe(Subscription s) {
         s.request(Integer.MAX_VALUE)
@@ -50,6 +51,7 @@ class EventSubscriptionResource extends ExternalResource {
     })
 
 
+    sleep(500)
   }
 
   @Override

@@ -1,9 +1,9 @@
 package io.muoncore.newton.eventsource.muon;
 
+import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.QueryConfiguration;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import org.junit.Ignore;
 import org.junit.Test;

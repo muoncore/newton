@@ -6,11 +6,11 @@ import io.muoncore.codec.Codecs;
 import io.muoncore.codec.json.JsonOnlyCodecs;
 import io.muoncore.config.AutoConfiguration;
 import io.muoncore.config.MuonConfigBuilder;
+import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.*;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.DefaultEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,12 +27,9 @@ public class MuonEventSourceConfiguration {
   @Value("${spring.application.name}")
   private String applicationName;
 
-  @Value("${muon.amqp.url}")
-  private String amqpUrl;
-
   @Bean
   @Profile("!test")
-  public Muon muon(Codecs codecs) {
+  public Muon muon(Codecs codecs, @Value("${muon.amqp.url}") String amqpUrl){
     AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier(applicationName)
       .addWriter(autoConfiguration -> {
         autoConfiguration.getProperties().put("amqp.transport.url", amqpUrl);

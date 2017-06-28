@@ -4,9 +4,11 @@ import com.github.javafaker.Faker
 import com.google.common.base.Stopwatch
 import groovyx.net.http.RESTClient
 import org.junit.Rule
+import spock.lang.Ignore
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Stepwise
+import spock.lang.Unroll
 import spock.util.concurrent.PollingConditions
 import utils.EventSubscriptionResource
 
@@ -21,7 +23,8 @@ class TaskSpecification extends Specification {
   def id, description
 
   @Rule
-  EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-sample", "Task")
+  EventSubscriptionResource eventSubscriptionRule = new EventSubscriptionResource("newton-event-helper", "Task")
+
 
   def "Create a new task"() {
     when:
@@ -43,7 +46,8 @@ class TaskSpecification extends Specification {
 
   }
 
-  def "Change task description"() {
+  @Unroll
+  def "Change task description run #i"() {
     def st = Stopwatch.createStarted()
     this.description = faker.lorem().word()
     when:
@@ -56,13 +60,12 @@ class TaskSpecification extends Specification {
     then:
     resp.status == 200
     System.err.println("Call duration:" + st.stop())
-//    new PollingConditions(timeout: 5).eventually {
-//      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
-//    }
-    where:
-    i << (1..25)
+    new PollingConditions(timeout: 5).eventually {
+      eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
+    }
+//    where:
+//    i << (1..25)
   }
-
 
   def "Get task details"() {
     when:
@@ -83,6 +86,4 @@ class TaskSpecification extends Specification {
     resp.status == 200
     resp.data.size() >= 1
   }
-
-
 }

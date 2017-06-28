@@ -14,7 +14,6 @@ import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
 import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.saga.SagaLoader;
-import io.muoncore.protocol.event.client.AggregateEventClient;
 import io.muoncore.protocol.event.client.DefaultEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.beans.factory.annotation.Autowired;
