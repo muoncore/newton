@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.10...HEAD)
+
+**Closed issues:**
+
+- Remove SagaBus and replace with a Saga Registry [\#17](https://github.com/muoncore/newton/issues/17)
+
 ## [v0.0.10](https://github.com/muoncore/newton/tree/v0.0.10) (2017-06-28)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...v0.0.10)
 
