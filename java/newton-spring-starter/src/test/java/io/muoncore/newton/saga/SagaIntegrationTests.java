@@ -1,10 +1,7 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.newton.*;
-import io.muoncore.newton.command.Command;
-import io.muoncore.newton.command.CommandBus;
-import io.muoncore.newton.command.CommandConfiguration;
-import io.muoncore.newton.command.CommandIntent;
+import io.muoncore.newton.command.*;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.eventsource.muon.TestAggregate;
 import io.muoncore.newton.mongo.MongoConfiguration;
@@ -12,9 +9,7 @@ import io.muoncore.newton.query.QueryConfiguration;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventResult;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -56,9 +51,38 @@ public class SagaIntegrationTests {
   private SagaRepository sagaRepository;
   @Autowired
   private CommandBus commandBus;
+  @Autowired
+  private EventClient eventClient;
 
   @Autowired
   private EventSourceRepository<SagaTestAggregate> testAggregateRepo;
+
+  @Test
+  public void sagaCommandFailureCallsFailedEventHandler() throws InterruptedException {
+
+    FailAThingEvent failAThingEvent = new FailAThingEvent();
+
+    eventClient.event(ClientEvent.ofType(FailAThingEvent.class.getSimpleName())
+      .payload(failAThingEvent)
+      .stream("faked")
+      .build()
+    );
+
+    Thread.sleep(1000);
+    //lookup the saga via the ID
+    List<SagaCreated> sagas = sagaRepository.getSagasCreatedByEventId(failAThingEvent.getId());
+    SagaMonitor<FailCommandSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), FailCommandSaga.class);
+
+    FailCommandSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
+
+    Optional<FailCommandSaga> load = sagaRepository.load(saga.getId(), FailCommandSaga.class);
+
+    System.out.println("SAGAS =" + sagas);
+    assertEquals(1, sagas.size());
+//    assertTrue(saga.isComplete());
+    assertNotNull(load.get().getFailresult());
+    assertTrue(load.get().getFailresult().contains("Broken!"));
+  }
 
   @Test
   public void sagaCanBeStartedViaStartEvent() throws InterruptedException {
@@ -74,7 +98,6 @@ public class SagaIntegrationTests {
     ComplexSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
 
     System.out.println("SAGAS =" + sagas);
-    assertEquals(1, sagas.size());
     assertTrue(saga.isComplete());
   }
 
@@ -110,12 +133,14 @@ public class SagaIntegrationTests {
   }
 
   @Test
-  public void multiStepSagaWorkflow() {
+  public void multiStepSagaWorkflow() throws InterruptedException {
 
     SagaMonitor<ComplexSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
     ComplexSaga saga = sagaMonitor.waitForCompletion(TimeUnit.MINUTES, 1);
+
+    saga = sagaRepository.load(saga.id, ComplexSaga.class).get();
 
     assertNotNull(saga);
     assertTrue(saga.isComplete());
@@ -161,7 +186,7 @@ public class SagaIntegrationTests {
 
     @EventHandler
     public void on(OrderShippedEvent shippedEvent) {
-      System.out.println("Order shipped, saga is completed ... ");
+      System.out.println("Order shipped, saga is completed ... " + id);
       end();
     }
   }
@@ -178,6 +203,7 @@ public class SagaIntegrationTests {
     private String orderId;
     private final String id = UUID.randomUUID().toString();
   }
+
 
   @Getter
   @AllArgsConstructor
@@ -240,6 +266,49 @@ public class SagaIntegrationTests {
           .build()
       );
       log.info("Got result " + result);
+    }
+  }
+
+  @Scope("prototype")
+  @Component
+  @SagaStreamConfig(streams = {"faked"}, aggregateRoots = {})
+  public static class FailCommandSaga extends StatefulSaga {
+
+    @Getter @Setter
+    private String dataName = "hello!";
+    @Getter @Setter
+    private String failresult;
+
+    @StartSagaWith
+    public void start(FailAThingEvent event) {
+      raiseCommand(CommandIntent.builder(FailingCommand.class.getName())
+        .build()
+      );
+    }
+
+    @EventHandler
+    public void on(CommandFailedEvent payment) {
+      this.failresult = payment.getFailureMessage();
+      System.out.println("Command has failed and the saga will be terminated.");
+      end();
+    }
+  }
+
+
+  @Getter
+  @ToString
+  public static class FailAThingEvent implements NewtonEvent {
+    private final String id = UUID.randomUUID().toString();
+  }
+
+  @Scope("prototype")
+  @Component
+  @Slf4j
+  public static class FailingCommand implements Command {
+    @Override
+    public void execute() {
+      log.info("Now failing!");
+      throw new IllegalStateException("Broken!");
     }
   }
 

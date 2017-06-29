@@ -1,9 +1,11 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.api.MuonFuture;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
+import io.muoncore.newton.command.CommandResult;
 import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -14,6 +16,7 @@ import org.springframework.context.event.EventListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -135,7 +138,8 @@ public class SagaStreamManager {
           sagaFactory.autowire(saga1);
           saga1.handle(event);
           sagaRepository.save(saga1);
-          processCommands(saga1);
+          sagaFactory.processCommands(saga1);
+          sagaRepository.save(saga1);
         });
 
       } catch (ClassNotFoundException e) {
@@ -152,12 +156,5 @@ public class SagaStreamManager {
     }
 
     sagas.forEach(sagaClass -> sagaFactory.create(sagaClass, event));
-  }
-
-  private void processCommands(Saga saga) {
-    for (CommandIntent intent : saga.getNewOperations()) {
-      commandBus.dispatch(intent);
-    }
-    saga.getNewOperations().clear();
   }
 }
