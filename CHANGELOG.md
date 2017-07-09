@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.10...HEAD)
 
+**Implemented enhancements:**
+
+- Add a method to add an event to an aggregate without fully loading it [\#2](https://github.com/muoncore/newton/issues/2)
+
 **Closed issues:**
 
 - Remove SagaBus and replace with a Saga Registry [\#17](https://github.com/muoncore/newton/issues/17)
