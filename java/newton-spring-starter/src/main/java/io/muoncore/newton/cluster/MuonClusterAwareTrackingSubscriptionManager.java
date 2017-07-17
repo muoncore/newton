@@ -93,6 +93,21 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   }
 
   @Override
+  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+    //TODO
+  }
+
+  @Override
+  public void localHotSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+
+    //TODO, implement this properly.
+    throw new IllegalStateException("BORKED");
+//    repeatUntilCleanlyRuns(subscriptionName, () -> {
+//      subscription(stream, onData);
+//    });
+  }
+
+  @Override
   public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData) {
     repeatUntilCleanlyRuns(subscriptionName, () -> {
       localTrackingSubscription(subscriptionName, streamName, onData, throwable -> {
@@ -169,7 +184,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
     @Override
     public void onError(Throwable throwable) {
-      log.error("Error in subscription ", throwable);
+      log.warn("Error in subscription {}", throwable.getMessage());
       onError.accept(throwable);
     }
 

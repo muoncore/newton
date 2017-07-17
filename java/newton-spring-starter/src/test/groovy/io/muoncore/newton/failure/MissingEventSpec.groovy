@@ -1,5 +1,6 @@
 package io.muoncore.newton.failure
 
+import com.google.gson.Gson
 import io.muoncore.newton.EventHandler
 import io.muoncore.newton.MuonTestConfiguration
 import io.muoncore.newton.NewtonEvent
@@ -47,6 +48,8 @@ class MissingEventSpec extends Specification {
       eventService.ev2
     }
   }
+
+
 }
 
 @Configuration

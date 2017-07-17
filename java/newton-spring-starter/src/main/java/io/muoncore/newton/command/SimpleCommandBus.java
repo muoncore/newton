@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 public class SimpleCommandBus implements CommandBus {
@@ -36,5 +37,10 @@ public class SimpleCommandBus implements CommandBus {
 		    new CommandResult(Collections.emptyList(), new CommandFailedEvent(commandIntent.getType(), e.getMessage(), e))
       );
     }
+  }
+
+  @Override
+  public CompletableFuture<CommandResult> dispatchComplete(CommandIntent commandIntent) {
+    return null;
   }
 }

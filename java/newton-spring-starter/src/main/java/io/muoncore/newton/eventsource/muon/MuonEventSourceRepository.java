@@ -17,6 +17,7 @@ import org.reactivestreams.Subscription;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,7 +40,17 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 		this.streamName = AggregateRootUtil.getAggregateRootStream(type, appName);
 	}
 
-	@Override
+  @Override
+  public CompletableFuture<A> loadAsync(Object aggregateIdentifier) {
+    return CompletableFuture.supplyAsync(() -> load(aggregateIdentifier));
+  }
+
+  @Override
+  public CompletableFuture<A> loadAsync(Object aggregateIdentifier, Long expectedVersion) throws AggregateNotFoundException, OptimisticLockException {
+    return CompletableFuture.supplyAsync(() -> load(aggregateIdentifier, expectedVersion));
+  }
+
+  @Override
 	public A load(Object aggregateIdentifier) {
 		try {
 			A aggregate = aggregateType.newInstance();

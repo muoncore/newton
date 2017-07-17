@@ -27,7 +27,13 @@ public interface StreamSubscriptionManager {
      * As {@link #globallyUniqueSubscription(String, String, Consumer)}, with the difference that this version starts from the current HOT
      * location in the stream, not the beginning. After it has started, it has the same behaviour as the ohter variant.
      */
-//    void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData);
+    void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData);
+
+    /**
+     * As {@link #globallyUniqueSubscription(String, String, Consumer)}, with the difference that this version starts from the current HOT
+     * location in the stream, not the beginning. After it has started, it has the same behaviour as the ohter variant.
+     */
+    void localHotSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData);
 
     /**
      * Will replay to the given stream and persist the current location so that on restart/ failover

@@ -6,6 +6,7 @@ import org.reactivestreams.Publisher;
 
 import java.util.List;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Allow loading and saving of event sourced aggregate roots.
@@ -16,6 +17,7 @@ public interface EventSourceRepository<A extends AggregateRoot> {
    * Load an aggregate root from the event store. Fully replays all events into the aggregate before returning
    */
 	A load(Object aggregateIdentifier) throws AggregateNotFoundException;
+	CompletableFuture<A> loadAsync(Object aggregateIdentifier);
 
   /**
    * Load an aggregate root from the event store. Fully replays all events into the aggregate before returning
@@ -23,6 +25,7 @@ public interface EventSourceRepository<A extends AggregateRoot> {
    * throws OptimisticLockException
    */
 	A load(Object aggregateIdentifier, Long expectedVersion) throws AggregateNotFoundException, OptimisticLockException;
+	CompletableFuture<A> loadAsync(Object aggregateIdentifier, Long expectedVersion) throws AggregateNotFoundException, OptimisticLockException;
 
   /**
    * Create a new instance of an aggregate via the given factory function.

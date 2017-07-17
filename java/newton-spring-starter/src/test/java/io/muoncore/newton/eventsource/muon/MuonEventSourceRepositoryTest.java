@@ -18,9 +18,12 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {MuonTestConfiguration.class, MongoConfiguration.class})
@@ -45,13 +48,29 @@ public class MuonEventSourceRepositoryTest {
 			new TestAggregateCreated(id)
 		));
 
+
 		TestAggregate aggregate = repository.load(id);
 		assertNotNull(aggregate);
 
 		assertEquals(id, aggregate.getId());
 	}
 
-	@Test
+  @Test
+  public void loadAsync() throws Exception {
+    String id = "simple-id";
+    client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
+      new TestAggregateCreated(id)
+    ));
+
+
+    TestAggregate aggregate = repository.loadAsync(id).get();
+    assertNotNull(aggregate);
+
+    assertEquals(id, aggregate.getId());
+  }
+
+
+  @Test
 	public void save() throws Exception {
     String id = UUID.randomUUID().toString();
 		TestAggregate customer = new TestAggregate(id);
@@ -91,6 +110,18 @@ public class MuonEventSourceRepositoryTest {
 	public void throwsExceptionOnNonExistingAggregate() {
 		repository.load("no-such-id-as-this");
 	}
+
+  @Test
+  public void throwsExceptionOnNonExistingAggregateAsync() throws ExecutionException, InterruptedException {
+    final AtomicBoolean bool = new AtomicBoolean(false);
+
+    repository.loadAsync("no-such-id-as-this").exceptionally(throwable -> {
+      bool.set(true);
+      return null;
+    }).join();
+
+    assertTrue(bool.get());
+  }
 
 	@Test(expected = AggregateNotFoundException.class)
 	public void withVersionThrowsExceptionOnNonExistingAggregate() {
