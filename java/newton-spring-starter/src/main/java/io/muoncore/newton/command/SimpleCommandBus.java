@@ -40,7 +40,18 @@ public class SimpleCommandBus implements CommandBus {
   }
 
   @Override
-  public CompletableFuture<CommandResult> dispatchComplete(CommandIntent commandIntent) {
-    return null;
+  public CompletableFuture<CommandResult> dispatchAsync(CommandIntent commandIntent) {
+    return CompletableFuture.supplyAsync(() -> {
+      try {
+        Command command = commandFactory.create((Class<Command>) Class.forName(commandIntent.getType()),
+          commandIntent.getPayload(),
+          commandIntent.getId(),
+          commandIntent.getAdditionalProperties(), null);
+
+        return new CommandResult(command.executeAndReturnEvents(), null);
+      } catch (ClassNotFoundException e) {
+        return new CommandResult(Collections.emptyList(), new CommandFailedEvent(commandIntent.getType(), e.getMessage(), e));
+      }
+    });
   }
 }
