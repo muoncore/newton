@@ -1,6 +1,7 @@
 package io.muoncore.newton.todo;
 
 import io.muoncore.newton.command.Command;
+import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import io.muoncore.newton.support.BusinessException;
 import io.muoncore.newton.support.DocumentId;
@@ -15,7 +16,7 @@ import static org.springframework.beans.factory.config.ConfigurableBeanFactory.S
 @Scope(SCOPE_PROTOTYPE)
 public class CreateTaskCommand implements Command{
 
-  private MuonEventSourceRepository<Task> repository;
+  private EventSourceRepository<Task> repository;
 
   private UniqueTaskDescriptionDomainService uniqueTaskDescriptionDomainService;
 
@@ -26,7 +27,7 @@ public class CreateTaskCommand implements Command{
 
 
   @Autowired
-  public CreateTaskCommand(MuonEventSourceRepository<Task> repository, UniqueTaskDescriptionDomainService uniqueTaskDescriptionDomainService) {
+  public CreateTaskCommand(EventSourceRepository<Task> repository, UniqueTaskDescriptionDomainService uniqueTaskDescriptionDomainService) {
     this.repository = repository;
     this.uniqueTaskDescriptionDomainService = uniqueTaskDescriptionDomainService;
   }

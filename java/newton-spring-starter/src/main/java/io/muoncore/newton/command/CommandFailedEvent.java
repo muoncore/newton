@@ -4,6 +4,7 @@ import io.muoncore.newton.NewtonEvent;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.UUID;
 
 @Getter
@@ -12,5 +13,5 @@ public class CommandFailedEvent implements NewtonEvent<String> {
   private final String id = UUID.randomUUID().toString();
   private String commandName;
   private String failureMessage;
-  private Object payload;
+  private Serializable payload;
 }

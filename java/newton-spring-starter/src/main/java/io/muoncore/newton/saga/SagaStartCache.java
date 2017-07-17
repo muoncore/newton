@@ -14,7 +14,6 @@ public class SagaStartCache {
     log.info("Adding saga to start {} on {}", sagaClass, evClass);
     Set<Class<? extends Saga>> classes = sagasToStart.getOrDefault(evClass, new HashSet<>());
     if (classes.contains(sagaClass)) {
-      log.debug("Error with registering a saga in the start cache. It exists already!");
       if (log.isTraceEnabled()){
         log.debug("Saga Start Cache already contains type saga type " + sagaClass + " for event " + evClass);
       }

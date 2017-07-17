@@ -10,7 +10,6 @@ import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.buffer.CircularFifoBuffer;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
@@ -29,6 +28,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private EventStreamProcessor eventStreamProcessor;
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
   private final Executor worker = Executors.newSingleThreadExecutor();
+  private final Executor pool = Executors.newCachedThreadPool();
 
   public MuonClusterAwareTrackingSubscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
     this.eventClient = eventClient;
@@ -39,6 +39,28 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
   @Override
   public void localNonTrackingSubscription(String streamName, Consumer<NewtonEvent> onData) {
+    repeatUntilCleanlyRuns(streamName, () -> {
+      subscription(streamName, onData);
+    });
+  }
+
+  private void repeatUntilCleanlyRuns(String name, Runnable exec) {
+    pool.execute(() -> {
+      while(true) {
+        try {
+          exec.run();
+          break;
+        } catch (Exception e) {
+          log.warn("Error on subscription {}, backing of and reconnecting: {}", name, e.getMessage());
+          try {
+            Thread.sleep(5000);
+          } catch (InterruptedException e1) {}
+        }
+      }
+    });
+  }
+
+  private void subscription(String streamName, Consumer<NewtonEvent> onData) {
     log.debug("Subscribing to event stream '{}' for full local replay", streamName);
 
     eventClient.replay(
@@ -72,18 +94,20 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
   @Override
   public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData) {
-    localTrackingSubscription(subscriptionName, streamName, onData, throwable -> {
-      log.warn("NewtonEvent subscription has ended, will attempt to reconnect in {}ms", RECONNECTION_BACKOFF);
-      try {
-        Thread.sleep(RECONNECTION_BACKOFF);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-      localTrackingSubscription(subscriptionName, streamName, onData);
+    repeatUntilCleanlyRuns(subscriptionName, () -> {
+      localTrackingSubscription(subscriptionName, streamName, onData, throwable -> {
+        log.warn("NewtonEvent subscription has ended, will attempt to reconnect in {}ms", RECONNECTION_BACKOFF);
+        try {
+          Thread.sleep(RECONNECTION_BACKOFF);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+        localTrackingSubscription(subscriptionName, streamName, onData);
+      });
     });
   }
 
-  public void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
+  private void localTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
     EventStreamIndex eventStreamIndex = getEventStreamIndex(subscriptionName, streamName);
 
     Long lastSeen = eventStreamIndex.getLastSeen() + 1;
