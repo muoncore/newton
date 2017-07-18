@@ -4,6 +4,7 @@ package io.muoncore.newton;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -32,8 +33,8 @@ public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAg
 		eventAdaptor.accept(event);
 	}
 
-	@PostConstruct
-	public void initSubscription() throws InterruptedException {
+  @org.springframework.context.event.EventListener
+  public void onApplicationEvent(ApplicationReadyEvent onReadyEvent) {
     Arrays.stream(eventStreams()).forEach(stream-> streamSubscriptionManager.globallyUniqueSubscription(this.getClass().getSimpleName(),stream, this::handleEvent));
 	}
 

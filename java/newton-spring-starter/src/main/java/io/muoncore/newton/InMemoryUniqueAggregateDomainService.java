@@ -2,6 +2,7 @@ package io.muoncore.newton;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 
 import javax.annotation.PostConstruct;
 import java.io.IOException;
@@ -25,8 +26,8 @@ public abstract class InMemoryUniqueAggregateDomainService<V> implements UniqueA
     eventAdaptor.accept(event);
   }
 
-  @PostConstruct
-  public void initSubscription() throws InterruptedException {
+  @org.springframework.context.event.EventListener
+  public void onApplicationEvent(ApplicationReadyEvent onReadyEvent) {
     Arrays.stream(eventStreams()).forEach(stream -> streamSubscriptionManager.localNonTrackingSubscription(stream, this::handleEvent));
   }
 
