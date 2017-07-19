@@ -6,10 +6,19 @@
 
 **Implemented enhancements:**
 
+- "Error with registering a saga in the start cache" log statement is misleading [\#53](https://github.com/muoncore/newton/issues/53)
 - Add a method to add an event to an aggregate without fully loading it [\#2](https://github.com/muoncore/newton/issues/2)
+
+**Fixed bugs:**
+
+- Starting client app when photon is unavailable causes undesirable failures [\#51](https://github.com/muoncore/newton/issues/51)
 
 **Closed issues:**
 
+- Newton shouldn't initialize if spring-app is unable to start [\#59](https://github.com/muoncore/newton/issues/59)
+- Less verbose 'error' logs upon lost connections [\#58](https://github.com/muoncore/newton/issues/58)
+- CommandBus should return CompleteableFuture to enable easy integration with Spring web async support. [\#56](https://github.com/muoncore/newton/issues/56)
+- On command execution failure in a saga, take the failure events and pass them back to the saga [\#49](https://github.com/muoncore/newton/issues/49)
 - Remove SagaBus and replace with a Saga Registry [\#17](https://github.com/muoncore/newton/issues/17)
 
 ## [v0.0.10](https://github.com/muoncore/newton/tree/v0.0.10) (2017-06-28)
@@ -26,7 +35,6 @@
 - Event not on classpath throws Nullpointer when processed outside originating bounded context [\#45](https://github.com/muoncore/newton/issues/45)
 - Endless loop when submitting an event during another event being processed [\#44](https://github.com/muoncore/newton/issues/44)
 - Restarting photon causes any further event processing to fail on clients [\#41](https://github.com/muoncore/newton/issues/41)
-- Unable to load aggregate even though it exists [\#40](https://github.com/muoncore/newton/issues/40)
 - Debugging using breakpoints causes any further event processing from happening [\#22](https://github.com/muoncore/newton/issues/22)
 
 **Closed issues:**
