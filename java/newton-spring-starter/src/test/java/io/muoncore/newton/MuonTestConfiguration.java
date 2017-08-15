@@ -13,6 +13,9 @@ import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
 import io.muoncore.newton.mongo.MongoConfiguration;
+import io.muoncore.newton.query.EventStreamIndex;
+import io.muoncore.newton.query.EventStreamIndexStore;
+import io.muoncore.newton.query.InMemEventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.DefaultEventClient;
 import io.muoncore.protocol.event.client.EventClient;
@@ -52,6 +55,11 @@ public class MuonTestConfiguration {
   @Bean
 	public InMemTransport transport(AutoConfiguration config) {
     return new InMemTransport(config, bus());
+  }
+
+  @Bean
+  public EventStreamIndexStore indexStore() {
+	  return new InMemEventStreamIndexStore();
   }
 
 	@Bean
