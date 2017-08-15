@@ -15,6 +15,7 @@
 
 **Closed issues:**
 
+- Don't use exceptions for flow control on aggregate repository [\#60](https://github.com/muoncore/newton/issues/60)
 - Newton shouldn't initialize if spring-app is unable to start [\#59](https://github.com/muoncore/newton/issues/59)
 - Less verbose 'error' logs upon lost connections [\#58](https://github.com/muoncore/newton/issues/58)
 - CommandBus should return CompleteableFuture to enable easy integration with Spring web async support. [\#56](https://github.com/muoncore/newton/issues/56)
