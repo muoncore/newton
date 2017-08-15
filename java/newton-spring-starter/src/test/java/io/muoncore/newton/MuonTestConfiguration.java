@@ -45,13 +45,21 @@ public class MuonTestConfiguration {
 	}
 
 	@Bean
-	public Muon muon() {
-		AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier("test-service")
-			.build();
+	public AutoConfiguration config() {
+    return MuonConfigBuilder.withServiceIdentifier("test-service").build();
+  }
+
+  @Bean
+	public InMemTransport transport(AutoConfiguration config) {
+    return new InMemTransport(config, bus());
+  }
+
+	@Bean
+	public Muon muon(AutoConfiguration config, InMemTransport transport) {
 
 		return new MultiTransportMuon(config, discovery(),
 			Collections.singletonList(
-				new InMemTransport(config, bus())
+				transport
 			),
 			new JsonOnlyCodecs());
 	}

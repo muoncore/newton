@@ -1,10 +1,12 @@
 package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
+import io.muoncore.memory.transport.InMemTransport;
 import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.MuonTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
+import io.muoncore.newton.EventStoreException;
 import io.muoncore.newton.eventsource.GenericAggregateDeletedEvent;
 import io.muoncore.newton.eventsource.OptimisticLockException;
 import io.muoncore.newton.mongo.MongoConfiguration;
@@ -14,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 
@@ -21,6 +24,7 @@ import java.util.*;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.Thread.sleep;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -41,8 +45,12 @@ public class MuonEventSourceRepositoryTest {
   @Autowired
   private MuonEventSourceRepository<TestAggregate> repository;
 
+  @Autowired
+  private InMemTransport transport;
+
 	@Test
 	public void load() throws Exception {
+
     String id = "simple-id";
 		client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
 			new TestAggregateCreated(id)
@@ -76,7 +84,7 @@ public class MuonEventSourceRepositoryTest {
 		TestAggregate customer = new TestAggregate(id);
 		repository.save(customer);
 
-		List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class);
+		List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class).get();
 
 		assertEquals(1, events.size());
 		assertEquals(TestAggregateCreated.class.getSimpleName(), events.get(0).getEventType());
@@ -90,7 +98,7 @@ public class MuonEventSourceRepositoryTest {
 
     repository.delete(customer);
 
-    List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class);
+    List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class).get();
 
     assertEquals(2, events.size());
     assertEquals(GenericAggregateDeletedEvent.class.getSimpleName(), events.get(1).getEventType());
@@ -104,6 +112,15 @@ public class MuonEventSourceRepositoryTest {
     repository.delete(customer);
 
     repository.load(id);
+  }
+
+  @DirtiesContext
+  @Test(expected = EventStoreException.class)
+  public void loadWhenTransportFailureThrowsException() throws Exception {
+
+    transport.triggerFailure();
+
+    repository.load(UUID.randomUUID().toString());
   }
 
 	@Test(expected = AggregateNotFoundException.class)
@@ -182,7 +199,7 @@ public class MuonEventSourceRepositoryTest {
       }
     });
 
-    Thread.sleep(1500);
+    sleep(1500);
 
     assertEquals(2, events.size());
   }
