@@ -42,8 +42,8 @@ public class LocalOnlyLockService implements LockService {
           });
           latch.await();
         } catch (Exception ex) {
-          log.warn("Locked process has failed with an exception, and {} has been unlocked", name);
-          log.warn("Locking Process failed with exception", ex);
+          log.warn("Locked process has failed with an exception {}, and {} has been unlocked", ex.getMessage(), name);
+          log.debug("Locking Process failed with exception", ex);
         } finally {
           synchronized (lock) {
             lock.unlock();

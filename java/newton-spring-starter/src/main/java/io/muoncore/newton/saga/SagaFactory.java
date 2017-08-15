@@ -36,7 +36,7 @@ public class SagaFactory implements ApplicationContextAware {
   }
 
   public void autowire(Saga saga) {
-    applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(saga, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, true);
+    applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(saga, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
   }
 
   public void notifySagaLifeCycle(Object id, SagaLifecycleEvent event) {
@@ -44,7 +44,7 @@ public class SagaFactory implements ApplicationContextAware {
   }
 
   public <T extends Saga> SagaMonitor<T> create(Class<T> sagaType, NewtonEvent payload) {
-    log.info("Creating new saga of type " + sagaType + " with payload " + payload);
+    log.debug("Creating new saga of type " + sagaType + " with payload " + payload);
     T saga = (T) loadFromSpringContext(sagaType);
     final T thesaga = saga;
 
