@@ -12,6 +12,7 @@
 **Fixed bugs:**
 
 - Starting client app when photon is unavailable causes undesirable failures [\#51](https://github.com/muoncore/newton/issues/51)
+- Unable to load aggregate even though it exists [\#40](https://github.com/muoncore/newton/issues/40)
 
 **Closed issues:**
 
