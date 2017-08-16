@@ -92,10 +92,10 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
     });
   }
 
-  @Override
-  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
-    //TODO
-  }
+//  @Override
+//  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+//    //TODO
+//  }
 
   @Override
   public void localHotSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
