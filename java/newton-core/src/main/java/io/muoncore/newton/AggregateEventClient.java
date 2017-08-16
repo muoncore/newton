@@ -13,6 +13,8 @@ import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
 @Slf4j
@@ -52,12 +54,14 @@ public class AggregateEventClient {
     });
   }
 
-  public List<Event> loadAggregateRoot(String id, Class type) throws InterruptedException {
+  public CompletableFuture<List<Event>> loadAggregateRoot(String id, Class type) throws InterruptedException {
 
-    CountDownLatch latch = new CountDownLatch(1);
     List<Event> events = new ArrayList<>();
+    CompletableFuture<List<Event>> ret = new CompletableFuture<>();
 
-    client.replay("/aggregate/" + type.getSimpleName() + "/" + id, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
+    String stream = "/aggregate/" + type.getSimpleName() + "/" + id;
+
+    client.replay(stream, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
       @Override
       public void onSubscribe(Subscription s) {
         s.request(Long.MAX_VALUE);
@@ -70,18 +74,16 @@ public class AggregateEventClient {
 
       @Override
       public void onError(Throwable t) {
-        log.error("Failed to load stream, releasing", t);
-        latch.countDown();
+        log.warn("Failed to load event stream due to a communication failure: {}", t.getMessage());
+        ret.completeExceptionally(new EventStoreException(id, stream, t.getMessage()));
       }
 
       @Override
       public void onComplete() {
-        latch.countDown();
+        ret.complete(events);
       }
     });
 
-    latch.await();
-
-    return events;
+    return ret;
   }
 }

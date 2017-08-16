@@ -2,6 +2,7 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.AggregateRoot;
+import io.muoncore.newton.EventStoreException;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -57,8 +59,8 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
 			if (aggregate.isDeleted()) throw new AggregateNotFoundException(aggregateIdentifier);
 			return aggregate;
-		} catch (AggregateNotFoundException e) {
-			throw e;
+		} catch (EventStoreException | AggregateNotFoundException e) {
+      throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Unable to load aggregate: ".concat(aggregateType.getSimpleName()), e);
 		}
@@ -71,7 +73,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
 			if (aggregate.getVersion() != version) throw new OptimisticLockException(aggregateIdentifier, version, aggregate.getVersion());
 			return aggregate;
-		} catch (AggregateNotFoundException | OptimisticLockException e) {
+		} catch (EventStoreException | AggregateNotFoundException | OptimisticLockException e) {
 			throw e;
 		} catch (Exception e) {
 			throw new IllegalStateException("Unable to load aggregate: ".concat(aggregateType.getSimpleName()), e);
@@ -141,7 +143,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 
   private List<NewtonEvent> replayEvents(Object id) {
 		try {
-			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString(), aggregateType)
+			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString(), aggregateType).get()
 				.stream()
 				.map(event -> {
           Class<? extends NewtonEvent> domainClass = MuonLookupUtils.getDomainClass(event);
@@ -156,10 +158,15 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 			if (events.size() == 0) throw new AggregateNotFoundException(id);
 
 			return (List<NewtonEvent>) processor.processForLoad(events);
-		} catch (InterruptedException e) {
+		} catch (ExecutionException e) {
+		  if (e.getCause() instanceof RuntimeException) {
+		    throw (RuntimeException) e.getCause();
+      }
+		  throw new RuntimeException(e.getCause());
+    } catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-	}
+  }
 
 	private void emitForAggregatePersistence(A aggregate) {
 		aggregateEventClient.publishDomainEvents(

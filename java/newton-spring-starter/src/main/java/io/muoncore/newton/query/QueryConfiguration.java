@@ -19,7 +19,7 @@ public class QueryConfiguration {
 	@Bean
 	@ConditionalOnClass(MongoTemplate.class)
   @ConditionalOnMissingBean(EventStreamIndexStore.class)
-	public EventStreamIndexStore mongoEventStreamIndexStore(MongoTemplate mongoTemplate) {
+	public EventStreamIndexStore indexStore(MongoTemplate mongoTemplate) {
 		return new MongoEventStreamIndexStore(mongoTemplate);
 	}
 

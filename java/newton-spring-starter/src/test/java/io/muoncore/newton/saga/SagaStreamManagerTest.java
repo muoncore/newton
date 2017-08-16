@@ -92,34 +92,6 @@ public class SagaStreamManagerTest {
     }
 
     @Test
-    public void newOperationsDispatched() throws Exception {
-
-        SagaWithCommands saga = new SagaWithCommands();
-
-        SagaStreamManager manager = streamManager();
-        ArgumentCaptor<Consumer<NewtonEvent>> eventStreamCaptor =  (ArgumentCaptor)ArgumentCaptor.forClass(Consumer.class);
-        manager.processSaga(SagaWithCommands.class);
-
-        String sagaId = "1234";
-
-        when(sagaRepository.getSagasInterestedIn(eq(SagaEvent.class))).thenReturn(Arrays.asList(new SagaInterest(
-                TestSaga.class.getName(), SagaWithEventHandler.class.getCanonicalName(), "4321", sagaId, "hello", "world")));
-
-        Class<? extends Saga> type = SagaWithCommands.class;
-
-        when(sagaLoader.loadSagaClass(any())).thenReturn((Class)type);
-        when(sagaRepository.load(eq(sagaId), eq(SagaWithCommands.class))).thenReturn(Optional.of(saga));
-
-
-        verify(subscriptionManager).globallyUniqueSubscription(eq("saga-manager-mystream"), eq("mystream"), eventStreamCaptor.capture());
-
-        eventStreamCaptor.getValue().accept(new SagaEvent());
-
-        Thread.sleep(500);
-        verify(commandBus, times(4)).dispatch(any(CommandIntent.class));
-    }
-
-    @Test
     public void associationsAreUsedToFilterStream() throws Exception {
 
         when(sagaInterestMatcher.matches(any(), any())).thenReturn(false);
@@ -188,7 +160,7 @@ public class SagaStreamManagerTest {
 
         }
 
-        @Override
+        @StartSagaWith
         public void startWith(NewtonEvent event) {
 
         }
