@@ -42,6 +42,7 @@ public class AggregateEventClient {
     events.forEach(domainEvent -> {
       ClientEvent persistEvent = ClientEvent
         .ofType(domainEvent.getClass().getSimpleName())
+        .id(id)
         .payload(domainEvent)
         .stream("/aggregate/" + type.getSimpleName() + "/" + id)
         .build();

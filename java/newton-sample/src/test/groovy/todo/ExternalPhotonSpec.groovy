@@ -16,8 +16,12 @@ import io.muoncore.newton.support.TenantContextHolder
 import io.muoncore.newton.todo.Task
 import io.muoncore.newton.todo.TenantEvent
 import io.muoncore.protocol.event.ClientEvent
+import io.muoncore.protocol.event.Event
 import io.muoncore.protocol.event.client.EventClient
+import io.muoncore.protocol.event.client.EventReplayMode
 import org.junit.Ignore
+import org.reactivestreams.Subscriber
+import org.reactivestreams.Subscription
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Bean
@@ -86,6 +90,58 @@ class MissingEventSpec extends Specification {
 
     then:
     task.description == "Hello41"
+  }
+
+  def "replay in paralllel"() {
+    when:
+
+//    500.times {
+//      println "EMIT WAS " + eventClient.event(ClientEvent.ofType(FirstEvent.simpleName).stream("awesome").payload(new FirstEvent(id:"12345")).build()).status
+//    }
+
+    def sub = {
+
+      def used = 0
+      def subscription = null
+
+      eventClient.replay("awesome", EventReplayMode.REPLAY_THEN_LIVE, new Subscriber<Event>() {
+        @Override
+        void onSubscribe(Subscription s) {
+          subscription = s
+          subscription.request(10)
+        }
+
+        @Override
+        void onNext(Event event) {
+          used--
+          if (used <= 0) {
+            used = 10
+            subscription.request(10)
+          }
+          println "DATA ${it} $event"
+        }
+
+        @Override
+        void onError(Throwable t) {
+          println "ERRORED!"
+          t.printStackTrace()
+        }
+
+        @Override
+        void onComplete() {
+          println "COMPLETED $it"
+        }
+      })
+    }
+
+    100.times {
+      Thread.start(sub)
+    }
+
+    then:
+    new PollingConditions(timeout: 20).eventually {
+      eventService.ev2?.id
+    }
   }
 
   def "event service can emit events"() {

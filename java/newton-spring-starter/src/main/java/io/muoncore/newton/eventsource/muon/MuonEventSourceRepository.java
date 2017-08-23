@@ -182,6 +182,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
         eventClient.event(
           ClientEvent
             .ofType(event.getClass().getSimpleName())
+            .id(aggregate.getId().toString())
             .stream(streamName)
             .payload(event)
             .build()
