@@ -1,25 +1,23 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.AggregateEventClient;
-import io.muoncore.newton.AggregateRoot;
-import io.muoncore.newton.EventStoreException;
-import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
+import io.muoncore.protocol.event.EventBuilder;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import lombok.extern.slf4j.Slf4j;
 import org.reactivestreams.Publisher;
 import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
+import reactor.rx.stream.PublisherStream;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -107,13 +105,13 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   }
 
   private Publisher<NewtonEvent> subscribe(Object aggregateIdentifier, EventReplayMode mode) {
-	  return sub -> eventClient.replay("/aggregate/" + aggregateType.getSimpleName() + "/" + aggregateIdentifier.toString(), mode, new Subscriber<Event>() {
+	  return sub -> eventClient.replay(createAggregateStreamName(aggregateIdentifier), mode, new Subscriber<Event>() {
         public void onSubscribe(Subscription s) {
           sub.onSubscribe(s);
         }
 
         public void onNext(Event o) {
-          sub.onNext(o.getPayload(MuonLookupUtils.getDomainClass(o)));
+          sub.onNext(MuonLookupUtils.decorateMeta(o.getPayload(MuonLookupUtils.getDomainClass(o)), o));
         }
 
         public void onError(Throwable t) {
@@ -129,6 +127,41 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   @Override
   public Publisher<NewtonEvent> replay(Object aggregateIdentifier) {
 	  return subscribe(aggregateIdentifier, EventReplayMode.REPLAY_ONLY);
+  }
+
+  @Override
+  public Publisher<AggregateRootUpdate<A>> susbcribeAggregateUpdates(Object aggregateIdentifier) {
+
+	  A root = load(aggregateIdentifier);
+
+	  Executor exec = Executors.newCachedThreadPool();
+    //should capture the order-id played up to and request from there.
+
+    return sub -> eventClient.replay(createAggregateStreamName(aggregateIdentifier), EventReplayMode.LIVE_ONLY, new Subscriber<Event>() {
+      public void onSubscribe(Subscription s) {
+        sub.onSubscribe(s);
+      }
+
+      public void onNext(Event o) {
+        exec.execute(() -> {
+          NewtonEvent payload = MuonLookupUtils.decorateMeta(o.getPayload(MuonLookupUtils.getDomainClass(o)), o);
+          root.handleEvent(payload);
+          sub.onNext(new AggregateRootUpdate<>(root, payload));
+        });
+      }
+
+      public void onError(Throwable t) {
+        sub.onError(t);
+      }
+
+      public void onComplete() {
+        sub.onComplete();
+      }
+    });
+  }
+
+  private String createAggregateStreamName(Object aggregateIdentifier) {
+    return aggregateEventClient.createAggregateStreamName(aggregateIdentifier.toString(), aggregateType);
   }
 
   @Override
@@ -151,7 +184,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
             log.error("Unable to load event {} for domain class {}", event.getEventType(), this.aggregateType);
             throw new IllegalStateException("Unable to load aggregate with id " + id + " as event type " + event.getEventType() + " could not be found");
           }
-          return event.getPayload(domainClass);
+          return MuonLookupUtils.decorateMeta(event.getPayload(domainClass), event);
         })
 				.collect(Collectors.toList());
 
@@ -172,21 +205,39 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 		aggregateEventClient.publishDomainEvents(
 			aggregate.getId().toString(),
       aggregateType,
-      processor.processForPersistence(aggregate.getNewOperations()));
+      processor.processForPersistence(aggregate.getNewOperations()), cause.get());
 	}
 
 	private void emitForStreamProcessing(A aggregate) {
     processor.processForPersistence(aggregate.getNewOperations()).forEach(
 			event -> {
         log.debug("Emitting {} event on {}", event, streamName);
-        eventClient.event(
-          ClientEvent
-            .ofType(event.getClass().getSimpleName())
-            .id(aggregate.getId().toString())
-            .stream(streamName)
-            .payload(event)
-            .build()
-        );
+
+        EventBuilder payload = ClientEvent
+          .ofType(event.getClass().getSimpleName())
+          .id(aggregate.getId().toString())
+          .stream(streamName)
+          .payload(event);
+
+        if (cause.get() != null) {
+          payload.causedBy(String.valueOf(cause.get().getMeta().getOrderId()), "CAUSED");
+        }
+
+        ClientEvent ev = payload.build();
+
+        eventClient.event(ev);
       });
 	}
+
+	// manage causation between events.
+	private static ThreadLocal<NewtonEventWithMeta> cause = new ThreadLocal<>();
+
+	public static <T> T executeCausedBy(NewtonEvent ev, Supplier<T> run) {
+	  if (NewtonEventWithMeta.class.isAssignableFrom(ev.getClass())) {
+      cause.set((NewtonEventWithMeta) ev);
+    }
+	  T ret = run.get();
+	  cause.remove();
+	  return ret;
+  }
 }

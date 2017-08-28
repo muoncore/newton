@@ -51,6 +51,13 @@ public interface EventSourceRepository<A extends AggregateRoot> {
 	Publisher<NewtonEvent> replay(Object aggregateIdentifier);
 
   /**
+   * Obtain notifications whenever the AR is updated.
+   * This will first fully roll up the AR, emit the first AggregateRootUpdate with the current state of the AR, then whenever
+   * new changes are made to the AR, a new AggregateRootUpdate will be emitted to subscribers.
+   */
+	Publisher<AggregateRootUpdate<A>> susbcribeAggregateUpdates(Object aggregateIdentifier);
+
+  /**
    * Cold+hot replay of of the event contents of Aggregate.
    */
   Publisher<NewtonEvent> subscribeColdHot(Object aggregateIdentifier);

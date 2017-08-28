@@ -1,5 +1,7 @@
 package io.muoncore.newton.command;
 
+import io.muoncore.newton.NewtonEvent;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -7,19 +9,14 @@ import java.util.Map;
 import java.util.Objects;
 
 @Getter
+@AllArgsConstructor
 public class CommandIntent {
 
 	private String type;
 	private Object payload;
 	private Object id;
 	private Map<String, Object> additionalProperties = new HashMap<>();
-
-	public CommandIntent(String type, Object id, Object payload, Map<String, Object> additionalProperties) {
-		this.type = type;
-		this.id = id;
-		this.payload = payload;
-		this.additionalProperties = additionalProperties;
-	}
+	private NewtonEvent causingEvent;
 
 	public static CommandIntentBuilder builder(String type) {
 		return new CommandIntentBuilder(type);
@@ -31,10 +28,16 @@ public class CommandIntent {
 		private Object request;
 		private Object id;
 		private Map<String, Object> additionalProperties = new HashMap<>();
+		private NewtonEvent causingEvent;
 
 		public CommandIntentBuilder(String type) {
 			this.type = Objects.requireNonNull(type, "Type is null!");
 		}
+
+		public CommandIntentBuilder causedBy(NewtonEvent ev) {
+		  this.causingEvent = ev;
+		  return this;
+    }
 
 		public CommandIntentBuilder request(Object request) {
 			this.request = Objects.requireNonNull(request, "Payload is null!");
@@ -52,7 +55,7 @@ public class CommandIntent {
 		}
 
 		public CommandIntent build() {
-			return new CommandIntent(type, id, request, additionalProperties);
+			return new CommandIntent(type, request, id, additionalProperties, causingEvent);
 		}
 
 	}

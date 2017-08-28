@@ -27,7 +27,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private LockService lockService;
   private EventStreamProcessor eventStreamProcessor;
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
-  private final Executor worker = Executors.newSingleThreadExecutor();
+  private final Executor worker = Executors.newCachedThreadPool();
   private final Executor pool = Executors.newCachedThreadPool();
 
   public MuonClusterAwareTrackingSubscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
@@ -68,7 +68,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       EventReplayMode.REPLAY_THEN_LIVE,
       new EventSubscriber(event -> {
         log.debug("NewtonEvent received " + event);
-        final NewtonEvent newtonEvent = event.getPayload(MuonLookupUtils.getDomainClass(event));
+        final NewtonEvent newtonEvent = MuonLookupUtils.decorateMeta(event.getPayload(MuonLookupUtils.getDomainClass(event)), event);
         worker.execute(() -> {
           eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
         });
@@ -144,12 +144,13 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
           log.trace("Store is {}, event is {}, time is {}", eventStreamIndexStore, event, event.getOrderId());
         }
 
+        log.info("Loading event up {}", event);
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
         NewtonEvent newtonEvent;
         if (eventType == null) {
           newtonEvent = new EventTypeNotFound(event.getOrderId(), event);
         } else {
-          newtonEvent = event.getPayload(eventType);
+          newtonEvent = MuonLookupUtils.decorateMeta(event.getPayload(eventType), event);
         }
         worker.execute(() -> {
           eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);

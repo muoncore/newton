@@ -2,6 +2,7 @@ package io.muoncore.newton.command;
 
 import io.muoncore.api.ImmediateReturnFuture;
 import io.muoncore.api.MuonFuture;
+import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -25,6 +26,12 @@ public class SimpleCommandBus implements CommandBus {
 					commandIntent.getPayload(),
 					commandIntent.getId(),
 					commandIntent.getAdditionalProperties(), null);
+
+			if (commandIntent.getCausingEvent() != null) {
+        return MuonEventSourceRepository.executeCausedBy(commandIntent.getCausingEvent(),
+          () -> new ImmediateReturnFuture<>(new CommandResult(command.executeAndReturnEvents(), null)));
+      }
+
 			return new ImmediateReturnFuture<>(new CommandResult(command.executeAndReturnEvents(), null));
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(String.format("Command of type '%s' does not exist", commandIntent.getType()));
