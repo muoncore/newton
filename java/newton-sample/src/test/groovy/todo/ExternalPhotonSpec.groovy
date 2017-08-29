@@ -95,9 +95,9 @@ class MissingEventSpec extends Specification {
   def "replay in paralllel"() {
     when:
 
-//    500.times {
-//      println "EMIT WAS " + eventClient.event(ClientEvent.ofType(FirstEvent.simpleName).stream("awesome").payload(new FirstEvent(id:"12345")).build()).status
-//    }
+    200.times {
+      println "EMIT WAS " + eventClient.event(ClientEvent.ofType(FirstEvent.simpleName).stream("awesome").payload(new FirstEvent(id:"12345")).build()).status
+    }
 
     def sub = {
 

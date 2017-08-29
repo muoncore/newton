@@ -134,20 +134,17 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 
 	  A root = load(aggregateIdentifier);
 
-	  Executor exec = Executors.newCachedThreadPool();
     //should capture the order-id played up to and request from there.
-
     return sub -> eventClient.replay(createAggregateStreamName(aggregateIdentifier), EventReplayMode.LIVE_ONLY, new Subscriber<Event>() {
       public void onSubscribe(Subscription s) {
         sub.onSubscribe(s);
+        sub.onNext(new AggregateRootUpdate<>(root, null));
       }
 
       public void onNext(Event o) {
-        exec.execute(() -> {
-          NewtonEvent payload = MuonLookupUtils.decorateMeta(o.getPayload(MuonLookupUtils.getDomainClass(o)), o);
-          root.handleEvent(payload);
-          sub.onNext(new AggregateRootUpdate<>(root, payload));
-        });
+        NewtonEvent payload = MuonLookupUtils.decorateMeta(o.getPayload(MuonLookupUtils.getDomainClass(o)), o);
+        root.handleEvent(payload);
+        sub.onNext(new AggregateRootUpdate<>(root, payload));
       }
 
       public void onError(Throwable t) {

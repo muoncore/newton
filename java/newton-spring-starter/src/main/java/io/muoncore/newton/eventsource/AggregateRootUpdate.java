@@ -15,5 +15,5 @@ import lombok.Getter;
 @Getter
 public class AggregateRootUpdate<A> {
   private A aggregateRoot;
-  private NewtonEvent udpate;
+  private NewtonEvent update;
 }

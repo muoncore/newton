@@ -35,7 +35,7 @@ dependencies {
   testCompile('com.github.javafaker:javafaker:0.13')
   testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
 
-  runtime "io.muoncore.transport:muon-amqp:0.0.7"
+  runtime "io.muoncore.transport:muon-amqp:0.0.9-SNAPSHOT"
   runtime("org.reactivestreams:reactive-streams:1.0.0.final")
 
 }
