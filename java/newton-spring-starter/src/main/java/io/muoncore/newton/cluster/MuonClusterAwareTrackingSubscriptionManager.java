@@ -92,10 +92,10 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
     });
   }
 
-  @Override
-  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
-    //TODO
-  }
+//  @Override
+//  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+//    //TODO
+//  }
 
   @Override
   public void localHotSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
@@ -164,8 +164,12 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
   static class EventSubscriber implements Subscriber<io.muoncore.protocol.event.Event> {
 
+    private final static int REQUEST_SIZE = 20;
+
     private Consumer<io.muoncore.protocol.event.Event> onData;
     private Consumer<Throwable> onError;
+    private int remaining = 0;
+    private Subscription subscription;
 
     public EventSubscriber(Consumer<io.muoncore.protocol.event.Event> onData, Consumer<Throwable> onError) {
       this.onData = onData;
@@ -174,11 +178,20 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
 
     @Override
     public void onSubscribe(Subscription subscription) {
-      subscription.request(Long.MAX_VALUE);
+      this.subscription = subscription;
+      this.remaining = REQUEST_SIZE;
+      this.subscription.request(REQUEST_SIZE);
     }
 
     @Override
     public void onNext(io.muoncore.protocol.event.Event event) {
+      synchronized (this) {
+        remaining--;
+        if (remaining <= 0) {
+          this.remaining = REQUEST_SIZE;
+          this.subscription.request(REQUEST_SIZE);
+        }
+      }
       onData.accept(event);
     }
 
