@@ -16,11 +16,11 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 @ConditionalOnClass(Muon.class)
 public class QueryConfiguration {
 
-	@Bean
-	@ConditionalOnClass(MongoTemplate.class)
+  @Bean
+  @ConditionalOnClass(MongoTemplate.class)
   @ConditionalOnMissingBean(EventStreamIndexStore.class)
-	public EventStreamIndexStore indexStore(MongoTemplate mongoTemplate) {
-		return new MongoEventStreamIndexStore(mongoTemplate);
-	}
+  public EventStreamIndexStore indexStore(MongoTemplate mongoTemplate) {
+    return new MongoEventStreamIndexStore(mongoTemplate);
+  }
 
 }

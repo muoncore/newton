@@ -23,7 +23,8 @@ repositories {
 test.enabled = false
 
 dependencies {
-  compile project(":newton-spring-starter")
+  compile project(path:":newton-spring-starter", configuration:"shadow")
+  compile project(path:":newton-spring-starter")
   compile("org.springframework.boot:spring-boot")
   compile("org.springframework.boot:spring-boot-autoconfigure")
   compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"

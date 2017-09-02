@@ -1,6 +1,5 @@
 package io.muoncore.newton;
 
-import com.google.common.eventbus.EventBus;
 import io.muoncore.MultiTransportMuon;
 import io.muoncore.Muon;
 import io.muoncore.codec.json.JsonOnlyCodecs;
@@ -9,11 +8,11 @@ import io.muoncore.config.MuonConfigBuilder;
 import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.memory.discovery.InMemDiscovery;
 import io.muoncore.memory.transport.InMemTransport;
+import io.muoncore.memory.transport.bus.EventBus;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
 import io.muoncore.newton.mongo.MongoConfiguration;
-import io.muoncore.newton.query.EventStreamIndex;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.query.InMemEventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;

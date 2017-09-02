@@ -34,7 +34,7 @@ public class AggregateEventClient {
    *
    * The events will be converted into Muon `Event` types
    * * stream will be /aggregate/[id]
-   * * type will be the event type class Simple Name - eg co.myapp.UserCreatedEvent -> UserCreatedEvent
+   * * type will be the event type class Simple Name - eg co.myapp.UserCreatedEvent to UserCreatedEvent
    *
    * @param id
    * @param events

@@ -2,6 +2,8 @@ package io.muoncore.newton.mongo;
 
 import com.mongodb.Mongo;
 import com.mongodb.MongoClient;
+import io.muoncore.newton.query.EventStreamIndexStore;
+import io.muoncore.newton.query.mongo.MongoEventStreamIndexStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -38,5 +40,12 @@ public class MongoConfiguration extends AbstractMongoConfiguration {
   @Bean
   public MongoTemplate mongoTemplate() throws Exception {
     return new MongoTemplate(this.mongoDbFactory(), this.mappingMongoConverter());
+  }
+
+  @Bean
+  @ConditionalOnClass(MongoTemplate.class)
+  @ConditionalOnMissingBean(EventStreamIndexStore.class)
+  public EventStreamIndexStore indexStore(MongoTemplate mongoTemplate) {
+    return new MongoEventStreamIndexStore(mongoTemplate);
   }
 }

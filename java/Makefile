@@ -1,6 +1,6 @@
 
-install: test
-	./gradlew install
+install:
+	./gradlew clean publishToMavenLocal
 
 snapshot: clean
 	echo repoKey=muon-snapshot>>gradle.properties
