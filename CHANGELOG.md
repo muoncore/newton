@@ -2,7 +2,24 @@
 
 ## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
 
-[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.10...HEAD)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.11...HEAD)
+
+**Fixed bugs:**
+
+- Locking Process failed with exception [\#62](https://github.com/muoncore/newton/issues/62)
+- Fails to persist domain events: photon is unavailable [\#54](https://github.com/muoncore/newton/issues/54)
+
+**Closed issues:**
+
+- Add event relationships into event meta data [\#67](https://github.com/muoncore/newton/issues/67)
+- Update to generate full pom for maven central [\#65](https://github.com/muoncore/newton/issues/65)
+
+**Merged pull requests:**
+
+- 0.12 series  [\#68](https://github.com/muoncore/newton/pull/68) ([daviddawson](https://github.com/daviddawson))
+
+## [v0.0.11](https://github.com/muoncore/newton/tree/v0.0.11) (2017-09-02)
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.10...v0.0.11)
 
 **Implemented enhancements:**
 
@@ -12,14 +29,21 @@
 **Fixed bugs:**
 
 - Starting client app when photon is unavailable causes undesirable failures [\#51](https://github.com/muoncore/newton/issues/51)
+- Unable to load aggregate even though it exists [\#40](https://github.com/muoncore/newton/issues/40)
 
 **Closed issues:**
 
+- In event replay, use RS back pressure to smooth replay and stop buffering [\#63](https://github.com/muoncore/newton/issues/63)
+- Don't use exceptions for flow control on aggregate repository [\#60](https://github.com/muoncore/newton/issues/60)
 - Newton shouldn't initialize if spring-app is unable to start [\#59](https://github.com/muoncore/newton/issues/59)
 - Less verbose 'error' logs upon lost connections [\#58](https://github.com/muoncore/newton/issues/58)
 - CommandBus should return CompleteableFuture to enable easy integration with Spring web async support. [\#56](https://github.com/muoncore/newton/issues/56)
 - On command execution failure in a saga, take the failure events and pass them back to the saga [\#49](https://github.com/muoncore/newton/issues/49)
 - Remove SagaBus and replace with a Saga Registry [\#17](https://github.com/muoncore/newton/issues/17)
+
+**Merged pull requests:**
+
+- Smooth event replay by using RS signals [\#66](https://github.com/muoncore/newton/pull/66) ([daviddawson](https://github.com/daviddawson))
 
 ## [v0.0.10](https://github.com/muoncore/newton/tree/v0.0.10) (2017-06-28)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.9...v0.0.10)
