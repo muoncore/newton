@@ -25,6 +25,7 @@ public class SagaInterestMatcher {
                 if (ed.getName().equals(interests.getKey())) {
                     try {
                         Object ret = method.invoke(event);
+                        if (ret == null) break;
                         String val = ret.toString();
                         if (interests.getValue().equals(val)) {
                             matches = true;

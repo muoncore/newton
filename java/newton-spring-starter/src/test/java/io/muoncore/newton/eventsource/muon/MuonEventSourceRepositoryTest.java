@@ -54,7 +54,7 @@ public class MuonEventSourceRepositoryTest {
     String id = "simple-id";
 		client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
 			new TestAggregateCreated(id)
-		));
+		), null);
 
 
 		TestAggregate aggregate = repository.load(id);
@@ -68,7 +68,7 @@ public class MuonEventSourceRepositoryTest {
     String id = "simple-id";
     client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
       new TestAggregateCreated(id)
-    ));
+    ), null);
 
 
     TestAggregate aggregate = repository.loadAsync(id).get();
@@ -151,7 +151,7 @@ public class MuonEventSourceRepositoryTest {
 		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
 			new TestAggregateCreated(),
 			new TestAggregateCreated()
-		));
+		), null);
 
 		TestAggregate aggregate = repository.load(id, 2L);
 		assertEquals(2, aggregate.getVersion());
@@ -162,7 +162,7 @@ public class MuonEventSourceRepositoryTest {
     String id = "awesome-id";
 		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
 			new TestAggregateCreated()
-		));
+		), null);
 
 		repository.load(id, 2L);
 	}
@@ -172,7 +172,7 @@ public class MuonEventSourceRepositoryTest {
     String id = "cool-id";
     client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
       new TestAggregateCreated(), new TestAggregateCreated()
-    ));
+    ), null);
 
     List<NewtonEvent> events = new ArrayList<>();
 

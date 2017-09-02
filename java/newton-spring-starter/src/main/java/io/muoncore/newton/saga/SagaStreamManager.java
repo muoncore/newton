@@ -1,12 +1,10 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.api.MuonFuture;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
-import io.muoncore.newton.command.CommandIntent;
-import io.muoncore.newton.command.CommandResult;
 import io.muoncore.newton.eventsource.AggregateRootUtil;
+import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,6 @@ import org.springframework.context.event.EventListener;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
@@ -33,7 +30,7 @@ public class SagaStreamManager {
   private SagaFactory sagaFactory;
   private SagaLoader sagaLoader;
   //avoid potential deadlock by doing all work on a different thread, not the event dispatch thread.
-  private Executor worker = Executors.newSingleThreadExecutor();
+  private Executor worker = Executors.newCachedThreadPool();
 
   private SagaStartCache sagaStartCache = new SagaStartCache();
 
@@ -122,10 +119,10 @@ public class SagaStreamManager {
     log.debug("Checking if there is a Saga to be run for " + event.getClass());
 
     startSagasFor(event);
-    extractSagasFor(event);
+    extractSagasForEventAndHandle(event);
   }
 
-  private void extractSagasFor(NewtonEvent event) {
+  private void extractSagasForEventAndHandle(NewtonEvent event) {
     List<SagaInterest> interests = sagaRepository.getSagasInterestedIn(event.getClass());
 
     interests.forEach(interest -> {
@@ -136,10 +133,15 @@ public class SagaStreamManager {
         Optional<? extends Saga> saga = sagaRepository.load(interest.getSagaId(), sagaLoader.loadSagaClass(interest));
         saga.ifPresent(saga1 -> {
           sagaFactory.autowire(saga1);
-          saga1.handle(event);
-          sagaRepository.save(saga1);
-          sagaFactory.processCommands(saga1);
-          sagaRepository.save(saga1);
+          worker.execute(() -> {
+            MuonEventSourceRepository.executeCausedBy(event, () -> {
+              saga1.handle(event);
+              sagaRepository.save(saga1);
+              sagaFactory.processCommands(saga1);
+              sagaRepository.save(saga1);
+              return null;
+            });
+          });
         });
 
       } catch (ClassNotFoundException e) {

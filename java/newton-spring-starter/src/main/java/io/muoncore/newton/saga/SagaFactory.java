@@ -7,6 +7,7 @@ import io.muoncore.api.MuonFuture;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandResult;
+import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import lombok.extern.slf4j.Slf4j;
 import io.muoncore.newton.command.CommandIntent;
@@ -43,22 +44,26 @@ public class SagaFactory implements ApplicationContextAware {
     bus.post(event);
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends Saga> SagaMonitor<T> create(Class<T> sagaType, NewtonEvent payload) {
     log.debug("Creating new saga of type " + sagaType + " with payload " + payload);
     T saga = (T) loadFromSpringContext(sagaType);
     final T thesaga = saga;
 
-    thesaga.startWith(payload);
+    return MuonEventSourceRepository.executeCausedBy(payload, () -> {
+      thesaga.startWith(payload);
 
-    sagaRepository.saveNewSaga(saga, payload);
+      sagaRepository.saveNewSaga(saga, payload);
 
-    EventedSagaMonitor monitor = new EventedSagaMonitor(saga.getId(), sagaType);
+      EventedSagaMonitor monitor = new EventedSagaMonitor(saga.getId(), sagaType);
 
-    processCommands(saga);
+      processCommands(saga);
 
-    sagaRepository.save(saga);
+      sagaRepository.save(saga);
 
-    return monitor;
+      return monitor;
+    });
+
   }
 
   public <T extends Saga> SagaMonitor<T> monitor(String sagaId, Class<T> type) {
@@ -78,8 +83,11 @@ public class SagaFactory implements ApplicationContextAware {
       try {
         CommandResult commandResult = dispatch.get();
         commandResult.getFailure().ifPresent(event -> {
-          saga.handle(event);
-          processCommands(saga);
+          MuonEventSourceRepository.executeCausedBy(event, () -> {
+            saga.handle(event);
+            processCommands(saga);
+            return null;
+          });
         });
       } catch (InterruptedException | ExecutionException e) {
         log.warn("Error extracting the command result for a saga", e);

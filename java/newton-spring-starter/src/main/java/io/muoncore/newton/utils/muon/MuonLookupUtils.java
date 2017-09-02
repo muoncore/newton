@@ -1,9 +1,11 @@
 package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.NewtonEventWithMeta;
 import io.muoncore.newton.streams.RebuildingStreamView;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
+import io.muoncore.protocol.event.Event;
 import lombok.extern.slf4j.Slf4j;
 import org.reflections.Reflections;
 import org.reflections.scanners.SubTypesScanner;
@@ -104,4 +106,11 @@ public class MuonLookupUtils {
       //NOTHING
     }
 	}
+
+	public static NewtonEvent decorateMeta(NewtonEvent ev, Event meta) {
+	  if (NewtonEventWithMeta.class.isAssignableFrom(ev.getClass())) {
+      ((NewtonEventWithMeta) ev).setMeta(meta);
+    }
+    return ev;
+  }
 }

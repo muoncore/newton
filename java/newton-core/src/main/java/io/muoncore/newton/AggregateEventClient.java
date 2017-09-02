@@ -4,6 +4,7 @@ package io.muoncore.newton;
 import io.muoncore.exception.MuonException;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
+import io.muoncore.protocol.event.EventBuilder;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import io.muoncore.protocol.event.client.EventResult;
@@ -33,20 +34,27 @@ public class AggregateEventClient {
    *
    * The events will be converted into Muon `Event` types
    * * stream will be /aggregate/[id]
-   * * type will be the event type class Simple Name - eg co.myapp.UserCreatedEvent -> UserCreatedEvent
+   * * type will be the event type class Simple Name - eg co.myapp.UserCreatedEvent to UserCreatedEvent
    *
    * @param id
    * @param events
    */
-  public void publishDomainEvents(String id, Class type, List events) {
+  public void publishDomainEvents(String id, Class type, List events, NewtonEventWithMeta cause) {
     events.forEach(domainEvent -> {
-      ClientEvent persistEvent = ClientEvent
-        .ofType(domainEvent.getClass().getSimpleName())
-        .payload(domainEvent)
-        .stream("/aggregate/" + type.getSimpleName() + "/" + id)
-        .build();
 
-      EventResult result = client.event(persistEvent);
+      EventBuilder payload = ClientEvent
+        .ofType(domainEvent.getClass().getSimpleName())
+        .id(id)
+        .stream(createAggregateStreamName(id, type))
+        .payload(domainEvent);
+
+      if (cause != null) {
+        payload.causedBy(String.valueOf(cause.getMeta().getOrderId()), "CAUSED");
+      }
+
+      ClientEvent ev = payload.build();
+
+      EventResult result = client.event(ev);
 
       if (result.getStatus() == EventResult.EventResultStatus.FAILED) {
         throw new MuonException("Failed to persist domain event " + domainEvent + ":" + result.getCause());
@@ -59,7 +67,7 @@ public class AggregateEventClient {
     List<Event> events = new ArrayList<>();
     CompletableFuture<List<Event>> ret = new CompletableFuture<>();
 
-    String stream = "/aggregate/" + type.getSimpleName() + "/" + id;
+    String stream = createAggregateStreamName(id, type);
 
     client.replay(stream, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
       @Override
@@ -85,5 +93,9 @@ public class AggregateEventClient {
     });
 
     return ret;
+  }
+
+  public String createAggregateStreamName(String id, Class type) {
+    return "/aggregate/" + type.getSimpleName() + "/" + id;
   }
 }

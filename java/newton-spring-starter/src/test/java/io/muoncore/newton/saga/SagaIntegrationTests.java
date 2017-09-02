@@ -197,11 +197,14 @@ public class SagaIntegrationTests {
   }
 
   @Getter
-  @AllArgsConstructor
   @ToString
   public static class PaymentRecievedEvent implements NewtonEvent {
     private String orderId;
     private final String id = UUID.randomUUID().toString();
+
+    public PaymentRecievedEvent(String orderId) {
+      this.orderId = orderId;
+    }
   }
 
 

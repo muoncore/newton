@@ -1,9 +1,7 @@
 package io.muoncore.newton.streams;
 
-import org.reflections.Reflections;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
-import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 
 @Deprecated

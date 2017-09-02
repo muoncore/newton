@@ -1,11 +1,44 @@
 
+plugins {
+  id 'com.github.johnrengelman.shadow' version '2.0.1'
+}
 
 dependencies {
-  compile "io.muoncore:muon-core:7.3.4"
-  compile "io.muoncore.protocol:stack-event:0.0.1"
+  compile "io.muoncore:muon-core:7.4.0-SNAPSHOT"
+  compile "io.muoncore.protocol:stack-event:0.0.2-SNAPSHOT"
   compile "io.muoncore.protocol:stack-rpc:0.0.1"
   compile "io.muoncore.protocol:stack-reactive-streams:0.0.1"
-  compile 'org.reflections:reflections:0.9.11'
 
   compile 'org.jgroups:jgroups:4.0.1.Final'
+}
+
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact sourceJar {
+        classifier "sources"
+      }
+      artifact packageJavadoc
+      pom.withXml {
+        asNode().appendNode('name', "Newton Core")
+        asNode().appendNode('description', 'Newton is a framework for build distributed DDD applications on top of the Muon persisted event protocol')
+        asNode().appendNode('url', 'http://muoncore.io')
+        def license = asNode().appendNode("licenses").appendNode("license")
+        license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
+        license.appendNode("url", "http://www.gnu.org/licenses/lgpl-3.0.txt")
+        license.appendNode("distribution", "repo")
+
+        asNode().appendNode("scm").appendNode("url", "https://github.com/muoncore/newton")
+      }
+    }
+  }
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+task packageJavadoc(type: Jar) {
+  from javadoc
+  classifier = 'javadoc'
 }

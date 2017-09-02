@@ -13,7 +13,7 @@ buildscript {
     }
   }
   dependencies {
-    classpath 'io.muoncore.release:muon-java-release:0.0.5'
+    classpath 'io.muoncore.release:muon-java-release:0.0.6'
     classpath(group: 'org.jfrog.buildinfo', name: 'build-info-extractor-gradle', version: '3.2.0')
     classpath "io.franzbecker:gradle-lombok:1.8"
   }
@@ -23,9 +23,7 @@ apply plugin: 'io.muoncore.release'
 
 project.subprojects.each {
   it.repositories {
-    mavenLocal()
     jcenter()
-    maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon' }
-    maven { url 'https://simplicityitself.artifactoryonline.com/simplicityitself/muon-snapshot' }
   }
 }
+

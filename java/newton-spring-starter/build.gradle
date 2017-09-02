@@ -8,21 +8,31 @@ buildscript {
     }
 }
 
+plugins {
+  id 'com.github.johnrengelman.shadow' version '2.0.1'
+}
+
 apply plugin:"groovy"
 
 repositories {
   mavenLocal()
+  jcenter()
 }
 
 def springVersion = "1.5.2.RELEASE"
 
 dependencies {
-  compile project(":newton-core")
-  compile("org.springframework.boot:spring-boot:$springVersion")
-  compile("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
-  compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
-  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
+  compile project(path: ':newton-core', configuration:"shadow")
+//  compile project(path: ':newton-core')
+  shadow("org.springframework.boot:spring-boot:$springVersion")
+  shadow("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
+  shadow "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
+  shadow group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 
+  compile 'org.reflections:reflections:0.9.11'
+  shadow "org.javassist:javassist:3.21.0-GA"
+
+  testCompile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
   testCompile 'cglib:cglib-nodep:3.2.2'
@@ -30,4 +40,88 @@ dependencies {
     //exclude module:"slf4j-simple"
   }
 }
+
+
+shadowJar {
+  dependencies {
+    exclude(dependency({
+      !(it.moduleGroup in ["org.reflections", "com.google.guava"])
+    }))
+  }
+  relocate'com.google.common', 'io.muoncore.newton.liblib.google.common'
+  relocate'com.google.thirdparty', 'io.muoncore.newton.liblib.google.thirdparty'
+  relocate'org.reflections', 'io.muoncore.newton.liblib.reflections'
+  archiveName = "${baseName}-${version}.${extension}"
+}
+
+task sourceJar(type: Jar) {
+  from sourceSets.main.allJava
+}
+task packageJavadoc(type: Jar) {
+  from javadoc
+  classifier = 'javadoc'
+}
+
+
+publishing {
+  publications {
+    mavenJava(MavenPublication) {
+      artifact sourceJar {
+        classifier "sources"
+      }
+      artifact packageJavadoc
+    }
+
+    shadow(MavenPublication) { publication ->
+      project.shadow.component(publication)
+      pom.withXml {
+        asNode().dependencies.'*'.each{
+          it.scope[0].value="compile"
+        }
+      }
+    }
+  }
+}
+
+javadoc {
+  source = sourceSets.main.allJava
+  classpath = configurations.compileClasspath
+
+  options
+    {
+      setMemberLevel JavadocMemberLevel.PUBLIC
+      setAuthor true
+
+      links "https://docs.oracle.com/javase/8/docs/api/"
+    }
+}
+
+install {
+  repositories.mavenInstaller {
+    pom.withXml {
+      asNode().dependencies.'*'.each{
+        it.scope[0].value="compile"
+      }
+    }
+  }
+}
+
+task copyPomLocal(type: Copy) {
+  from 'build/publications/shadow'
+  into 'build/poms'
+}
+
+task copyPom(type: Copy) {
+  from 'build/publications/shadow'
+  into 'build/publications/mavenJava'
+}
+
+tasks.jar.enabled = false
+project.tasks.artifactoryPublish.dependsOn project.tasks.shadowJar
+project.tasks.artifactoryPublish.dependsOn project.tasks.shadowJar
+project.tasks.artifactoryPublish.dependsOn "publishShadowPublicationToMavenLocal"
+project.tasks.artifactoryPublish.dependsOn copyPom
+project.tasks.install.dependsOn copyPomLocal
+copyPomLocal.dependsOn "generatePomFileForShadowPublication"
+copyPom.dependsOn "generatePomFileForMavenJavaPublication"
 
