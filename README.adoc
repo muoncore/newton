@@ -1,12 +1,20 @@
 |===
 | Master Build | License
-| image:https://img.shields.io/teamcity/http/teamcity.simplicityitself.com/e/OpenSource_Newton_PublishSnapshot.svg[Status]
-| image:https://img.shields.io/github/license/muoncore/newton.svg[]
+| image:https://img.shields.io/teamcity/http/teamcity.cloud.daviddawson.me/e/OpenSource_Newton_PublishSnapshot.svg[Status]
+| image:https://img.shields.io/github/license/muoncore/muon-spring.svg[]
 |===
 
-# Newton
+# What is Muon
+Microservices today are optimised for building systems that can continue to change as you need them to. The achieve this, you decompose an application into its component parts, then recompose it back together again using some form of integration technology. The most common form of integration today is RPC based, whether HTTP, gRPC or one of its friends.
 
-Newton is a Polyglot Distributed DDD Framework designed for building complex event based Microservice applications using CQRS principles, Event Sourcing and Stream Processing. 
+RPC is a fairly simplistic model for integration, with well known flaws and foibles. The other options, messaging and event collaboration are much harder to get started with, and so are often avoided until the "v2 rewrite". Muon lets you adopt messaging and events from the start of a project, by making it easy to do the right thing with them.
+
+Muon is fully polyglot and enables you to build and use much richer *_message based APIs_* to recompose your distributed system in highly performant, rich communication styles, beyond RPC.
+
+Muon Spring lets you use, expose and interact with these APIs in various forms and gives helpers for using them in a Spring project.  It has particular support for using persisted event streams as described at https://github.com/muoncore/stack-event
+
+## Event Systems 
+Distributed DDD Framework designed for building complex event based Microservice applications using CQRS principles, Event Sourcing and Stream Processing. 
 
 It provides Event Sourced Aggregates, Stream Processed Views and Distributed Sagas. It enables you to build highly complex transactional systems that are naturally distributed, event oriented and give event based transactional semantics.
 
