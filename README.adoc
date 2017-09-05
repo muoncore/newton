@@ -14,13 +14,15 @@ Muon is fully polyglot and enables you to build and use much richer *_message ba
 Muon Spring lets you use, expose and interact with these APIs in various forms and gives helpers for using them in a Spring project.  It has particular support for using persisted event streams as described at https://github.com/muoncore/stack-event
 
 ## Event Systems 
-Distributed DDD Framework designed for building complex event based Microservice applications using CQRS principles, Event Sourcing and Stream Processing. 
 
-It provides Event Sourced Aggregates, Stream Processed Views and Distributed Sagas. It enables you to build highly complex transactional systems that are naturally distributed, event oriented and give event based transactional semantics.
+The Muon Event Protocol provides a muon api for creating and consuming persisted event streams. These can be used to implement Event Sourcing, stream processing and other techniques.
 
-|===
-| Master Build | License
-| image:https://img.shields.io/teamcity/http/teamcity.simplicityitself.com/e/OpenSource_MuonReleases_Libraries_StackStreamSnapshot.svg[Status]
-| image:https://img.shields.io/github/license/muoncore/stack-reactive-streams.svg[]
-|===
+Muon Spring uses this API to provide a set of DDD patterns. Notably :-
 
+* Event Sourced Aggregates
+* Stream Processed Views
+* Distributed Sagas. 
+
+It enables you to build highly complex transactional systems that are naturally distributed, event oriented and give event based transactional semantics. 
+
+These integrate well with the other Muon APIs, enabling you to interact easily with other services written in other languages.
