@@ -4,10 +4,10 @@ plugins {
 }
 
 dependencies {
-  compile "io.muoncore:muon-core:7.4.0-SNAPSHOT"
-  compile "io.muoncore.protocol:stack-event:0.0.2-SNAPSHOT"
-  compile "io.muoncore.protocol:stack-rpc:0.0.1"
-  compile "io.muoncore.protocol:stack-reactive-streams:0.0.1"
+  compile "io.muoncore:muon-core:7.4.0"
+  compile "io.muoncore.protocol:stack-event:0.0.3"
+  compile "io.muoncore.protocol:stack-rpc:0.0.2"
+  compile "io.muoncore.protocol:stack-reactive-streams:0.0.3"
 
   compile 'org.jgroups:jgroups:4.0.1.Final'
 }

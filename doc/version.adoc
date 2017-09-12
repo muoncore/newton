@@ -1,1 +1,1 @@
-The current version is 0.0.10
+The current version is 0.0.11

@@ -16,8 +16,8 @@ import org.springframework.data.mongodb.config.AbstractMongoConfiguration;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-@ConditionalOnMissingBean(value = {Mongo.class})
-@ConditionalOnClass(MongoClient.class)
+//@ConditionalOnMissingBean(value = {Mongo.class})
+//@ConditionalOnClass(MongoClient.class)
 @Import(value = MongoAutoConfiguration.class)
 public class MongoConfiguration extends AbstractMongoConfiguration {
 

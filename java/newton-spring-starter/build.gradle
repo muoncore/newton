@@ -22,11 +22,11 @@ repositories {
 def springVersion = "1.5.2.RELEASE"
 
 dependencies {
-  compile project(path: ':newton-core', configuration:"shadow")
+  shadow project(path: ':newton-core', configuration:"shadow")
 //  compile project(path: ':newton-core')
   shadow("org.springframework.boot:spring-boot:$springVersion")
   shadow("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
-  shadow "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
+  compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
   shadow group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 
   compile 'org.reflections:reflections:0.9.11'
@@ -36,7 +36,7 @@ dependencies {
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
   testCompile 'cglib:cglib-nodep:3.2.2'
-  testCompile("io.muoncore:test-event-store:0.0.10-SNAPSHOT") {
+  testCompile("io.muoncore:test-event-store:0.0.11-SNAPSHOT") {
     //exclude module:"slf4j-simple"
   }
 }
