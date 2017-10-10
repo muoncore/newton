@@ -15,7 +15,9 @@ plugins {
 apply plugin:"groovy"
 
 repositories {
-  mavenLocal()
+  maven {
+    url "http://artifactory.cloud.daviddawson.me/artifactory/muon"
+  }
   jcenter()
 }
 
@@ -75,6 +77,23 @@ publishing {
     shadow(MavenPublication) { publication ->
       project.shadow.component(publication)
       pom.withXml {
+        asNode().appendNode('name', "Newton Spring Starter")
+        asNode().appendNode('description', 'Newton is a toolkit for building highly portable, polyglot, reactive microservices. Newton Spring Starter implements DDD patterns on top of the Muon Event Log API.')
+        asNode().appendNode('url', 'http://muoncore.io')
+        def license = asNode().appendNode("licenses").appendNode("license")
+        license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
+        license.appendNode("url", "http://www.gnu.org/licenses/lgpl-3.0.txt")
+        license.appendNode("distribution", "repo")
+
+        def developers = asNode().appendNode("developers")
+        def dev = developers.appendNode("developer")
+        dev.appendNode("name", "Muon Developers")
+        dev.appendNode("email", "info@muoncore.io")
+        dev.appendNode("organization", "Muon Project")
+        dev.appendNode("organizationUrl", "http://muoncore.io")
+
+        asNode().appendNode("scm").appendNode("url", "https://github.com/muoncore/newton")
+        asNode().packaging[0].value = 'jar'
         asNode().dependencies.'*'.each{
           it.scope[0].value="compile"
         }

@@ -4,10 +4,10 @@ plugins {
 }
 
 dependencies {
-  compile "io.muoncore:muon-core:7.4.0"
-  compile "io.muoncore.protocol:stack-event:0.0.3"
-  compile "io.muoncore.protocol:stack-rpc:0.0.2"
-  compile "io.muoncore.protocol:stack-reactive-streams:0.0.3"
+  compile "io.muoncore:muon-core:7.4.1"
+  compile "io.muoncore.protocol:stack-event:0.0.4"
+  compile "io.muoncore.protocol:stack-rpc:0.0.5"
+  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
 
   compile 'org.jgroups:jgroups:4.0.1.Final'
 }
@@ -22,7 +22,7 @@ publishing {
       artifact packageJavadoc
       pom.withXml {
         asNode().appendNode('name', "Newton Core")
-        asNode().appendNode('description', 'Newton is a framework for build distributed DDD applications on top of the Muon persisted event protocol')
+        asNode().appendNode('description', 'Newton is a framework for build distributed DDD applications on top of the Muon event log API')
         asNode().appendNode('url', 'http://muoncore.io')
         def license = asNode().appendNode("licenses").appendNode("license")
         license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
@@ -30,6 +30,13 @@ publishing {
         license.appendNode("distribution", "repo")
 
         asNode().appendNode("scm").appendNode("url", "https://github.com/muoncore/newton")
+
+        def developers = asNode().appendNode("developers")
+        def dev = developers.appendNode("developer")
+        dev.appendNode("name", "Muon Developers")
+        dev.appendNode("email", "info@muoncore.io")
+        dev.appendNode("organization", "Muon Project")
+        dev.appendNode("organizationUrl", "http://muoncore.io")
       }
     }
   }
