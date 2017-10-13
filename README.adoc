@@ -5,7 +5,7 @@
 |===
 
 # What is Muon
-Microservices today are optimised for building systems that can continue to change as you need them to. The achieve this, you decompose an application into its component parts, then recompose it back together again using some form of integration technology. The most common form of integration today is RPC based, whether HTTP, gRPC or one of its friends.
+Microservices today are optimised for building systems that can continue to change as you need them to. To achieve this, you decompose an application into its component parts, then recompose it back together again using some form of integration technology. The most common form of integration today is RPC based, whether HTTP, gRPC or one of its friends.
 
 RPC is a fairly simplistic model for integration, with well known flaws and foibles. The other options, messaging and event collaboration are much harder to get started with, and so are often avoided until the "v2 rewrite". Muon lets you adopt messaging and events from the start of a project, by making it easy to do the right thing with them.
 
