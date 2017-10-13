@@ -1,14 +1,6 @@
 # Change Log
 
-## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
-
-[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.12...HEAD)
-
-**Merged pull requests:**
-
-- Correction in README [\#69](https://github.com/muoncore/newton/pull/69) ([fiq](https://github.com/fiq))
-
-## [v0.0.12](https://github.com/muoncore/newton/tree/v0.0.12) (2017-10-10)
+## [v0.0.12](https://github.com/muoncore/newton/tree/v0.0.12) (2017-10-13)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.11...v0.0.12)
 
 **Fixed bugs:**
@@ -23,6 +15,7 @@
 
 **Merged pull requests:**
 
+- Correction in README [\#69](https://github.com/muoncore/newton/pull/69) ([fiq](https://github.com/fiq))
 - 0.12 series  [\#68](https://github.com/muoncore/newton/pull/68) ([daviddawson](https://github.com/daviddawson))
 
 ## [v0.0.11](https://github.com/muoncore/newton/tree/v0.0.11) (2017-09-02)
