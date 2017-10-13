@@ -38,6 +38,8 @@ public class CreateTaskCommand implements Command{
       throw new BusinessException("Todo description not unique!");
     }
 
+    repository.newInstance(() -> new Task());
+
     Task task = new Task(this.id, this.description);
     repository.save(task);
   }
