@@ -1,153 +1,131 @@
-
 buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
-    }
+  repositories {
+    jcenter()
+  }
+  dependencies {
+    classpath 'org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE'
+  }
 }
 
-plugins {
-  id 'com.github.johnrengelman.shadow' version '2.0.1'
-}
-
-apply plugin:"groovy"
+apply plugin: 'maven'
 
 repositories {
   maven {
-    url "http://artifactory.cloud.daviddawson.me/artifactory/muon"
+    url 'http://artifactory.cloud.daviddawson.me/artifactory/muon'
   }
   jcenter()
 }
 
-def springVersion = "1.5.2.RELEASE"
+def springVersion = '1.5.2.RELEASE'
 
 dependencies {
-  shadow project(path: ':newton-core', configuration:"shadow")
-  compile project(path: ':newton-core', configuration:"shadow")
-  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
+  compile project(path: ':newton-core')
 
-  compile "io.muoncore:muon-core:7.4.1"
-  compile "io.muoncore.protocol:stack-event:0.0.4"
-  compile "io.muoncore.protocol:stack-rpc:0.0.5"
-  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
+  compile 'io.muoncore:muon-core:7.4.1'
+  compile 'io.muoncore.protocol:stack-event:0.0.4'
+  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
+  compile 'io.muoncore.protocol:stack-reactive-streams:0.0.4'
 
-  shadow("org.springframework.boot:spring-boot:$springVersion")
-  shadow("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
-  compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
-  shadow group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
-
-  compile 'org.reflections:reflections:0.9.11'
-  shadow "org.javassist:javassist:3.21.0-GA"
-
-  testCompile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
-  testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
-  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
-  testCompile 'cglib:cglib-nodep:3.2.2'
-  testCompile("io.muoncore:test-event-store:0.0.14") {
-    //exclude module:"slf4j-simple"
-  }
-}
-
-
-shadowJar {
-  dependencies {
-    exclude(dependency({
-      !(it.moduleGroup in ["org.reflections", "com.google.guava"])
-    }))
-  }
-  relocate'com.google.common', 'io.muoncore.newton.liblib.google.common'
-  relocate'com.google.thirdparty', 'io.muoncore.newton.liblib.google.thirdparty'
-  relocate'org.reflections', 'io.muoncore.newton.liblib.reflections'
-  archiveName = "${baseName}-${version}.${extension}"
+  compile "org.springframework.boot:spring-boot:$springVersion"
+  compile "org.springframework.boot:spring-boot-autoconfigure:$springVersion"
+  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 }
 
 task sourceJar(type: Jar) {
   from sourceSets.main.allJava
 }
+
 task packageJavadoc(type: Jar) {
   from javadoc
   classifier = 'javadoc'
 }
 
-
-publishing {
-  publications {
-    mavenJava(MavenPublication) {
-      artifact sourceJar {
-        classifier "sources"
-      }
-      artifact packageJavadoc
-    }
-
-    shadow(MavenPublication) { publication ->
-      project.shadow.component(publication)
-      pom.withXml {
-        asNode().appendNode('name', "Newton Spring Starter")
-        asNode().appendNode('description', 'Newton is a toolkit for building highly portable, polyglot, reactive microservices. Newton Spring Starter implements DDD patterns on top of the Muon Event Log API.')
-        asNode().appendNode('url', 'http://muoncore.io')
-        def license = asNode().appendNode("licenses").appendNode("license")
-        license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
-        license.appendNode("url", "http://www.gnu.org/licenses/lgpl-3.0.txt")
-        license.appendNode("distribution", "repo")
-
-        def developers = asNode().appendNode("developers")
-        def dev = developers.appendNode("developer")
-        dev.appendNode("name", "Muon Developers")
-        dev.appendNode("email", "info@muoncore.io")
-        dev.appendNode("organization", "Muon Project")
-        dev.appendNode("organizationUrl", "http://muoncore.io")
-
-        asNode().appendNode("scm").appendNode("url", "https://github.com/muoncore/newton")
-        asNode().packaging[0].value = 'jar'
-        asNode().dependencies.'*'.each{
-          it.scope[0].value="compile"
+uploadArchives {
+  repositories {
+    mavenDeployer {
+//      repository(url: "file:///Users/rob/.m2/repository/")
+      pom.project {
+        name 'Newton Spring Starter'
+        description 'Newton is a toolkit for building highly portable, polyglot, reactive microservices. ' +
+                      'Newton Spring Starter implements DDD patterns on top of the Muon Event Log API.'
+        url 'http://muoncore.io'
+        developers {
+          developer {
+            name 'Muon Developers'
+            email 'info@muoncore.io'
+            organization 'Muon Project'
+            organizationUrl 'http://muoncore.io'
+          }
+        }
+        licenses {
+          license {
+            name 'The GNU Lesser General Public License, Version 3.0'
+            url 'http://www.gnu.org/licenses/lgpl-3.0.txt'
+            distribution 'repo'
+          }
         }
       }
     }
   }
 }
 
+//publishing {
+//  publications {
+//    mavenJava(MavenPublication) {
+//      artifact sourceJar {
+//        classifier "sources"
+//      }
+//      artifact packageJavadoc
+//    }
+//
+//    shadow(MavenPublication) { publication ->
+//      project.shadow.component(publication)
+//      pom.withXml {
+//        asNode().appendNode('name', "Newton Spring Starter")
+//        asNode().appendNode('description', 'Newton is a toolkit for building highly portable, polyglot, reactive
+// microservices. Newton Spring Starter implements DDD patterns on top of the Muon Event Log API.')
+//        asNode().appendNode('url', 'http://muoncore.io')
+//        def license = asNode().appendNode("licenses").appendNode("license")
+//        license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
+//        license.appendNode("url", "http://www.gnu.org/licenses/lgpl-3.0.txt")
+//        license.appendNode("distribution", "repo")
+//
+//        def developers = asNode().appendNode("developers")
+//        def dev = developers.appendNode("developer")
+//        dev.appendNode("name", "Muon Developers")
+//        dev.appendNode("email", "info@muoncore.io")
+//        dev.appendNode("organization", "Muon Project")
+//        dev.appendNode("organizationUrl", "http://muoncore.io")
+//
+//        asNode().appendNode("scm").appendNode("url", "https://github.com/muoncore/newton")
+//        asNode().packaging[0].value = 'jar'
+//        asNode().dependencies.'*'.each{
+//          it.scope[0].value="compile"
+//        }
+//      }
+//    }
+//  }
+//}
+
 javadoc {
   source = sourceSets.main.allJava
   classpath = configurations.compileClasspath
 
-  options
-    {
-      setMemberLevel JavadocMemberLevel.PUBLIC
-      setAuthor true
+  options {
+    setMemberLevel JavadocMemberLevel.PUBLIC
+    setAuthor true
 
-      links "https://docs.oracle.com/javase/8/docs/api/"
-    }
-}
-
-install {
-  repositories.mavenInstaller {
-    pom.withXml {
-      asNode().dependencies.'*'.each{
-        it.scope[0].value="compile"
-      }
-    }
+    links "https://docs.oracle.com/javase/8/docs/api/"
   }
 }
 
-task copyPomLocal(type: Copy) {
-  from 'build/publications/shadow'
-  into 'build/poms'
-}
-
-task copyPom(type: Copy) {
-  from 'build/publications/shadow'
-  into 'build/publications/mavenJava'
-}
-
-tasks.jar.enabled = false
-project.tasks.artifactoryPublish.dependsOn project.tasks.shadowJar
-project.tasks.artifactoryPublish.dependsOn project.tasks.shadowJar
-project.tasks.artifactoryPublish.dependsOn "publishShadowPublicationToMavenLocal"
-project.tasks.artifactoryPublish.dependsOn copyPom
-project.tasks.install.dependsOn copyPomLocal
-copyPomLocal.dependsOn "generatePomFileForShadowPublication"
-copyPom.dependsOn "generatePomFileForMavenJavaPublication"
-
+//install {
+//  repositories.mavenInstaller {
+//    pom.withXml {
+//      asNode().dependencies.'*'.each {
+//        it.scope[0].value = "compile"
+//      }
+//    }
+//  }
+//}
