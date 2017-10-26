@@ -1,5 +1,13 @@
 # Change Log
 
+## [Unreleased](https://github.com/muoncore/newton/tree/HEAD)
+
+[Full Changelog](https://github.com/muoncore/newton/compare/v0.0.13...HEAD)
+
+**Closed issues:**
+
+- test-event-store:0.0.11-SNAPSHOT not available in Artifactory for netwon-spring-starter [\#70](https://github.com/muoncore/newton/issues/70)
+
 ## [v0.0.13](https://github.com/muoncore/newton/tree/v0.0.13) (2017-10-13)
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.12...v0.0.13)
 

@@ -25,7 +25,14 @@ def springVersion = "1.5.2.RELEASE"
 
 dependencies {
   shadow project(path: ':newton-core', configuration:"shadow")
-//  compile project(path: ':newton-core')
+  compile project(path: ':newton-core', configuration:"shadow")
+  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
+
+  compile "io.muoncore:muon-core:7.4.1"
+  compile "io.muoncore.protocol:stack-event:0.0.4"
+  compile "io.muoncore.protocol:stack-rpc:0.0.5"
+  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
+
   shadow("org.springframework.boot:spring-boot:$springVersion")
   shadow("org.springframework.boot:spring-boot-autoconfigure:$springVersion")
   compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
@@ -38,7 +45,7 @@ dependencies {
   testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
   testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
   testCompile 'cglib:cglib-nodep:3.2.2'
-  testCompile("io.muoncore:test-event-store:0.0.11-SNAPSHOT") {
+  testCompile("io.muoncore:test-event-store:0.0.14") {
     //exclude module:"slf4j-simple"
   }
 }
