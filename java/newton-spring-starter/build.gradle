@@ -23,13 +23,13 @@ dependencies {
 
   compile 'io.muoncore:muon-core:7.4.1'
   compile 'io.muoncore.protocol:stack-event:0.0.4'
-  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
   compile 'io.muoncore.protocol:stack-reactive-streams:0.0.4'
+  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
 
+  compile 'commons-beanutils:commons-beanutils:1.9.3'
   compile "org.springframework.boot:spring-boot:$springVersion"
   compile "org.springframework.boot:spring-boot-autoconfigure:$springVersion"
   compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
-  compile group: 'commons-beanutils', name: 'commons-beanutils', version: '1.9.3'
 }
 
 task sourceJar(type: Jar) {
@@ -119,13 +119,3 @@ javadoc {
     links "https://docs.oracle.com/javase/8/docs/api/"
   }
 }
-
-//install {
-//  repositories.mavenInstaller {
-//    pom.withXml {
-//      asNode().dependencies.'*'.each {
-//        it.scope[0].value = "compile"
-//      }
-//    }
-//  }
-//}

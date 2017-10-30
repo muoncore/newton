@@ -6,38 +6,37 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath("org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE")
+    classpath('org.springframework.boot:spring-boot-gradle-plugin:1.5.2.RELEASE')
   }
 }
 
 apply plugin: 'java'
-apply plugin: 'eclipse'
 apply plugin: 'org.springframework.boot'
 
 sourceCompatibility = 1.8
 
 repositories {
   mavenCentral()
-  maven { url "http://artifactory.cloud.daviddawson.me/artifactory/muon" }
+  maven { url 'http://artifactory.cloud.daviddawson.me/artifactory/muon' }
 }
 
 test.enabled = false
 
 dependencies {
-  compile project(path:":newton-spring-starter")
-  compile("org.springframework.boot:spring-boot")
-  compile("org.springframework.boot:spring-boot-autoconfigure")
-  compile "org.springframework.data:spring-data-mongodb:1.10.0.RELEASE"
-  compile('org.springframework.boot:spring-boot-starter-web')
+  compile project(path: ':newton-spring-starter')
 
-  testCompile('org.spockframework:spock-core:1.1-groovy-2.4')
-  testCompile('org.spockframework:spock-spring:1.1-groovy-2.4')
-  testCompile('org.springframework.boot:spring-boot-starter-test')
-  testCompile('com.github.javafaker:javafaker:0.13')
-  testCompile('org.codehaus.groovy.modules.http-builder:http-builder:0.7.1')
+  compile 'org.springframework.boot:spring-boot'
+  compile 'org.springframework.boot:spring-boot-autoconfigure'
+  compile 'org.springframework.boot:spring-boot-starter-web'
+  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+
   testCompile 'io.muoncore:test-event-store:0.0.14'
+  testCompile 'com.github.javafaker:javafaker:0.13'
+  testCompile 'org.codehaus.groovy.modules.http-builder:http-builder:0.7.1'
+  testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
+  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4'
+  testCompile 'org.springframework.boot:spring-boot-starter-test'
 
-  runtime "io.muoncore.transport:muon-amqp:0.0.15"
-  runtime("org.reactivestreams:reactive-streams:1.0.0.final")
-
+  runtime 'io.muoncore.transport:muon-amqp:0.0.15'
+  runtime 'org.reactivestreams:reactive-streams:1.0.0.final'
 }

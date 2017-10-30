@@ -1,5 +1,5 @@
-apply plugin:"groovy"
+apply plugin: 'groovy'
 
 dependencies {
-  compile project(":newton-core")
+  compile project(':newton-core')
 }
