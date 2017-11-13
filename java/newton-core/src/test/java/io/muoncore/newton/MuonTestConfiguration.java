@@ -12,7 +12,6 @@ import io.muoncore.memory.transport.bus.EventBus;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
-import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.query.InMemEventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;
@@ -22,86 +21,85 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 import java.util.Collections;
 
-//@Profile("test")
 @Configuration
-@EnableNewton
-@Import(MongoConfiguration.class)
 public class MuonTestConfiguration {
 
-	@Autowired
-	//Don't remove as it's required for tests - Spring lazy-loads beans & thus causes tests to fail as event store cannot be found!!!
-	private TestEventStore testEventStore;
+  @Autowired
+  //Don't remove as it's required for tests - Spring lazy-loads beans & thus causes tests to fail as event store cannot be found!!!
+  private TestEventStore testEventStore;
 
-	@Bean
-	public InMemDiscovery discovery() {
-		return new InMemDiscovery();
-	}
+  @Bean
+  public InMemDiscovery discovery() {
+    return new InMemDiscovery();
+  }
 
-	@Bean
-	public EventBus bus() {
-		return new EventBus();
-	}
+  @Bean
+  public EventBus bus() {
+    return new EventBus();
+  }
 
-	@Bean
-	public AutoConfiguration config() {
+  @Bean
+  public AutoConfiguration config() {
     return MuonConfigBuilder.withServiceIdentifier("test-service").build();
   }
 
   @Bean
-	public InMemTransport transport(AutoConfiguration config) {
+  public InMemTransport transport(AutoConfiguration config) {
     return new InMemTransport(config, bus());
   }
 
   @Bean
   public EventStreamIndexStore indexStore() {
-	  return new InMemEventStreamIndexStore();
+    return new InMemEventStreamIndexStore();
   }
 
-	@Bean
-	public Muon muon(AutoConfiguration config, InMemTransport transport) {
+  @Bean
+  public Muon muon(AutoConfiguration config, InMemTransport transport) {
+    return new MultiTransportMuon(config, discovery(),
+                                  Collections.singletonList(
+                                    transport
+                                  ),
+                                  new JsonOnlyCodecs());
+  }
 
-		return new MultiTransportMuon(config, discovery(),
-			Collections.singletonList(
-				transport
-			),
-			new JsonOnlyCodecs());
-	}
+  @Bean
+  public TestEventStore testEventStore() throws InterruptedException {
+    AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier("photon-mini")
+                                                .withTags("eventstore")
+                                                .build();
+    //Another separate instance of muon is fired up to ensure....
+    Muon muon = new MultiTransportMuon(config,
+                                       discovery(),
+                                       Collections.singletonList(new InMemTransport(config, bus())),
+                                       new JsonOnlyCodecs()
+    );
 
-	@Bean
-	public TestEventStore testEventStore() throws InterruptedException {
-		AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier("photon-mini")
-			.withTags("eventstore")
-			.build();
-		//Another separate instance of muon is fired up to ensure....
-		Muon muon = new MultiTransportMuon(config, discovery(),
-			Collections.singletonList(new InMemTransport(config, bus())),
-			new JsonOnlyCodecs());
+    return new TestEventStore(muon);
+  }
 
-		return new TestEventStore(muon);
-	}
-	@Bean
-	public EventClient eventClient(Muon muon) {
-		return new DefaultEventClient(muon);
-	}
+  @Bean
+  public EventClient eventClient(Muon muon) {
+    return new DefaultEventClient(muon);
+  }
 
-	@Bean
-	public AggregateEventClient aggregateEventClient(EventClient eventClient) {
-		return new AggregateEventClient(eventClient);
-	}
+  @Bean
+  public AggregateEventClient aggregateEventClient(EventClient eventClient) {
+    return new AggregateEventClient(eventClient);
+  }
 
-	@Bean
-	public LockService lockService() throws Exception {
-		return (name, exec) -> exec.execute((LockService.TaskLockControl) () -> {});
-	}
+  @Bean
+  public LockService lockService() throws Exception {
+    return (name, exec) -> exec.execute((LockService.TaskLockControl) () -> {
+    });
+  }
 
-	@Bean
-	public SagaLoader sagaLoader() {
-		return interest -> (Class) MuonTestConfiguration.class.getClassLoader().loadClass(interest.getSagaClassName());
-	}
+  @Bean
+  public SagaLoader sagaLoader() {
+    return interest -> (Class) MuonTestConfiguration.class.getClassLoader().loadClass(interest.getSagaClassName());
+  }
 
   @Bean
   @ConditionalOnMissingBean(EventStreamProcessor.class)

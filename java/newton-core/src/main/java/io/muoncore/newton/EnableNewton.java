@@ -3,8 +3,8 @@ package io.muoncore.newton;
 
 import io.muoncore.newton.command.CommandConfiguration;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceConfiguration;
-import io.muoncore.newton.query.QueryConfiguration;
-import io.muoncore.newton.saga.SagaConfiguration;
+//import io.muoncore.newton.query.QueryConfiguration;
+//import io.muoncore.newton.saga.SagaConfiguration;
 import io.muoncore.newton.utils.muon.EnableNewtonRegistrar;
 import org.springframework.context.annotation.Import;
 
@@ -24,8 +24,8 @@ import java.lang.annotation.*;
   EnableNewtonRegistrar.class,
   MuonEventSourceConfiguration.class,
   CommandConfiguration.class,
-  QueryConfiguration.class,
-  SagaConfiguration.class
+//  QueryConfiguration.class,
+//  SagaConfiguration.class
 })
 public @interface EnableNewton {
   String[] value() default {};

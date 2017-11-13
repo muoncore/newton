@@ -1,4 +1,4 @@
-package io.muoncore.newton.saga.mongo;
+package io.muoncore.newton.mongodb;
 
 import com.mongodb.BulkWriteResult;
 import io.muoncore.newton.NewtonEvent;

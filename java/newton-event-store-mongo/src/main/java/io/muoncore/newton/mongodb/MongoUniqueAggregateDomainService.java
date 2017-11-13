@@ -1,6 +1,7 @@
-package io.muoncore.newton;
+package io.muoncore.newton.mongodb;
 
 
+import io.muoncore.newton.*;
 import lombok.Data;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +19,13 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Slf4j
-public abstract class MongoDbUniqueAggregateDomainService<V> implements UniqueAggregateDomainService<V> {
+public abstract class MongoUniqueAggregateDomainService<V> implements UniqueAggregateDomainService<V> {
 
 	private StreamSubscriptionManager streamSubscriptionManager;
 	private MongoTemplate mongoTemplate;
 	private DynamicInvokeEventAdaptor eventAdaptor = new DynamicInvokeEventAdaptor(this, EventHandler.class);
 
-	public MongoDbUniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager, MongoTemplate mongoTemplate) throws IOException {
+	public MongoUniqueAggregateDomainService(StreamSubscriptionManager streamSubscriptionManager, MongoTemplate mongoTemplate) throws IOException {
 		this.streamSubscriptionManager = streamSubscriptionManager;
     this.mongoTemplate = mongoTemplate;
   }

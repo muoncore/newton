@@ -20,16 +20,17 @@ def springVersion = '1.5.2.RELEASE'
 
 dependencies {
   compile project(path: ':newton-core')
+  compile project(path: ':newton-event-store-mongo')
 
-  compile 'io.muoncore:muon-core:7.4.1'
-  compile 'io.muoncore.protocol:stack-event:0.0.4'
-  compile 'io.muoncore.protocol:stack-reactive-streams:0.0.4'
-  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
+//  compile 'io.muoncore:muon-core:7.4.1'
+//  compile 'io.muoncore.protocol:stack-event:0.0.4'
+//  compile 'io.muoncore.protocol:stack-reactive-streams:0.0.4'
+//  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
 
   compile 'commons-beanutils:commons-beanutils:1.9.3'
   compile "org.springframework.boot:spring-boot:$springVersion"
   compile "org.springframework.boot:spring-boot-autoconfigure:$springVersion"
-  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+//  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
 }
 
 task sourceJar(type: Jar) {

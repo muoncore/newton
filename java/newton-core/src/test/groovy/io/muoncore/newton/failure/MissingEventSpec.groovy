@@ -1,8 +1,7 @@
 package io.muoncore.newton.failure
 
-import com.google.gson.Gson
 import io.muoncore.newton.EventHandler
-import io.muoncore.newton.MuonTestConfiguration
+import io.muoncore.newton.InMemoryTestConfiguration
 import io.muoncore.newton.NewtonEvent
 import io.muoncore.newton.StreamSubscriptionManager
 import io.muoncore.newton.domainservice.EventDrivenDomainService
@@ -19,7 +18,7 @@ import spock.lang.Specification
 import spock.util.concurrent.PollingConditions
 
 @ActiveProfiles("test")
-@SpringBootTest(classes = [MuonTestConfiguration, FailConfig])
+@SpringBootTest(classes = [InMemoryTestConfiguration, FailConfig])
 class MissingEventSpec extends Specification {
 
   @Autowired

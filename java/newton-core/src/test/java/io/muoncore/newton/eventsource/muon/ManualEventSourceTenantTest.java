@@ -2,8 +2,7 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.newton.AggregateEventClient;
 import io.muoncore.newton.eventsource.EventSourceRepository;
-import io.muoncore.newton.mongo.MongoConfiguration;
-import io.muoncore.newton.query.QueryConfiguration;
+import io.muoncore.newton.query.InMemoryQueryConfiguration;
 import io.muoncore.protocol.event.client.EventClient;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -27,7 +26,9 @@ import static org.junit.Assert.assertNotNull;
 @ActiveProfiles({"default"})
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = {
-	ManualEventSourceTenantTest.TestConfiguration.class, MuonEventSourceConfiguration.class, QueryConfiguration.class, MongoConfiguration.class
+	ManualEventSourceTenantTest.TestConfiguration.class,
+  MuonEventSourceConfiguration.class,
+  InMemoryQueryConfiguration.class
 })
 @Ignore
 public class ManualEventSourceTenantTest {

@@ -1,4 +1,4 @@
-package io.muoncore.newton.saga;
+package io.muoncore.newton.mongodb;
 
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.LockService;
@@ -6,7 +6,8 @@ import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.query.EventStreamIndexStore;
-import io.muoncore.newton.saga.mongo.MongoSagaRepository;
+import io.muoncore.newton.mongodb.MongoSagaRepository;
+import io.muoncore.newton.saga.*;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,7 +15,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.data.mongodb.core.MongoTemplate;
 
 @Configuration
-public class SagaConfiguration {
+public class MongoSagaConfiguration {
 
   @Bean
   public SagaBus sagaBus(SagaFactory sagaFactory) {

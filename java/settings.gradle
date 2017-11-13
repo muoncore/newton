@@ -1,3 +1,8 @@
-rootProject.name="newton"
+rootProject.name= 'newton'
 
-include 'newton-core', 'newton-spring-starter', 'newton-groovy', 'newton-sample'
+include 'newton-core'
+include 'newton-event-store-mongo'
+include 'newton-spring-starter'
+include 'newton-groovy'
+include 'newton-sample'
+

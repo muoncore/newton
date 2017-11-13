@@ -3,13 +3,12 @@ package io.muoncore.newton.eventsource.muon;
 import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.memory.transport.InMemTransport;
 import io.muoncore.newton.AggregateEventClient;
-import io.muoncore.newton.MuonTestConfiguration;
+import io.muoncore.newton.EventStoreException;
+import io.muoncore.newton.InMemoryTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.eventsource.AggregateNotFoundException;
-import io.muoncore.newton.EventStoreException;
 import io.muoncore.newton.eventsource.GenericAggregateDeletedEvent;
 import io.muoncore.newton.eventsource.OptimisticLockException;
-import io.muoncore.newton.mongo.MongoConfiguration;
 import io.muoncore.protocol.event.Event;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,19 +24,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static java.lang.Thread.sleep;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 @RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {MuonTestConfiguration.class, MongoConfiguration.class})
+@ContextConfiguration(classes = {InMemoryTestConfiguration.class})
 public class MuonEventSourceRepositoryTest {
 
-	@Autowired
-	private TestEventStore eventStore;
+  @Autowired
+  private TestEventStore eventStore;
 
-	@Autowired
-	private AggregateEventClient client;
+  @Autowired
+  private AggregateEventClient client;
 
 //	@Autowired
 //	private TestEventSourceRepo repository;
@@ -48,20 +45,20 @@ public class MuonEventSourceRepositoryTest {
   @Autowired
   private InMemTransport transport;
 
-	@Test
-	public void load() throws Exception {
+  @Test
+  public void load() throws Exception {
 
     String id = "simple-id";
-		client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
-			new TestAggregateCreated(id)
-		), null);
+    client.publishDomainEvents(id.toString(), TestAggregate.class, Collections.singletonList(
+      new TestAggregateCreated(id)
+    ), null);
 
 
-		TestAggregate aggregate = repository.load(id);
-		assertNotNull(aggregate);
+    TestAggregate aggregate = repository.load(id);
+    assertNotNull(aggregate);
 
-		assertEquals(id, aggregate.getId());
-	}
+    assertEquals(id, aggregate.getId());
+  }
 
   @Test
   public void loadAsync() throws Exception {
@@ -79,16 +76,16 @@ public class MuonEventSourceRepositoryTest {
 
 
   @Test
-	public void save() throws Exception {
+  public void save() throws Exception {
     String id = UUID.randomUUID().toString();
-		TestAggregate customer = new TestAggregate(id);
-		repository.save(customer);
+    TestAggregate customer = new TestAggregate(id);
+    repository.save(customer);
 
-		List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class).get();
+    List<Event> events = client.loadAggregateRoot(id.toString(), TestAggregate.class).get();
 
-		assertEquals(1, events.size());
-		assertEquals(TestAggregateCreated.class.getSimpleName(), events.get(0).getEventType());
-	}
+    assertEquals(1, events.size());
+    assertEquals(TestAggregateCreated.class.getSimpleName(), events.get(0).getEventType());
+  }
 
   @Test
   public void deleteCreatesDeletedEvent() throws Exception {
@@ -123,10 +120,10 @@ public class MuonEventSourceRepositoryTest {
     repository.load(UUID.randomUUID().toString());
   }
 
-	@Test(expected = AggregateNotFoundException.class)
-	public void throwsExceptionOnNonExistingAggregate() {
-		repository.load("no-such-id-as-this");
-	}
+  @Test(expected = AggregateNotFoundException.class)
+  public void throwsExceptionOnNonExistingAggregate() {
+    repository.load("no-such-id-as-this");
+  }
 
   @Test
   public void throwsExceptionOnNonExistingAggregateAsync() throws ExecutionException, InterruptedException {
@@ -140,32 +137,32 @@ public class MuonEventSourceRepositoryTest {
     assertTrue(bool.get());
   }
 
-	@Test(expected = AggregateNotFoundException.class)
-	public void withVersionThrowsExceptionOnNonExistingAggregate() {
-		repository.load("no-such-id-as-this", 5L);
-	}
+  @Test(expected = AggregateNotFoundException.class)
+  public void withVersionThrowsExceptionOnNonExistingAggregate() {
+    repository.load("no-such-id-as-this", 5L);
+  }
 
-	@Test
-	public void canLoadWithVersion() {
+  @Test
+  public void canLoadWithVersion() {
     String id = "awesome-things";
-		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
-			new TestAggregateCreated(),
-			new TestAggregateCreated()
-		), null);
+    client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
+      new TestAggregateCreated(),
+      new TestAggregateCreated()
+    ), null);
 
-		TestAggregate aggregate = repository.load(id, 2L);
-		assertEquals(2, aggregate.getVersion());
-	}
+    TestAggregate aggregate = repository.load(id, 2L);
+    assertEquals(2, aggregate.getVersion());
+  }
 
-	@Test(expected = OptimisticLockException.class)
-	public void throwsOptimisticLockExceptionOnBadVersion() {
+  @Test(expected = OptimisticLockException.class)
+  public void throwsOptimisticLockExceptionOnBadVersion() {
     String id = "awesome-id";
-		client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
-			new TestAggregateCreated()
-		), null);
+    client.publishDomainEvents(id.toString(), TestAggregate.class, Arrays.asList(
+      new TestAggregateCreated()
+    ), null);
 
-		repository.load(id, 2L);
-	}
+    repository.load(id, 2L);
+  }
 
   @Test()
   public void canStreamAggregateEvents() throws InterruptedException {

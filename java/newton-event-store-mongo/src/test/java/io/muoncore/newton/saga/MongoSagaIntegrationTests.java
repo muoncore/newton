@@ -1,10 +1,14 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.*;
+import io.muoncore.newton.EnableNewton;
+import io.muoncore.newton.EventHandler;
+import io.muoncore.newton.MuonTestConfiguration;
+import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.command.*;
 import io.muoncore.newton.eventsource.EventSourceRepository;
-import io.muoncore.newton.eventsource.muon.TestAggregate;
-import io.muoncore.newton.query.InMemoryQueryConfiguration;
+import io.muoncore.newton.mongodb.MongoSagaConfiguration;
+import io.muoncore.newton.mongodb.config.MongoConfiguration;
+import io.muoncore.newton.mongodb.config.MongoQueryConfiguration;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.client.EventClient;
 import io.muoncore.protocol.event.client.EventResult;
@@ -36,34 +40,28 @@ import static org.junit.Assert.*;
 @ActiveProfiles({"test", "log-events"})
 @ContextConfiguration(
   classes = {
-    InMemoryQueryConfiguration.class,
+    MongoQueryConfiguration.class,
     CommandConfiguration.class,
-    TestSagaConfiguration.class,
-    InMemoryTestConfiguration.class,
+    MuonTestConfiguration.class,
+    MongoSagaConfiguration.class,
+    MongoConfiguration.class
   })
 @RunWith(SpringRunner.class)
 @Configuration
 @SpringBootTest
-@EnableNewton("io.muoncore.newton.saga")
+@EnableNewton("io.muoncore.newton.mongo")
 @ComponentScan
-public class SagaIntegrationTests {
-
-  @Autowired
-  private SagaFactory sagaFactory;
-  @Autowired
-  private SagaBus sagaBus;
-  @Autowired
-  private SagaRepository sagaRepository;
-  @Autowired
-  private CommandBus commandBus;
-  @Autowired
-  private EventClient eventClient;
-
-  @Autowired
-  private EventSourceRepository<SagaTestAggregate> testAggregateRepo;
+public class MongoSagaIntegrationTests {
+  @Autowired private SagaFactory sagaFactory;
+  @Autowired private SagaBus sagaBus;
+  @Autowired private SagaRepository sagaRepository;
+  @Autowired private CommandBus commandBus;
+  @Autowired private EventClient eventClient;
+  @Autowired private EventSourceRepository<MongoSagaTestAggregate> testAggregateRepo;
 
   @Test
   public void sagaCommandFailureCallsFailedEventHandler() throws InterruptedException {
+
     FailAThingEvent failAThingEvent = new FailAThingEvent();
 
     eventClient.event(ClientEvent.ofType(FailAThingEvent.class.getSimpleName())
@@ -90,24 +88,23 @@ public class SagaIntegrationTests {
 
   @Test
   public void sagaCanBeStartedViaStartEvent() throws InterruptedException {
-    // Save a domain class, triggering a save event
-    NewtonEvent<String> createEvent = testAggregateRepo.save(new SagaTestAggregate()).get(0);
+
+    //save a domain class, triggering a save event
+    NewtonEvent<String> createEvent = testAggregateRepo.save(new MongoSagaTestAggregate()).get(0);
 
     Thread.sleep(1000);
-
-    // Lookup the saga via the ID
+    //lookup the saga via the ID
     List<SagaCreated> sagas = sagaRepository.getSagasCreatedByEventId(createEvent.getId());
     SagaMonitor<ComplexSaga> monitor = sagaFactory.monitor(sagas.get(0).getSagaId(), ComplexSaga.class);
 
     ComplexSaga saga = monitor.waitForCompletion(TimeUnit.SECONDS, 1);
 
-    System.out.println("SAGAS = " + sagas);
+    System.out.println("SAGAS =" + sagas);
     assertTrue(saga.isComplete());
   }
 
   @Test
   public void sagaCanBeStartedViaIntent() throws InterruptedException {
-
     TestSaga testSaga = sagaBus.dispatch(
       new SagaIntent<>(TestSaga.class, new OrderRequestedEvent())).waitForCompletion(TimeUnit.MINUTES, 1);
 
@@ -138,9 +135,9 @@ public class SagaIntegrationTests {
 
   @Test
   public void multiStepSagaWorkflow() throws InterruptedException {
+
     SagaMonitor<ComplexSaga> sagaMonitor = sagaBus.dispatch(
-      new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent())
-    );
+      new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
     ComplexSaga saga = sagaMonitor.waitForCompletion(TimeUnit.MINUTES, 1);
 
@@ -152,7 +149,7 @@ public class SagaIntegrationTests {
 
   @Scope("prototype")
   @Component
-  @SagaStreamConfig(streams = {"TestAggregate"}, aggregateRoots = {SagaTestAggregate.class})
+  @SagaStreamConfig(streams = {"TestAggregate"}, aggregateRoots = {MongoSagaTestAggregate.class})
   public static class ComplexSaga extends StatefulSaga {
 
     private String orderId;
@@ -167,7 +164,7 @@ public class SagaIntegrationTests {
 
       System.out.println("Got order id  " + orderId);
 
-      notifyOn(PaymentReceivedEvent.class, "orderId", orderId.toString());
+      notifyOn(PaymentRecievedEvent.class, "orderId", orderId.toString());
       notifyOn(OrderShippedEvent.class, "orderId", orderId.toString());
 
       raiseCommand(CommandIntent.builder(TakePayment.class.getName())
@@ -178,7 +175,7 @@ public class SagaIntegrationTests {
     }
 
     @EventHandler
-    public void on(PaymentReceivedEvent payment) {
+    public void on(PaymentRecievedEvent payment) {
       System.out.println("App name is " + context.getApplicationName());
       System.out.println("Payment received, ordering shipping... ");
       //order a shipping
@@ -202,14 +199,15 @@ public class SagaIntegrationTests {
 
   @Getter
   @ToString
-  public static class PaymentReceivedEvent implements NewtonEvent {
+  public static class PaymentRecievedEvent implements NewtonEvent {
     private String orderId;
     private final String id = UUID.randomUUID().toString();
 
-    public PaymentReceivedEvent(String orderId) {
+    public PaymentRecievedEvent(String orderId) {
       this.orderId = orderId;
     }
   }
+
 
   @Getter
   @AllArgsConstructor
@@ -222,6 +220,7 @@ public class SagaIntegrationTests {
   @Scope("prototype")
   @Component
   public static class TakePayment implements Command {
+
     @Autowired
     private EventClient eventClient;
     private String orderId;
@@ -236,9 +235,9 @@ public class SagaIntegrationTests {
       //fake interaction with an aggregate and dump out domain events directly.
       EventResult event = eventClient.event(
         ClientEvent
-          .ofType(PaymentReceivedEvent.class.getSimpleName())
+          .ofType(PaymentRecievedEvent.class.getSimpleName())
           .stream(TestAggregate.class.getSimpleName())
-          .payload(new PaymentReceivedEvent(orderId))
+          .payload(new PaymentRecievedEvent(orderId))
           .build()
       );
 
@@ -250,6 +249,7 @@ public class SagaIntegrationTests {
   @Component
   @Slf4j
   public static class ShipOrder implements Command {
+
     @Autowired
     private EventClient eventClient;
     private String orderId;
@@ -277,6 +277,7 @@ public class SagaIntegrationTests {
   @Component
   @SagaStreamConfig(streams = {"faked"}, aggregateRoots = {})
   public static class FailCommandSaga extends StatefulSaga {
+
     @Getter @Setter
     private String dataName = "hello!";
     @Getter @Setter
@@ -296,6 +297,7 @@ public class SagaIntegrationTests {
       end();
     }
   }
+
 
   @Getter
   @ToString

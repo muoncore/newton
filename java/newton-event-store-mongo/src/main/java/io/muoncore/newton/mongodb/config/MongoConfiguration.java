@@ -1,9 +1,8 @@
-package io.muoncore.newton.mongo;
+package io.muoncore.newton.mongodb.config;
 
 import com.mongodb.Mongo;
-import com.mongodb.MongoClient;
 import io.muoncore.newton.query.EventStreamIndexStore;
-import io.muoncore.newton.query.mongo.MongoEventStreamIndexStore;
+import io.muoncore.newton.mongodb.MongoEventStreamIndexStore;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

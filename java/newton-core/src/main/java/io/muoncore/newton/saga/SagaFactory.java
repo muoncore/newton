@@ -67,7 +67,6 @@ public class SagaFactory implements ApplicationContextAware {
   }
 
   public <T extends Saga> SagaMonitor<T> monitor(String sagaId, Class<T> type) {
-
     Optional<T> saga = sagaRepository.load(sagaId, type);
     if (!saga.isPresent()) {
       throw new IllegalStateException("Saga with ID " + sagaId + " does not exist");

@@ -1,4 +1,4 @@
-package io.muoncore.newton.query.mongo;
+package io.muoncore.newton.mongodb;
 
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.query.EventStreamIndex;
@@ -6,7 +6,6 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.util.Optional;
 
-//todo: get rid of Mongo store & replace with in-memory or prompt user to provide 1
 public class MongoEventStreamIndexStore implements EventStreamIndexStore {
 
 	private MongoTemplate mongoTemplate;
@@ -14,7 +13,6 @@ public class MongoEventStreamIndexStore implements EventStreamIndexStore {
 	public MongoEventStreamIndexStore(MongoTemplate mongoTemplate) {
 		this.mongoTemplate = mongoTemplate;
 	}
-
 
 	@Override
 	public Optional<EventStreamIndex> findOneById(String id) {

@@ -8,24 +8,38 @@ import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
 public class SagaInterestMatcherTest {
-    @Test
-    public void matchesSuccess() throws Exception {
-        SagaInterestMatcher matcher = new SagaInterestMatcher();
+  @Test
+  public void matchesSuccess() throws Exception {
+    SagaInterestMatcher matcher = new SagaInterestMatcher();
 
-        assertTrue(matcher.matches(new TestEvent("hello world"), new SagaInterest(
-                TestSaga.class.getName(), TestEvent.class.getCanonicalName(), "saga-id", "some-id", "myId", "hello world")));
+    // Given a test event and an interest registered in the Saga
+    final TestEvent testEvent = new TestEvent("hello world");
 
-    }
+    final SagaInterest sagaInterest = new SagaInterest(
+      TestSaga.class.getName(),
+      TestEvent.class.getCanonicalName(),
+      "saga-id",
+      "some-id",
+      "myId",
+      "hello world"
+    );
 
-    @Test
-    public void matchesFailure() throws Exception {
+    // When match is attempted
+    final boolean result = matcher.matches(testEvent, sagaInterest);
 
-    }
+    // The the match is found
+    assertTrue(result);
+  }
 
-    @Data
-    @AllArgsConstructor
-    static class TestEvent implements NewtonEvent {
-        private String myId;
-        private final String id = "hello-world";
-    }
+  @Test
+  public void matchesFailure() throws Exception {
+
+  }
+
+  @Data
+  @AllArgsConstructor
+  static class TestEvent implements NewtonEvent {
+    private String myId;
+    private final String id = "hello-world";
+  }
 }

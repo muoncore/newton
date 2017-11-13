@@ -79,7 +79,4 @@ public class MuonEventSourceConfiguration {
     return interest -> (Class) Class.forName(interest.getSagaClassName());
   }
 
-
 }
-
-
