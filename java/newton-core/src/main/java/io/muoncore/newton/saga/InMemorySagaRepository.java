@@ -5,19 +5,23 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.Collections.emptySet;
 
 @Slf4j
 public class InMemorySagaRepository implements SagaRepository {
 
   private Map<String, Saga> sagaStore = new HashMap<>();
   private Map<Object, List<SagaCreated>> sagaCreatedStore = new HashMap<>();
-  private Map<String, List<SagaInterest>> sagaInterestStore = new HashMap<>();
+  private Map<String, Set<SagaInterest>> sagaInterestStore = new HashMap<>();
 
   @Override
   public <T extends Saga> Optional<T> load(String sagaIdentifier, Class<T> type) {
     Saga saga = sagaStore.get(sagaIdentifier);
-    Optional<T> o = Optional.ofNullable((T) saga); // Dodgy, but maybe good enough for the default impl.
-    return o;
+    //noinspection unchecked
+    return Optional.ofNullable((T) saga);
   }
 
   @Override
@@ -51,16 +55,28 @@ public class InMemorySagaRepository implements SagaRepository {
     sagaCreatedStore.put(eventId, sagasCreated);
   }
 
-  private void clearInterests(Saga saga) {
-    // TODO RP: I've just realised this is wrong... 13/11/17 19:31
-    List<SagaInterest> interests = sagaInterestStore.remove(saga.getId());
-    log.debug("Saga is complete, removed {} interests"); //, interests.size());
+    private void clearInterests(Saga saga) {
+    List<SagaInterest> interests = saga.getNewSagaInterests();
+
+    for (SagaInterest interest : interests) {
+      final String className = interest.getClassName();
+      Predicate<SagaInterest> hasNotSameSagaId = i -> !i.getSagaId().equals(saga.getId());
+
+      Set<SagaInterest> storedInterests = sagaInterestStore.get(className);
+      sagaInterestStore.put(className,
+                            storedInterests.stream()
+                                           .filter(hasNotSameSagaId)
+                                           .collect(Collectors.toSet())
+      );
+    }
+
+    log.debug("Saga is complete, removed interests where necessary.");
   }
 
   private void registerEventExpectation(SagaInterest sagaInterest) {
     log.debug("Persisting Saga interest " + sagaInterest);
-    List<SagaInterest> newInterests = new ArrayList<>();
-    List<SagaInterest> currentInterests = sagaInterestStore.get(sagaInterest.getClassName());
+    Set<SagaInterest> newInterests = new HashSet<>();
+    Set<SagaInterest> currentInterests = sagaInterestStore.get(sagaInterest.getClassName());
 
     if (currentInterests != null) {
       newInterests.addAll(currentInterests);
@@ -73,7 +89,7 @@ public class InMemorySagaRepository implements SagaRepository {
   @Override
   public List<SagaInterest> getSagasInterestedIn(Class<? extends NewtonEvent> eventClass) {
     String eventName = eventClass.getName();
-    return sagaInterestStore.getOrDefault(eventName, Collections.emptyList());
+    return new ArrayList<>(sagaInterestStore.getOrDefault(eventName, emptySet()));
   }
 
   @Override
