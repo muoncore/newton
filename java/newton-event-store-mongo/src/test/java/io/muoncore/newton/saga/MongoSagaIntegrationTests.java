@@ -106,7 +106,7 @@ public class MongoSagaIntegrationTests {
   @Test
   public void sagaCanBeStartedViaIntent() throws InterruptedException {
     TestSaga testSaga = sagaBus.dispatch(
-      new SagaIntent<>(TestSaga.class, new OrderRequestedEvent())).waitForCompletion(TimeUnit.MINUTES, 1);
+      new SagaIntent<>(TestSaga.class, new TriggerATestSagaEvent())).waitForCompletion(TimeUnit.MINUTES, 1);
 
     assertTrue(testSaga.isComplete());
   }
@@ -114,7 +114,7 @@ public class MongoSagaIntegrationTests {
   @Test
   public void sagaCanBeLoadedLater() {
     SagaMonitor<TestSaga> sagaMonitor = sagaBus.dispatch(
-      new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
+      new SagaIntent<>(TestSaga.class, new TriggerATestSagaEvent()));
 
     Optional<TestSaga> load = sagaRepository.load(sagaMonitor.getId(), TestSaga.class);
 
@@ -125,7 +125,7 @@ public class MongoSagaIntegrationTests {
   @Test
   public void sagaCanBeMonitoredLater() {
     SagaMonitor<TestSaga> sagaMonitor = sagaBus.dispatch(
-      new SagaIntent<>(TestSaga.class, new OrderRequestedEvent()));
+      new SagaIntent<>(TestSaga.class, new TriggerATestSagaEvent()));
 
     SagaMonitor<TestSaga> monitor = sagaFactory.monitor(sagaMonitor.getId(), TestSaga.class);
 
@@ -135,7 +135,6 @@ public class MongoSagaIntegrationTests {
 
   @Test
   public void multiStepSagaWorkflow() throws InterruptedException {
-
     SagaMonitor<ComplexSaga> sagaMonitor = sagaBus.dispatch(
       new SagaIntent<>(ComplexSaga.class, new OrderRequestedEvent()));
 
@@ -316,4 +315,9 @@ public class MongoSagaIntegrationTests {
     }
   }
 
+  @Getter
+  @ToString
+  public static class TriggerATestSagaEvent implements NewtonEvent {
+    private final String id = UUID.randomUUID().toString();
+  }
 }

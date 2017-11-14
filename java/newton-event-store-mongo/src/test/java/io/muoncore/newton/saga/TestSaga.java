@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 @SagaStreamConfig(aggregateRoots = MongoSagaTestAggregate.class)
 public class TestSaga extends StatefulSaga {
   @StartSagaWith
-  public void start(MongoSagaIntegrationTests.OrderRequestedEvent event) {
+  public void start(MongoSagaIntegrationTests.TriggerATestSagaEvent event) {
     end();
   }
 }
