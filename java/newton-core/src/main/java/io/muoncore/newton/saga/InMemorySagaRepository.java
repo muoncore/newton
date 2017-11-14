@@ -73,7 +73,7 @@ public class InMemorySagaRepository implements SagaRepository {
   @Override
   public List<SagaInterest> getSagasInterestedIn(Class<? extends NewtonEvent> eventClass) {
     String eventName = eventClass.getName();
-    return sagaInterestStore.get(eventName);
+    return sagaInterestStore.getOrDefault(eventName, Collections.emptyList());
   }
 
   @Override

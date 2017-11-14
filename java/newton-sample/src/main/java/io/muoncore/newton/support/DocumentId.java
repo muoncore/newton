@@ -3,25 +3,20 @@ package io.muoncore.newton.support;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import org.bson.types.ObjectId;
+//import org.bson.types.ObjectId;
 
 import java.io.Serializable;
+import java.util.UUID;
 
 public final class DocumentId implements Serializable, Comparable<DocumentId>/*, AggregateRootId*/ {
 
-	private ObjectId objectId;
+	private String objectId;
 
 	public DocumentId() {
-		this.objectId = new ObjectId();
+		this.objectId = UUID.randomUUID().toString();
 	}
 
 	private DocumentId(String objectId) {
-		if (objectId != null) {
-			this.objectId = new ObjectId(objectId);
-		}
-	}
-
-	private DocumentId(ObjectId objectId) {
 		this.objectId = objectId;
 	}
 
@@ -30,22 +25,18 @@ public final class DocumentId implements Serializable, Comparable<DocumentId>/*,
 		return new DocumentId(value);
 	}
 
-	public static DocumentId valueOf(ObjectId value) {
-		return new DocumentId(value);
-	}
-
-	public ObjectId getObjectId() {
+	public String getObjectId() {
 		return objectId;
 	}
 
 	@JsonValue
 	public String getValue() {
-		return objectId.toHexString();
+		return objectId;
 	}
 
 	@Override
 	public String toString() {
-		return objectId != null ? objectId.toHexString() : null;
+		return objectId;
 	}
 
 	@Override

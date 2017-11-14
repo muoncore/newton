@@ -8,13 +8,10 @@ import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.mongodb.core.query.Criteria;
-import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,12 +20,14 @@ import java.util.List;
 @Slf4j
 public class TaskViewStore extends SharedDatastoreView {
 
-  private MongoTemplate mongoTemplate;
+  private List<TaskView> views = new ArrayList<>();
+
+//  private MongoTemplate mongoTemplate;
 
   @Autowired
-  public TaskViewStore(StreamSubscriptionManager streamSubscriptionManager, MongoTemplate mongoTemplate1) throws IOException {
+  public TaskViewStore(StreamSubscriptionManager streamSubscriptionManager/*, MongoTemplate mongoTemplate1*/) throws IOException {
     super(streamSubscriptionManager);
-    this.mongoTemplate = mongoTemplate1;
+//    this.mongoTemplate = mongoTemplate1;
   }
 
 //  @Override
@@ -48,26 +47,31 @@ public class TaskViewStore extends SharedDatastoreView {
   }
 
   public TaskView findById(DocumentId id) {
-    return mongoTemplate.findById(id, TaskView.class);
+    //return mongoTemplate.findById(id, TaskView.class);
+    return views.stream().filter(taskView -> taskView.getId().equals(id)).findFirst().orElse(null);
   }
 
   public List<TaskView> listAll() {
-    return mongoTemplate.findAll(TaskView.class);
+    //return mongoTemplate.findAll(TaskView.class);
+    return views;
   }
 
   @EventHandler
   public void handle(TaskCreatedEvent event) {
-    if (TenantContextHolder.getTenantId() == null){
-      throw new IllegalStateException("Tenant context unavailable!!!!");
-    }
-    mongoTemplate.save(new TaskView(event.getId(), event.getDescription(), TenantContextHolder.getTenantId()));
+//    if (TenantContextHolder.getTenantId() == null){
+//      throw new IllegalStateException("Tenant context unavailable!!!!");
+//    }
+//    mongoTemplate.save(new TaskView(event.getId(), event.getDescription(), TenantContextHolder.getTenantId()));
+
+    views.add(new TaskView(event.getId(), event.getDescription(), TenantContextHolder.getTenantId()));
   }
 
   @EventHandler
   public void handle(TaskDescriptionChangedEvent event) {
     log.info("Processing description update into view " + event);
-    Update update = new Update();
-    update.set("description", event.getDescription());
-    mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(event.getId().getObjectId())), update, Task.class);
+//    Update update = new Update();
+//    update.set("description", event.getDescription());
+//    mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(event.getId().getObjectId())), update, Task.class);
+    findById(event.getId()).setDescription(event.getDescription());
   }
 }

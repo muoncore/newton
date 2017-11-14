@@ -28,7 +28,7 @@ dependencies {
   compile 'org.springframework.boot:spring-boot'
   compile 'org.springframework.boot:spring-boot-autoconfigure'
   compile 'org.springframework.boot:spring-boot-starter-web'
-  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+//  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
 
   testCompile 'io.muoncore:test-event-store:0.0.14'
   testCompile 'com.github.javafaker:javafaker:0.13'

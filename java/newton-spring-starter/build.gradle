@@ -20,7 +20,7 @@ def springVersion = '1.5.2.RELEASE'
 
 dependencies {
   compile project(path: ':newton-core')
-  compile project(path: ':newton-event-store-mongo')
+//  compile project(path: ':newton-event-store-mongo')
 
 //  compile 'io.muoncore:muon-core:7.4.1'
 //  compile 'io.muoncore.protocol:stack-event:0.0.4'

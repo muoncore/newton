@@ -17,6 +17,18 @@ import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+/**
+ * Sagas, aka Process Managers are long running transactional components in Newton. They can be through of as state
+ * machines that consume events from other parts of the system and produce Commands to mutate it further.
+ *
+ * `SagaStreamManager` manages the lifecycle of Saga instances.  App code instances of a Saga are discovered at boot time
+ * by this class and then instantiated from the spring app context as necessary whenever an event arrives that a particular
+ * Saga is interested in. This interest comes in the form of @{@link StartSagaWith} annotations to describe how a process should begin,
+ * or via {@link SagaInterest} registrations that describe subsequent steps in the workflow.
+ *
+ * @see SagaInterest
+ * @see StartSagaWith
+ */
 @Slf4j
 public class SagaStreamManager {
 
