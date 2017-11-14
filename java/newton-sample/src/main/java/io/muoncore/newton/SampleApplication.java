@@ -2,7 +2,6 @@ package io.muoncore.newton;
 
 import io.muoncore.newton.todo.TenantEvent;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
-import io.muoncore.newton.mongodb.config.MongoConfiguration;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
@@ -11,7 +10,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -20,7 +18,6 @@ import java.util.function.Consumer;
 @ComponentScan
 @EnableAutoConfiguration
 @EnableNewton
-@Import(MongoConfiguration.class)
 @Configuration
 @Slf4j
 public class SampleApplication {
