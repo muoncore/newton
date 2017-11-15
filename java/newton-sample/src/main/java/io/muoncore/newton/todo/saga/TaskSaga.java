@@ -44,7 +44,6 @@ public class TaskSaga extends StatefulSaga {
 	@EventHandler
 	public void handle(TaskDescriptionChangedEvent event) {
 		log.debug("Ending saga");
+		end();
 	}
-
-
 }

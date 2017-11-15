@@ -1,17 +1,29 @@
-
 plugins {
   id 'com.github.johnrengelman.shadow' version '2.0.1'
 }
 
+def springVersion = '1.5.2.RELEASE'
+
 dependencies {
-  compile "io.muoncore:muon-core:7.4.1"
-  compile "io.muoncore.protocol:stack-event:0.0.4"
-  compile "io.muoncore.protocol:stack-rpc:0.0.5"
-  compile "io.muoncore.protocol:stack-reactive-streams:0.0.4"
+  compile 'io.muoncore:muon-core:7.4.1'
+  compile 'io.muoncore.protocol:stack-event:0.0.4'
+  compile 'io.muoncore.protocol:stack-reactive-streams:0.0.4'
+  compile 'io.muoncore.protocol:stack-rpc:0.0.5'
 
+  compile 'commons-beanutils:commons-beanutils:1.9.3'
+  compile 'org.apache.commons:commons-lang3:3.5'
   compile 'org.jgroups:jgroups:4.0.1.Final'
-}
+  compile 'org.springframework.data:spring-data-commons:1.13.0.RELEASE' // Todo - Spring Boot equivalent?
+  compile "org.springframework.boot:spring-boot:$springVersion"
+  compile "org.springframework.boot:spring-boot-autoconfigure:$springVersion"
+  compile 'org.reflections:reflections:0.9.11'
 
+  shadow 'org.javassist:javassist:3.21.0-GA'
+
+  testCompile 'io.muoncore:test-event-store:0.0.14'
+  testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
+  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
+}
 
 publishing {
   publications {
@@ -22,7 +34,8 @@ publishing {
       artifact packageJavadoc
       pom.withXml {
         asNode().appendNode('name', "Newton Core")
-        asNode().appendNode('description', 'Newton is a framework for build distributed DDD applications on top of the Muon event log API')
+        asNode().appendNode('description', 'Newton is a framework for build distributed DDD applications on top of ' +
+          'the Muon event log API')
         asNode().appendNode('url', 'http://muoncore.io')
         def license = asNode().appendNode("licenses").appendNode("license")
         license.appendNode("name", "The GNU Lesser General Public License, Version 3.0")
@@ -45,6 +58,7 @@ publishing {
 task sourceJar(type: Jar) {
   from sourceSets.main.allJava
 }
+
 task packageJavadoc(type: Jar) {
   from javadoc
   classifier = 'javadoc'

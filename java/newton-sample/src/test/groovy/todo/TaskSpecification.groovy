@@ -3,6 +3,9 @@ package todo
 import com.github.javafaker.Faker
 import com.google.common.base.Stopwatch
 import groovyx.net.http.RESTClient
+import io.muoncore.newton.eventsource.AggregateRootUtil
+import io.muoncore.newton.todo.Task
+import io.muoncore.newton.utils.muon.MuonLookupUtils
 import org.junit.Rule
 import spock.lang.Ignore
 import spock.lang.Shared
@@ -36,11 +39,15 @@ class TaskSpecification extends Specification {
       ]
     )
 
+    println "RESP $resp"
+
     this.id = resp.getHeaders("Location")[0].getValue().split("/").last()
+    println "ID $id"
     then:
     resp.status == 201
 
     new PollingConditions(timeout: 5).eventually {
+      println "events ${eventSubscriptionRule.getEventsRaised()}"
       eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskCreatedEvent" }
     }
 
@@ -48,13 +55,16 @@ class TaskSpecification extends Specification {
 
   @Unroll
   def "Change task description run #i"() {
+
+    println "EVENT ID IS ${this.id}"
+
     def st = Stopwatch.createStarted()
-    this.description = faker.lorem().word()
+    def newdescription = faker.lorem().word()
     when:
     def resp = rc.put(
       path: "/api/tasks/${this.id}",
       body: [
-        description: this.description
+        description: newdescription
       ]
     )
     then:
@@ -63,8 +73,8 @@ class TaskSpecification extends Specification {
     new PollingConditions(timeout: 5).eventually {
       eventSubscriptionRule.getEventsRaised().find { it.eventType = "TaskDescriptionChangedEvent" }
     }
-//    where:
-//    i << (1..25)
+    where:
+    i << (1..5)
   }
 
   def "Get task details"() {

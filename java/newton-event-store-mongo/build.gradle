@@ -1,0 +1,23 @@
+group 'io.muoncore.newton'
+version '0.0.15-SNAPSHOT'
+
+apply plugin: 'java'
+
+sourceCompatibility = 1.8
+
+repositories {
+  mavenCentral()
+}
+
+def springVersion = '1.5.2.RELEASE'
+
+dependencies {
+  compile project(path: ':newton-core')
+
+  compile 'org.springframework.data:spring-data-mongodb:1.10.0.RELEASE'
+
+  testCompile group: 'junit', name: 'junit', version: '4.12'
+  testCompile 'io.muoncore:test-event-store:0.0.14'
+  testCompile "org.springframework.boot:spring-boot-starter-test:$springVersion"
+  testCompile 'org.spockframework:spock-spring:1.1-groovy-2.4-rc-4'
+}

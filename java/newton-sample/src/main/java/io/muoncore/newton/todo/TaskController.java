@@ -3,6 +3,7 @@ package io.muoncore.newton.todo;
 import com.google.common.base.Stopwatch;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.command.CommandIntent;
+import io.muoncore.newton.eventsource.AggregateRootUtil;
 import io.muoncore.newton.support.DocumentId;
 import io.muoncore.newton.support.TenantContextHolder;
 import lombok.Data;
@@ -34,6 +35,7 @@ public class TaskController {
 
   @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> create(@RequestBody @Valid CreateRequest createRequest){
+
     //todo: remove once a better way is found to set tenantId
     TenantContextHolder.setTenantId("test-tenant");
     final DocumentId id = new DocumentId();
@@ -49,6 +51,7 @@ public class TaskController {
 
   @RequestMapping(value = "/{id}",method = RequestMethod.PUT, consumes = MediaType.APPLICATION_JSON_VALUE)
   public void changeDescription(@PathVariable("id") DocumentId id, @RequestBody @Valid ChangeDescriptionRequest request){
+    log.info("Changing description of task with Id:" + id);
     final Stopwatch stopwatch = Stopwatch.createStarted();
     this.commandBus.dispatch(
       CommandIntent.builder(ChangeTaskDescriptionCommand.class.getName())
