@@ -7,7 +7,6 @@ import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
 import io.muoncore.newton.command.CommandBus;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.query.EventStreamIndexStore;
-import io.muoncore.newton.query.InMemEventStreamIndexStore;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -39,14 +38,22 @@ public class InMemorySagaConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(SagaStreamManager.class)
-  public SagaStreamManager sagaStreamManager(StreamSubscriptionManager streamSubscriptionManager, SagaRepository sagaRepository, CommandBus commandBus, SagaInterestMatcher sagaInterestMatcher, SagaFactory sagaFactory, SagaLoader sagaLoader) {
-    return new SagaStreamManager(streamSubscriptionManager, sagaRepository, commandBus, sagaInterestMatcher, sagaFactory, sagaLoader);
+  public SagaStreamManager sagaStreamManager(StreamSubscriptionManager streamSubscriptionManager,
+                                             SagaRepository sagaRepository, CommandBus commandBus,
+                                             SagaInterestMatcher sagaInterestMatcher, SagaFactory sagaFactory,
+                                             SagaLoader sagaLoader) {
+    return new SagaStreamManager(streamSubscriptionManager, sagaRepository, commandBus, sagaInterestMatcher,
+                                 sagaFactory, sagaLoader);
   }
 
   @Bean
   @ConditionalOnMissingBean(StreamSubscriptionManager.class)
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
-    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, eventStreamProcessor);
+  public StreamSubscriptionManager subscriptionManager(EventClient eventClient,
+                                                       EventStreamIndexStore eventStreamIndexStore,
+                                                       LockService lockService,
+                                                       EventStreamProcessor eventStreamProcessor) {
+    return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService,
+                                                           eventStreamProcessor);
   }
 
   @Bean

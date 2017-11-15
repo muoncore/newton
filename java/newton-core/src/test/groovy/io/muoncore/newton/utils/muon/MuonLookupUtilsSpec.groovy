@@ -7,7 +7,6 @@ import spock.lang.Specification
 class MuonLookupUtilsSpec extends Specification {
 
   def "decorates correctly"() {
-
     def ev = new MetaEvent()
     def meta = new Event("", "", "", "", "", "", "", 123l, 321l, Collections.EMPTY_MAP, null)
 
@@ -16,11 +15,10 @@ class MuonLookupUtilsSpec extends Specification {
 
     then:
     decorated.meta != null
-
   }
 
   class MetaEvent extends NewtonEventWithMeta {
-    String id = "hello-world";
+    String id = "hello-world"
   }
 
 }

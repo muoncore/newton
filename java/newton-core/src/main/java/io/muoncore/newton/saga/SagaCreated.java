@@ -8,7 +8,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class SagaCreated {
-    private String sagaClassName;
-    private Object eventId;
-    private String sagaId;
+  private String sagaClassName;
+  private Object eventId;
+  private String sagaId;
 }

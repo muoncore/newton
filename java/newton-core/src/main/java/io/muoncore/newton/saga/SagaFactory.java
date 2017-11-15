@@ -6,12 +6,12 @@ import com.google.common.eventbus.Subscribe;
 import io.muoncore.api.MuonFuture;
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.command.CommandBus;
+import io.muoncore.newton.command.CommandIntent;
 import io.muoncore.newton.command.CommandResult;
 import io.muoncore.newton.eventsource.muon.MuonEventSourceRepository;
+import io.muoncore.newton.saga.events.SagaEndEvent;
 import io.muoncore.newton.saga.events.SagaLifecycleEvent;
 import lombok.extern.slf4j.Slf4j;
-import io.muoncore.newton.command.CommandIntent;
-import io.muoncore.newton.saga.events.SagaEndEvent;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
@@ -37,7 +37,8 @@ public class SagaFactory implements ApplicationContextAware {
   }
 
   public void autowire(Saga saga) {
-    applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(saga, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
+    applicationContext.getAutowireCapableBeanFactory()
+                      .autowireBeanProperties(saga, AutowireCapableBeanFactory.AUTOWIRE_BY_TYPE, false);
   }
 
   public void notifySagaLifeCycle(Object id, SagaLifecycleEvent event) {
@@ -48,10 +49,10 @@ public class SagaFactory implements ApplicationContextAware {
   public <T extends Saga> SagaMonitor<T> create(Class<T> sagaType, NewtonEvent payload) {
     log.debug("Creating new saga of type " + sagaType + " with payload " + payload);
     T saga = (T) loadFromSpringContext(sagaType);
-    final T thesaga = saga;
+    final T theSaga = saga;
 
     return MuonEventSourceRepository.executeCausedBy(payload, () -> {
-      thesaga.startWith(payload);
+      theSaga.startWith(payload);
 
       sagaRepository.saveNewSaga(saga, payload);
 
@@ -63,7 +64,6 @@ public class SagaFactory implements ApplicationContextAware {
 
       return monitor;
     });
-
   }
 
   public <T extends Saga> SagaMonitor<T> monitor(String sagaId, Class<T> type) {
@@ -81,19 +81,16 @@ public class SagaFactory implements ApplicationContextAware {
       MuonFuture<CommandResult> dispatch = commandBus.dispatch(intent);
       try {
         CommandResult commandResult = dispatch.get();
-        commandResult.getFailure().ifPresent(event -> {
-          MuonEventSourceRepository.executeCausedBy(event, () -> {
-            saga.handle(event);
-            processCommands(saga);
-            return null;
-          });
-        });
+        commandResult.getFailure().ifPresent(event -> MuonEventSourceRepository.executeCausedBy(event, () -> {
+          saga.handle(event);
+          processCommands(saga);
+          return null;
+        }));
       } catch (InterruptedException | ExecutionException e) {
         log.warn("Error extracting the command result for a saga", e);
       }
     }
   }
-
 
   @Override
   public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {

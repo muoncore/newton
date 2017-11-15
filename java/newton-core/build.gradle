@@ -11,8 +11,9 @@ dependencies {
   compile 'io.muoncore.protocol:stack-rpc:0.0.5'
 
   compile 'commons-beanutils:commons-beanutils:1.9.3'
+  compile 'org.apache.commons:commons-lang3:3.5'
   compile 'org.jgroups:jgroups:4.0.1.Final'
-  compile "org.springframework.data:spring-data-commons:1.13.0.RELEASE" // Todo - Spring Boot equivalent?
+  compile 'org.springframework.data:spring-data-commons:1.13.0.RELEASE' // Todo - Spring Boot equivalent?
   compile "org.springframework.boot:spring-boot:$springVersion"
   compile "org.springframework.boot:spring-boot-autoconfigure:$springVersion"
   compile 'org.reflections:reflections:0.9.11'

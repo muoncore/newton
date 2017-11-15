@@ -55,7 +55,7 @@ public class InMemorySagaRepository implements SagaRepository {
     sagaCreatedStore.put(eventId, sagasCreated);
   }
 
-    private void clearInterests(Saga saga) {
+  private void clearInterests(Saga saga) {
     List<SagaInterest> interests = saga.getNewSagaInterests();
 
     for (SagaInterest interest : interests) {
@@ -95,5 +95,17 @@ public class InMemorySagaRepository implements SagaRepository {
   @Override
   public List<SagaCreated> getSagasCreatedByEventId(Object id) {
     return sagaCreatedStore.get(id);
+  }
+
+  protected Map<String, Saga> getSagaStore() {
+    return this.sagaStore;
+  }
+
+  protected Map<Object, List<SagaCreated>> getSagaCreatedStore() {
+    return sagaCreatedStore;
+  }
+
+  protected Map<String, Set<SagaInterest>> getSagaInterestStore() {
+    return sagaInterestStore;
   }
 }
