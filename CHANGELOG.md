@@ -4,6 +4,10 @@
 
 [Full Changelog](https://github.com/muoncore/newton/compare/v0.0.13...HEAD)
 
+**Implemented enhancements:**
+
+- Remove mongo [\#23](https://github.com/muoncore/newton/issues/23)
+
 **Closed issues:**
 
 - test-event-store:0.0.11-SNAPSHOT not available in Artifactory for netwon-spring-starter [\#70](https://github.com/muoncore/newton/issues/70)
