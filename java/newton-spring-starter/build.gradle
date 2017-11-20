@@ -11,7 +11,7 @@ apply plugin: 'maven'
 
 repositories {
   maven {
-    url 'http://artifactory.cloud.daviddawson.me/artifactory/muon'
+    url 'https://artifactory.cloud.daviddawson.me/artifactory/muon'
   }
   jcenter()
 }

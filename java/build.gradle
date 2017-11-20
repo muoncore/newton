@@ -6,7 +6,7 @@ buildscript {
     maven { url 'http://artifactory.cloud.daviddawson.me/artifactory/muon' }
   }
   dependencies {
-    classpath 'io.muoncore.release:muon-java-release:0.0.8'
+    classpath 'io.muoncore.release:muon-java-release:0.0.10'
     classpath 'io.franzbecker:gradle-lombok:1.8'
     classpath 'org.jfrog.buildinfo:build-info-extractor-gradle:3.2.0'
   }
