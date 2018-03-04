@@ -1,6 +1,6 @@
 package io.muoncore.newton.eventsource.muon;
 
-import io.muoncore.newton.AggregateEventClient;
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.query.InMemoryQueryConfiguration;
 import io.muoncore.protocol.event.client.EventClient;
@@ -69,7 +69,7 @@ public class ManualEventSourceTenantTest {
 		}
 
 		@Bean
-		public EventSourceRepository<TestAggregate> eventSourceRepository(EventClient eventClient, AggregateEventClient aggregateEventClient) {
+		public EventSourceRepository<TestAggregate> eventSourceRepository(EventClient eventClient, NewtonEventClient aggregateEventClient) {
 			return new TestEventSourceRepository(TestAggregate.class, aggregateEventClient, eventClient);
 		}
 	}
@@ -86,8 +86,8 @@ public class ManualEventSourceTenantTest {
 
 	public static class TestEventSourceRepository extends MuonEventSourceRepository<TestAggregate> {
 
-		public TestEventSourceRepository(Class<TestAggregate> type, AggregateEventClient aggregateEventClient, EventClient eventClient) {
-			super(type, aggregateEventClient, eventClient, new NoOpEventStreamProcessor(), "faked-app");
+		public TestEventSourceRepository(Class<TestAggregate> type, NewtonEventClient aggregateEventClient, EventClient eventClient) {
+			super(type, aggregateEventClient, new NoOpEventStreamProcessor(), "faked-app");
 		}
 	}
 }

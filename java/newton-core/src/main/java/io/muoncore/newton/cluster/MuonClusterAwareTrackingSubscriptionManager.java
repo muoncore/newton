@@ -1,6 +1,7 @@
 package io.muoncore.newton.cluster;
 
 import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.eventsource.EventTypeNotFound;
 import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
@@ -22,7 +23,7 @@ import java.util.function.Consumer;
 public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscriptionManager {
 
   private final int RECONNECTION_BACKOFF = 5000;
-  private EventClient eventClient;
+  private NewtonEventClient eventClient;
   private EventStreamIndexStore eventStreamIndexStore;
   private LockService lockService;
   private EventStreamProcessor eventStreamProcessor;
@@ -30,7 +31,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
   private final Executor worker = Executors.newCachedThreadPool();
   private final Executor pool = Executors.newCachedThreadPool();
 
-  public MuonClusterAwareTrackingSubscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
+  public MuonClusterAwareTrackingSubscriptionManager(NewtonEventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
     this.eventClient = eventClient;
     this.eventStreamIndexStore = eventStreamIndexStore;
     this.lockService = lockService;

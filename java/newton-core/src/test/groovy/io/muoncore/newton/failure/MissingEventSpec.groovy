@@ -3,6 +3,7 @@ package io.muoncore.newton.failure
 import io.muoncore.newton.EventHandler
 import io.muoncore.newton.InMemoryTestConfiguration
 import io.muoncore.newton.NewtonEvent
+import io.muoncore.newton.NewtonEventClient
 import io.muoncore.newton.StreamSubscriptionManager
 import io.muoncore.newton.domainservice.EventDrivenDomainService
 import io.muoncore.newton.eventsource.EventTypeNotFound
@@ -25,7 +26,7 @@ class MissingEventSpec extends Specification {
   MyEventService eventService
 
   @Autowired
-  EventClient eventClient
+  NewtonEventClient eventClient
 
   def "when receives a non existent event type, is cast to EventTypeNotFound"() {
 
@@ -62,7 +63,7 @@ class FailConfig {
 class MyEventService extends EventDrivenDomainService {
 
   @Autowired
-  EventClient client
+  NewtonEventClient client
 
   EventTypeNotFound ev;
   SubsequentEvent ev2

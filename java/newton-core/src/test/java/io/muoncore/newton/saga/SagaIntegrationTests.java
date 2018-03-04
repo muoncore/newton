@@ -1,9 +1,6 @@
 package io.muoncore.newton.saga;
 
-import io.muoncore.newton.EnableNewton;
-import io.muoncore.newton.EventHandler;
-import io.muoncore.newton.InMemoryTestConfiguration;
-import io.muoncore.newton.NewtonEvent;
+import io.muoncore.newton.*;
 import io.muoncore.newton.command.*;
 import io.muoncore.newton.eventsource.EventSourceRepository;
 import io.muoncore.newton.eventsource.muon.TestAggregate;
@@ -60,7 +57,7 @@ public class SagaIntegrationTests {
   @Autowired
   private CommandBus commandBus;
   @Autowired
-  private EventClient eventClient;
+  private NewtonEventClient eventClient;
 
   @Autowired
   private EventSourceRepository<SagaTestAggregate> testAggregateRepo;
@@ -226,7 +223,7 @@ public class SagaIntegrationTests {
   @Component
   public static class TakePayment implements Command {
     @Autowired
-    private EventClient eventClient;
+    private NewtonEventClient eventClient;
     private String orderId;
 
     public void setId(String id) {
@@ -254,7 +251,7 @@ public class SagaIntegrationTests {
   @Slf4j
   public static class ShipOrder implements Command {
     @Autowired
-    private EventClient eventClient;
+    private NewtonEventClient eventClient;
     private String orderId;
 
     public void setId(String id) {

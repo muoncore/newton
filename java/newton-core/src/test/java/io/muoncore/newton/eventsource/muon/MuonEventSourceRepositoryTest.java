@@ -2,7 +2,7 @@ package io.muoncore.newton.eventsource.muon;
 
 import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.memory.transport.InMemTransport;
-import io.muoncore.newton.AggregateEventClient;
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.EventStoreException;
 import io.muoncore.newton.InMemoryTestConfiguration;
 import io.muoncore.newton.NewtonEvent;
@@ -34,7 +34,7 @@ public class MuonEventSourceRepositoryTest {
   private TestEventStore eventStore;
 
   @Autowired
-  private AggregateEventClient client;
+  private NewtonEventClient client;
 
 //	@Autowired
 //	private TestEventSourceRepo repository;

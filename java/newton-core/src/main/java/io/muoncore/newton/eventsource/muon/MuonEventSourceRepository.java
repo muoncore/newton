@@ -23,19 +23,16 @@ import java.util.stream.Collectors;
 public class MuonEventSourceRepository<A extends AggregateRoot> implements EventSourceRepository<A> {
 
 	private Class<A> aggregateType;
-	private AggregateEventClient aggregateEventClient;
-	private EventClient eventClient;
+	private NewtonEventClient eventClient;
 	private EventStreamProcessor processor;
 	private String streamName;
 
 	public MuonEventSourceRepository(Class<A> type,
-                                   AggregateEventClient aggregateEventClient,
-                                   EventClient eventClient,
+                                   NewtonEventClient aggregateEventClient,
                                    EventStreamProcessor eventStreamProcessor, String appName) {
 		aggregateType = type;
 		this.processor = eventStreamProcessor;
-		this.aggregateEventClient = aggregateEventClient;
-		this.eventClient = eventClient;
+		this.eventClient = aggregateEventClient;
 		this.streamName = AggregateRootUtil.getAggregateRootStream(type, appName);
 	}
 
@@ -157,7 +154,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   }
 
   private String createAggregateStreamName(Object aggregateIdentifier) {
-    return aggregateEventClient.createAggregateStreamName(aggregateIdentifier.toString(), aggregateType);
+    return eventClient.createAggregateStreamName(aggregateIdentifier.toString(), aggregateType);
   }
 
   @Override
@@ -172,7 +169,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 
   private List<NewtonEvent> replayEvents(Object id) {
 		try {
-			List<NewtonEvent> events = aggregateEventClient.loadAggregateRoot(id.toString(), aggregateType).get()
+			List<NewtonEvent> events = eventClient.loadAggregateRoot(id.toString(), aggregateType).get()
 				.stream()
 				.map(event -> {
           Class<? extends NewtonEvent> domainClass = MuonLookupUtils.getDomainClass(event);
@@ -198,7 +195,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   }
 
 	private void emitForAggregatePersistence(A aggregate) {
-		aggregateEventClient.publishDomainEvents(
+		eventClient.publishDomainEvents(
 			aggregate.getId().toString(),
       aggregateType,
       processor.processForPersistence(aggregate.getNewOperations()), cause.get());

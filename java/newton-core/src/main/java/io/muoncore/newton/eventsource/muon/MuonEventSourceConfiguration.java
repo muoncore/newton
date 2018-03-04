@@ -6,7 +6,7 @@ import io.muoncore.codec.Codecs;
 import io.muoncore.codec.json.JsonOnlyCodecs;
 import io.muoncore.config.AutoConfiguration;
 import io.muoncore.config.MuonConfigBuilder;
-import io.muoncore.newton.AggregateEventClient;
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.*;
 import io.muoncore.newton.query.EventStreamIndexStore;
@@ -26,6 +26,9 @@ public class MuonEventSourceConfiguration {
 
   @Value("${spring.application.name}")
   private String applicationName;
+
+  @Value("${newton.token}")
+  private String authToken;
 
   @Bean
   @Profile("!test")
@@ -57,13 +60,13 @@ public class MuonEventSourceConfiguration {
   }
 
   @Bean
-  public AggregateEventClient aggregateEventClient(EventClient eventClient) {
-    return new AggregateEventClient(eventClient);
+  public NewtonEventClient aggregateEventClient(EventClient eventClient) {
+    return new NewtonEventClient(eventClient, authToken);
   }
 
   @ConditionalOnMissingBean(StreamSubscriptionManager.class)
   @Bean
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
+  public StreamSubscriptionManager subscriptionManager(NewtonEventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
     return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, eventStreamProcessor);
   }
 

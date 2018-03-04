@@ -1,11 +1,14 @@
 package io.muoncore.newton;
 
 
+import io.muoncore.api.MuonFuture;
 import io.muoncore.exception.MuonException;
+import io.muoncore.protocol.Auth;
 import io.muoncore.protocol.event.ClientEvent;
 import io.muoncore.protocol.event.Event;
 import io.muoncore.protocol.event.EventBuilder;
 import io.muoncore.protocol.event.client.EventClient;
+import io.muoncore.protocol.event.client.EventReplayControl;
 import io.muoncore.protocol.event.client.EventReplayMode;
 import io.muoncore.protocol.event.client.EventResult;
 import lombok.extern.slf4j.Slf4j;
@@ -14,17 +17,20 @@ import org.reactivestreams.Subscription;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 
 @Slf4j
-public class AggregateEventClient {
+public class NewtonEventClient {
 
   private EventClient client;
+  private Auth auth;
 
-  public AggregateEventClient(EventClient client) {
+  public NewtonEventClient(EventClient client, String authToken) {
     this.client = client;
+    this.auth = new Auth("aether", authToken);
   }
 
   /**
@@ -54,7 +60,7 @@ public class AggregateEventClient {
 
       ClientEvent ev = payload.build();
 
-      EventResult result = client.event(ev);
+      EventResult result = client.event(ev, auth);
 
       if (result.getStatus() == EventResult.EventResultStatus.FAILED) {
         throw new MuonException("Failed to persist domain event " + domainEvent + ":" + result.getCause());
@@ -69,7 +75,7 @@ public class AggregateEventClient {
 
     String stream = createAggregateStreamName(id, type);
 
-    client.replay(stream, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
+    client.replay(stream, auth, EventReplayMode.REPLAY_ONLY, new Subscriber<Event>() {
       @Override
       public void onSubscribe(Subscription s) {
         s.request(Long.MAX_VALUE);
@@ -97,5 +103,21 @@ public class AggregateEventClient {
 
   public String createAggregateStreamName(String id, Class type) {
     return "/aggregate/" + type.getSimpleName() + "/" + id;
+  }
+
+  public EventResult event(ClientEvent event) {
+    return this.client.event(event, auth);
+  }
+
+  public MuonFuture<EventResult> eventAsync(ClientEvent event) {
+    return this.client.eventAsync(event, auth);
+  }
+
+  public <X> MuonFuture<EventReplayControl> replay(String streamName, EventReplayMode mode, Subscriber<Event> subscriber) {
+    return this.client.replay(streamName, auth, mode, subscriber);
+  }
+
+  public <X> MuonFuture<EventReplayControl> replay(String streamName, EventReplayMode mode, Map<String, Object> args, Subscriber<Event> subscriber) {
+    return this.client.replay(streamName, auth, mode, args, subscriber);
   }
 }

@@ -1,5 +1,6 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.command.Command;
 import io.muoncore.newton.saga.events.SagaEndEvent;
 import io.muoncore.protocol.event.ClientEvent;
@@ -18,7 +19,7 @@ public class SagaEndCommand implements Command {
   private String id;
 
   @Autowired
-  transient private EventClient eventClient;
+  transient private NewtonEventClient eventClient;
 
   @Override
   public void execute() {

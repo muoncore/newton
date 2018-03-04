@@ -1,6 +1,7 @@
 package io.muoncore.newton.saga;
 
 import io.muoncore.Muon;
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
@@ -48,7 +49,7 @@ public class InMemorySagaConfiguration {
 
   @Bean
   @ConditionalOnMissingBean(StreamSubscriptionManager.class)
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient,
+  public StreamSubscriptionManager subscriptionManager(NewtonEventClient eventClient,
                                                        EventStreamIndexStore eventStreamIndexStore,
                                                        LockService lockService,
                                                        EventStreamProcessor eventStreamProcessor) {

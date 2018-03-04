@@ -1,5 +1,6 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.LockService;
 import io.muoncore.newton.cluster.MuonClusterAwareTrackingSubscriptionManager;
@@ -35,7 +36,7 @@ public class TestSagaConfiguration {
   }
 
   @Bean
-  public StreamSubscriptionManager subscriptionManager(EventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
+  public StreamSubscriptionManager subscriptionManager(NewtonEventClient eventClient, EventStreamIndexStore eventStreamIndexStore, LockService lockService, EventStreamProcessor eventStreamProcessor) {
     return new MuonClusterAwareTrackingSubscriptionManager(eventClient, eventStreamIndexStore, lockService, eventStreamProcessor);
   }
 

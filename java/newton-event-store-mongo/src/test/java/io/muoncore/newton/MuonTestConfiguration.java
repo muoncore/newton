@@ -89,8 +89,8 @@ public class MuonTestConfiguration {
 	}
 
 	@Bean
-	public AggregateEventClient aggregateEventClient(EventClient eventClient) {
-		return new AggregateEventClient(eventClient);
+	public NewtonEventClient aggregateEventClient(EventClient eventClient) {
+		return new NewtonEventClient(eventClient, "unknown-token");
 	}
 
 	@Bean
