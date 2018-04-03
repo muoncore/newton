@@ -22,7 +22,7 @@ public abstract class EventDrivenDomainService extends BaseStreamSubscriber {
   @Override
   protected Consumer<Consumer<NewtonEvent>> run(String stream) {
     return consumer -> {
-      streamSubscriptionManager.globallyUniqueSubscription(getClass().getSimpleName() + "-" + stream, stream, consumer);
+      streamSubscriptionManager.globallyUniqueSubscriptionFromNow(getClass().getSimpleName() + "-" + stream, stream, consumer);
     };
   }
 

@@ -2,6 +2,7 @@ package io.muoncore.newton;
 
 import io.muoncore.MultiTransportMuon;
 import io.muoncore.Muon;
+import io.muoncore.codec.Codecs;
 import io.muoncore.codec.json.JsonOnlyCodecs;
 import io.muoncore.config.AutoConfiguration;
 import io.muoncore.config.MuonConfigBuilder;
@@ -14,7 +15,9 @@ import io.muoncore.newton.eventsource.muon.EventStreamProcessor;
 import io.muoncore.newton.eventsource.muon.NoOpEventStreamProcessor;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.query.InMemEventStreamIndexStore;
+import io.muoncore.newton.saga.SagaIntegrationTests;
 import io.muoncore.newton.saga.SagaLoader;
+import io.muoncore.protocol.event.Event;
 import io.muoncore.protocol.event.client.DefaultEventClient;
 import io.muoncore.protocol.event.client.EventClient;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,6 +26,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 //@Profile("test")
 @Configuration
@@ -66,8 +71,10 @@ public class InMemoryTestConfiguration {
     );
   }
 
+  public static String EXISTING_EVENT_ID;
+
   @Bean
-  public TestEventStore testEventStore() throws InterruptedException {
+  public TestEventStore testEventStore(Codecs codecs) throws InterruptedException {
     AutoConfiguration config = MuonConfigBuilder.withServiceIdentifier("photon-mini")
                                                 .withTags("eventstore")
                                                 .build();
@@ -76,7 +83,34 @@ public class InMemoryTestConfiguration {
                                        Collections.singletonList(new InMemTransport(config, bus())),
                                        new JsonOnlyCodecs());
 
-    return new TestEventStore(muon);
+    TestEventStore testEventStore = new TestEventStore(muon);
+
+    createPreExistingEvent(codecs, testEventStore);
+
+    return testEventStore;
+  }
+
+  private void createPreExistingEvent(Codecs codecs, TestEventStore testEventStore) {
+    testEventStore.setOrderid(new AtomicLong(2));
+
+    SagaIntegrationTests.OrderRequestedEvent orderRequestedEvent = new SagaIntegrationTests.OrderRequestedEvent();
+    EXISTING_EVENT_ID = orderRequestedEvent.getId();
+
+    Codecs.EncodingResult encode = codecs.encode(orderRequestedEvent, codecs.getAvailableCodecs());
+
+    testEventStore.getHistory().add(new Event(
+      "123456789",
+      "OrderRequestedEvent",
+      "TestAggregate",
+      null,
+      null,
+      null,
+      "faked-service",
+      2L,
+      System.currentTimeMillis(),
+      codecs.decode(encode.getPayload(), encode.getContentType(), Map.class),
+      null
+    ));
   }
 
   @Bean

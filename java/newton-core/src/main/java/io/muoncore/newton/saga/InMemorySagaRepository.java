@@ -94,7 +94,7 @@ public class InMemorySagaRepository implements SagaRepository {
 
   @Override
   public List<SagaCreated> getSagasCreatedByEventId(Object id) {
-    return sagaCreatedStore.get(id);
+    return sagaCreatedStore.getOrDefault(id, new ArrayList<>());
   }
 
   protected Map<String, Saga> getSagaStore() {

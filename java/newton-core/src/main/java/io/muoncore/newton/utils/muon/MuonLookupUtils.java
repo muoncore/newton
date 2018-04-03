@@ -2,7 +2,6 @@ package io.muoncore.newton.utils.muon;
 
 import io.muoncore.newton.NewtonEvent;
 import io.muoncore.newton.NewtonEventWithMeta;
-import io.muoncore.newton.streams.RebuildingStreamView;
 import io.muoncore.newton.saga.Saga;
 import io.muoncore.newton.AggregateRoot;
 import io.muoncore.protocol.event.Event;
@@ -23,8 +22,6 @@ public class MuonLookupUtils {
 	private static Map<String, Class<? extends Saga>> sagaTypeMappings;
 	private static Map<String, Class<? extends NewtonEvent>> eventTypeMappings;
 	private static Map<String, Class<? extends AggregateRoot>> aggregateRootMappings;
-
-	private static Map<String, Class> views;
 
 	static CountDownLatch ready = new CountDownLatch(1);
 
@@ -47,12 +44,6 @@ public class MuonLookupUtils {
       .addScanners(new SubTypesScanner())
       .addScanners(new TypeAnnotationsScanner())
       .setUrls(urls));
-
-    final Set<Class<?>> rebuildingViewTypes = reflections.getTypesAnnotatedWith(RebuildingStreamView.class);
-    views = new HashMap<>();
-    for (Class<?> cibecsEvent : rebuildingViewTypes) {
-      views.put(cibecsEvent.getSimpleName(), cibecsEvent);
-    }
 
     final Set<Class<? extends NewtonEvent>> eventTypes = reflections.getSubTypesOf(NewtonEvent.class);
 		eventTypeMappings = new HashMap<>();

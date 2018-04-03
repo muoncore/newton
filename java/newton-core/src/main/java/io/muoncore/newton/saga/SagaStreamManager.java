@@ -100,7 +100,7 @@ public class SagaStreamManager {
     for (String stream : streams) {
       if (!subscribedStreams.contains(stream)) {
         subscribedStreams.add(stream);
-        streamSubscriptionManager.globallyUniqueSubscription("saga-manager-" + stream, stream, event -> {
+        streamSubscriptionManager.globallyUniqueSubscriptionFromNow("saga-manager-" + stream, stream, event -> {
           worker.execute(() -> {
             processEvent(event);
           });

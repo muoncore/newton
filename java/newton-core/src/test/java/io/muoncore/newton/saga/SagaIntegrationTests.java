@@ -1,5 +1,6 @@
 package io.muoncore.newton.saga;
 
+import io.muoncore.eventstore.TestEventStore;
 import io.muoncore.newton.*;
 import io.muoncore.newton.command.*;
 import io.muoncore.newton.eventsource.EventSourceRepository;
@@ -46,6 +47,7 @@ import static org.junit.Assert.*;
 @SpringBootTest
 @EnableNewton("io.muoncore.newton.saga")
 @ComponentScan
+@Slf4j
 public class SagaIntegrationTests {
 
   @Autowired
@@ -61,6 +63,21 @@ public class SagaIntegrationTests {
 
   @Autowired
   private EventSourceRepository<SagaTestAggregate> testAggregateRepo;
+
+  @Autowired
+  TestEventStore eventStore;
+
+  @Test
+  public void sagaIsNotStartedByPreExistingEvent() throws InterruptedException {
+
+    Thread.sleep(2000);
+
+    List<SagaCreated> sagas = sagaRepository.getSagasCreatedByEventId(InMemoryTestConfiguration.EXISTING_EVENT_ID);
+
+    log.info("SAGAS = " + sagas);
+
+    assertEquals(0, sagas.size());
+  }
 
   @Test
   public void sagaCommandFailureCallsFailedEventHandler() throws InterruptedException {

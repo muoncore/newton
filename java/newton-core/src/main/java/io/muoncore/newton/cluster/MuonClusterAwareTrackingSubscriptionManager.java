@@ -68,7 +68,7 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
       streamName,
       EventReplayMode.REPLAY_THEN_LIVE,
       new EventSubscriber(event -> {
-        log.debug("NewtonEvent received " + event);
+        log.trace("NewtonEvent received " + event);
         final NewtonEvent newtonEvent = MuonLookupUtils.decorateMeta(event.getPayload(MuonLookupUtils.getDomainClass(event)), event);
         worker.execute(() -> {
           eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
@@ -93,19 +93,21 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
     });
   }
 
-//  @Override
-//  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
-//    //TODO
-//  }
-
   @Override
-  public void localHotSubscription(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+  public void globallyUniqueSubscriptionFromNow(String subscriptionName, String stream, Consumer<NewtonEvent> onData) {
+    lockService.executeAndRepeatWithLock(subscriptionName, control -> {
 
-    //TODO, implement this properly.
-    throw new IllegalStateException("BORKED");
-//    repeatUntilCleanlyRuns(subscriptionName, () -> {
-//      subscription(stream, onData);
-//    });
+      EventStreamIndex eventStreamIndex = getEventStreamIndex(subscriptionName, stream);
+      if (eventStreamIndex.getLastSeen() == 0) {
+        localHotTrackingSubscription(subscriptionName, stream, onData, throwable -> {
+          control.releaseLock();
+        });
+      } else {
+        localTrackingSubscription(subscriptionName, stream, onData, error -> {
+          control.releaseLock();
+        });
+      }
+    });
   }
 
   @Override
@@ -146,6 +148,32 @@ public class MuonClusterAwareTrackingSubscriptionManager implements StreamSubscr
         }
 
         eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
+        NewtonEvent newtonEvent;
+        if (eventType == null) {
+          newtonEvent = new EventTypeNotFound(event.getOrderId(), event);
+        } else {
+          newtonEvent = MuonLookupUtils.decorateMeta(event.getPayload(eventType), event);
+        }
+        worker.execute(() -> {
+          eventStreamProcessor.executeWithinEventContext(newtonEvent, onData);
+        });
+      }, onError));
+  }
+
+  private void localHotTrackingSubscription(String subscriptionName, String streamName, Consumer<NewtonEvent> onData, Consumer<Throwable> onError) {
+
+    log.info("Subscribing to HOT data on event stream {} '{}'", subscriptionName, streamName);
+
+    Map args = new HashMap();
+    args.put("sub-name", subscriptionName);
+
+    eventClient.replay(
+      streamName,
+      EventReplayMode.LIVE_ONLY,
+      args,
+      new EventSubscriber(event -> {
+        eventStreamIndexStore.save(new EventStreamIndex(subscriptionName, event.getOrderId()==null?0l:event.getOrderId()));
+        Class<? extends NewtonEvent> eventType = MuonLookupUtils.getDomainClass(event);
         NewtonEvent newtonEvent;
         if (eventType == null) {
           newtonEvent = new EventTypeNotFound(event.getOrderId(), event);
