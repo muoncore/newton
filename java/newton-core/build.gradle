@@ -5,7 +5,7 @@ plugins {
 def springVersion = '1.5.2.RELEASE'
 
 dependencies {
-  compile 'io.muoncore:muon-core:7.4.1'
+  compile 'io.muoncore:muon-core:8.0.2'
   compile 'io.muoncore.protocol:stack-event:0.0.9'
   compile 'io.muoncore.protocol:stack-reactive-streams:0.0.8'
   compile 'io.muoncore.protocol:stack-rpc:0.0.8'

@@ -30,6 +30,7 @@ public class MuonEventSourceConfiguration {
   @Value("${newton.token}")
   private String authToken;
 
+  @ConditionalOnMissingBean(Muon.class)
   @Bean
   @Profile("!test")
   public Muon muon(Codecs codecs, @Value("${muon.amqp.url}") String amqpUrl){
