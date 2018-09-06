@@ -44,9 +44,9 @@ public class SagaStreamManagerTest {
         manager.processSaga(SagaWithConfig.class);
 
         verify(subscriptionManager,
-                times(1)).globallyUniqueSubscription(eq("saga-manager-stream"), eq("stream"), any());
+                times(1)).globallyUniqueSubscriptionFromNow(eq("saga-manager-stream"), eq("stream"), any());
         verify(subscriptionManager,
-                times(1)).globallyUniqueSubscription(eq("saga-manager-stream2"), eq("stream2"), any());
+                times(1)).globallyUniqueSubscriptionFromNow(eq("saga-manager-stream2"), eq("stream2"), any());
     }
 
     @Test
@@ -57,7 +57,7 @@ public class SagaStreamManagerTest {
         manager.processSaga(SagaWithConfig.class);
 
         verify(subscriptionManager,
-                times(1)).globallyUniqueSubscription(eq("saga-manager-stream"), eq("stream"), any());
+                times(1)).globallyUniqueSubscriptionFromNow(eq("saga-manager-stream"), eq("stream"), any());
     }
 
     @Test
@@ -81,7 +81,7 @@ public class SagaStreamManagerTest {
         manager.processSaga(SagaWithConfig.class);
 
         verify(subscriptionManager,
-                times(1)).globallyUniqueSubscription(eq("saga-manager-stream"), eq("stream"), eventStreamCaptor.capture());
+                times(1)).globallyUniqueSubscriptionFromNow(eq("saga-manager-stream"), eq("stream"), eventStreamCaptor.capture());
 
         SagaEvent ev = new SagaEvent();
         eventStreamCaptor.getValue().accept(ev);
@@ -113,7 +113,7 @@ public class SagaStreamManagerTest {
         when(sagaRepository.load(eq(sagaId), eq(SagaWithCommands.class))).thenReturn(Optional.of(saga));
 
 
-        verify(subscriptionManager).globallyUniqueSubscription(eq("saga-manager-mystream"), eq("mystream"), eventStreamCaptor.capture());
+        verify(subscriptionManager).globallyUniqueSubscriptionFromNow(eq("saga-manager-mystream"), eq("mystream"), eventStreamCaptor.capture());
 
         eventStreamCaptor.getValue().accept(new SagaEvent());
 

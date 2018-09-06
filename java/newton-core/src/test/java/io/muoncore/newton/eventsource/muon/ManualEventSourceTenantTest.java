@@ -87,7 +87,7 @@ public class ManualEventSourceTenantTest {
 	public static class TestEventSourceRepository extends MuonEventSourceRepository<TestAggregate> {
 
 		public TestEventSourceRepository(Class<TestAggregate> type, NewtonEventClient aggregateEventClient, EventClient eventClient) {
-			super(type, aggregateEventClient, new NoOpEventStreamProcessor(), "faked-app");
+			super(type, new NoOpAggregateRootSnapshotRepository(), aggregateEventClient, new NoOpEventStreamProcessor(), "faked-app");
 		}
 	}
 }

@@ -1,5 +1,6 @@
 package io.muoncore.newton.eventsource.muon;
 
+import io.muoncore.exception.MuonException;
 import io.muoncore.newton.*;
 import io.muoncore.newton.eventsource.*;
 import io.muoncore.newton.utils.muon.MuonLookupUtils;
@@ -26,11 +27,14 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 	private NewtonEventClient eventClient;
 	private EventStreamProcessor processor;
 	private String streamName;
+	private AggregateRootSnapshotRepository snapshotRepository;
 
 	public MuonEventSourceRepository(Class<A> type,
+                                   AggregateRootSnapshotRepository snapshotRepository,
                                    NewtonEventClient aggregateEventClient,
                                    EventStreamProcessor eventStreamProcessor, String appName) {
 		aggregateType = type;
+		this.snapshotRepository = snapshotRepository;
 		this.processor = eventStreamProcessor;
 		this.eventClient = aggregateEventClient;
 		this.streamName = AggregateRootUtil.getAggregateRootStream(type, appName);
@@ -49,10 +53,18 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
   @Override
 	public A load(Object aggregateIdentifier) {
 		try {
-			A aggregate = aggregateType.newInstance();
-			replayEvents(aggregateIdentifier).forEach(aggregate::handleEvent);
-			if (aggregate.isDeleted()) throw new AggregateNotFoundException(aggregateIdentifier);
-			return aggregate;
+			AggregateRoot aggregate = snapshotRepository.getLatestSnapshot(aggregateIdentifier).orElseGet(() -> {
+        try {
+          AggregateRoot ag = aggregateType.newInstance();
+          replayEvents(aggregateIdentifier).forEach(ag::handleEvent);
+          return ag;
+        } catch (InstantiationException | IllegalAccessException e) {
+          throw new MuonException("Error creating new instance of Aggregate", e);
+        }
+      });
+
+      if (aggregate.isDeleted()) throw new AggregateNotFoundException(aggregateIdentifier);
+			return (A) aggregate;
 		} catch (EventStoreException | AggregateNotFoundException e) {
       throw e;
 		} catch (Exception e) {
@@ -91,6 +103,7 @@ public class MuonEventSourceRepository<A extends AggregateRoot> implements Event
 		emitForStreamProcessing(aggregate);
 		List<NewtonEvent> events = new ArrayList<>(aggregate.getNewOperations());
 		aggregate.getNewOperations().clear();
+		snapshotRepository.persist(aggregate);
 		return events;
 	}
 

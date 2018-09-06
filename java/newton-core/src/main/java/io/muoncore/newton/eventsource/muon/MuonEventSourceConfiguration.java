@@ -9,6 +9,7 @@ import io.muoncore.config.MuonConfigBuilder;
 import io.muoncore.newton.NewtonEventClient;
 import io.muoncore.newton.StreamSubscriptionManager;
 import io.muoncore.newton.cluster.*;
+import io.muoncore.newton.eventsource.AggregateRootSnapshotRepository;
 import io.muoncore.newton.query.EventStreamIndexStore;
 import io.muoncore.newton.saga.SagaLoader;
 import io.muoncore.protocol.event.client.DefaultEventClient;
@@ -41,6 +42,12 @@ public class MuonEventSourceConfiguration {
       }).build();
 
     return MuonBuilder.withConfig(config).withCodecs(codecs).build();
+  }
+
+  @ConditionalOnMissingBean(AggregateRootSnapshotRepository.class)
+  @Bean
+  public AggregateRootSnapshotRepository aggregateRootSnapshotRepository() {
+    return new NoOpAggregateRootSnapshotRepository();
   }
 
   @ConditionalOnMissingBean(Codecs.class)
